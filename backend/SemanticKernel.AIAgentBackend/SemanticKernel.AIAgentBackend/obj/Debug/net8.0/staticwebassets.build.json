@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "dbqlmNB+W9tOiMSSlyCoSZ5RmXEvp1elAvrQpRcbgec=",
+  "Source": "SemanticKernel.AIAgentBackend",
+  "BasePath": "_content/SemanticKernel.AIAgentBackend",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

@@ -1,0 +1,6 @@
+@SemanticKernel.AIAgentBackend_HostAddress = http://localhost:5085
+
+GET {{SemanticKernel.AIAgentBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
