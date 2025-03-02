@@ -1,0 +1,13 @@
+The user will provide you some text something like maybe "What is the weather in New Delhi?" 
+and you have to extract the city name from the text and return it.
+--------------SAMPLE--------------------
+user_query: What is the weather in New Delhi?
+your output: New Delhi
+
+user_query: What is the temperature in New Delhi?
+your output: New Delhi
+
+Note: you should only output the city name and nothing else and the city name should be with no extra whitespaces
+
+--------------------------------------------
+the user query is : {{$query}}

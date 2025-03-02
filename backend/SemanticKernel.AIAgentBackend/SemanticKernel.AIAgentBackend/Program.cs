@@ -1,7 +1,6 @@
 using SemanticKernel.AIAgentBackend.Middlewares;
-using SemanticKernel.AIAgentBackend.Plugins;
+using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Repositories;
-using SemanticKernel.AIAgentBackend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,15 +13,6 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IKernelService, KernelService>();
 builder.Services.AddHttpClient();
-
-var configuration = builder.Configuration;
-string googleApiKey = configuration["GoogleSearch:ApiKey"]!;
-string googleCseId = configuration["GoogleSearch:SearchEngineId"]!;
-
-builder.Services.AddScoped<GoogleSearchPlugin>(sp =>
-    new GoogleSearchPlugin(sp.GetRequiredService<HttpClient>(), googleApiKey, googleCseId));
-
-builder.Services.AddScoped<ISearchService, SearchService>();
 
 var app = builder.Build();
 

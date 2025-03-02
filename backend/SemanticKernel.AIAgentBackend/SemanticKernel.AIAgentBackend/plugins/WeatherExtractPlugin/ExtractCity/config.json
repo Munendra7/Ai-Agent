@@ -1,0 +1,18 @@
+{
+  "$schema": 1,
+  "type": "completion",
+  "description": "Extract city from user query",
+  "execution_settings": {
+    "default": {
+      "max_tokens": 50,
+      "temperature": 0
+    }
+  },
+  "input_variables": [
+    {
+      "name": "query",
+      "description": "User's Query",
+      "required": true
+    }
+  ]
+}

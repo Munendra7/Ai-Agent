@@ -56,7 +56,11 @@
             },
             "Microsoft.SemanticKernel.Connectors.Ollama": {
               "target": "Package",
-              "version": "[1.36.1-alpha, )"
+              "version": "[1.40.0-alpha, )"
+            },
+            "Microsoft.SemanticKernel.Planners.Handlebars": {
+              "target": "Package",
+              "version": "[1.40.0-preview, )"
             },
             "Microsoft.SemanticKernel.Plugins.Core": {
               "target": "Package",

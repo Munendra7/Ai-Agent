@@ -90,7 +90,47 @@
           }
         }
       },
-      "Microsoft.Bcl.AsyncInterfaces/8.0.0": {
+      "Handlebars.Net/2.1.6": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/Handlebars.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Handlebars.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Handlebars.Net.Helpers/2.4.10": {
+        "type": "package",
+        "dependencies": {
+          "Handlebars.Net.Helpers.Core": "2.4.10",
+          "System.Text.RegularExpressions": "4.3.1"
+        },
+        "compile": {
+          "lib/net8.0/Handlebars.Net.Helpers.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/Handlebars.Net.Helpers.dll": {}
+        }
+      },
+      "Handlebars.Net.Helpers.Core/2.4.10": {
+        "type": "package",
+        "dependencies": {
+          "Handlebars.Net": "2.1.6",
+          "Stef.Validation": "0.1.1",
+          "System.Text.RegularExpressions": "4.3.1"
+        },
+        "compile": {
+          "lib/net8.0/HandlebarsDotNet.Helpers.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/HandlebarsDotNet.Helpers.Core.dll": {}
+        }
+      },
+      "Microsoft.Bcl.AsyncInterfaces/9.0.0": {
         "type": "package",
         "compile": {
           "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
@@ -101,6 +141,9 @@
           "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       },
       "Microsoft.Bcl.HashCode/1.1.1": {
@@ -130,16 +173,16 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
-      "Microsoft.Extensions.AI/9.1.0-preview.1.25064.3": {
+      "Microsoft.Extensions.AI/9.3.0-preview.1.25114.11": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.AI.Abstractions": "9.1.0-preview.1.25064.3",
-          "Microsoft.Extensions.Caching.Abstractions": "9.0.1",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.1",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.1",
-          "System.Diagnostics.DiagnosticSource": "9.0.1",
-          "System.Text.Json": "9.0.1",
-          "System.Threading.Channels": "9.0.1"
+          "Microsoft.Extensions.AI.Abstractions": "9.3.0-preview.1.25114.11",
+          "Microsoft.Extensions.Caching.Abstractions": "9.0.2",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.2",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.2",
+          "System.Diagnostics.DiagnosticSource": "9.0.2",
+          "System.Text.Json": "9.0.2",
+          "System.Threading.Channels": "9.0.2"
         },
         "compile": {
           "lib/net8.0/Microsoft.Extensions.AI.dll": {
@@ -176,10 +219,10 @@
           "buildMultiTargeting/Microsoft.Extensions.ApiDescription.Server.targets": {}
         }
       },
-      "Microsoft.Extensions.Caching.Abstractions/9.0.1": {
+      "Microsoft.Extensions.Caching.Abstractions/9.0.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "9.0.1"
+          "Microsoft.Extensions.Primitives": "9.0.2"
         },
         "compile": {
           "lib/net8.0/Microsoft.Extensions.Caching.Abstractions.dll": {
@@ -272,7 +315,7 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
-      "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.1": {
+      "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.2": {
         "type": "package",
         "compile": {
           "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
@@ -374,11 +417,11 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
-      "Microsoft.Extensions.Logging.Abstractions/9.0.1": {
+      "Microsoft.Extensions.Logging.Abstractions/9.0.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.1",
-          "System.Diagnostics.DiagnosticSource": "9.0.1"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.2",
+          "System.Diagnostics.DiagnosticSource": "9.0.2"
         },
         "compile": {
           "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll": {
@@ -437,7 +480,7 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
-      "Microsoft.Extensions.Primitives/9.0.1": {
+      "Microsoft.Extensions.Primitives/9.0.2": {
         "type": "package",
         "compile": {
           "lib/net8.0/Microsoft.Extensions.Primitives.dll": {
@@ -464,6 +507,24 @@
           "lib/net8.0/Microsoft.Extensions.VectorData.Abstractions.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "Microsoft.NETCore.Platforms/1.1.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/_._": {}
+        },
+        "runtime": {
+          "lib/netstandard1.0/_._": {}
+        }
+      },
+      "Microsoft.NETCore.Targets/1.1.3": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/_._": {}
+        },
+        "runtime": {
+          "lib/netstandard1.0/_._": {}
         }
       },
       "Microsoft.OpenApi/1.6.14": {
@@ -520,13 +581,13 @@
           }
         }
       },
-      "Microsoft.SemanticKernel.Connectors.Ollama/1.36.1-alpha": {
+      "Microsoft.SemanticKernel.Connectors.Ollama/1.40.0-alpha": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.AI": "9.1.0-preview.1.25064.3",
-          "Microsoft.SemanticKernel.Abstractions": "1.36.1",
-          "Microsoft.SemanticKernel.Core": "1.36.1",
-          "OllamaSharp": "4.0.17"
+          "Microsoft.Extensions.AI": "9.3.0-preview.1.25114.11",
+          "Microsoft.SemanticKernel.Abstractions": "1.40.0",
+          "Microsoft.SemanticKernel.Core": "1.40.0",
+          "OllamaSharp": "5.0.7"
         },
         "compile": {
           "lib/net8.0/Microsoft.SemanticKernel.Connectors.Ollama.dll": {
@@ -575,6 +636,24 @@
           }
         }
       },
+      "Microsoft.SemanticKernel.Planners.Handlebars/1.40.0-preview": {
+        "type": "package",
+        "dependencies": {
+          "Handlebars.Net": "2.1.6",
+          "Microsoft.SemanticKernel.Core": "1.40.0",
+          "Microsoft.SemanticKernel.PromptTemplates.Handlebars": "1.40.0"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.SemanticKernel.Planners.Handlebars.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.SemanticKernel.Planners.Handlebars.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.SemanticKernel.Plugins.Core/1.40.0-alpha": {
         "type": "package",
         "dependencies": {
@@ -612,6 +691,24 @@
           }
         }
       },
+      "Microsoft.SemanticKernel.PromptTemplates.Handlebars/1.40.0": {
+        "type": "package",
+        "dependencies": {
+          "Handlebars.Net": "2.1.6",
+          "Handlebars.Net.Helpers": "2.4.10",
+          "Microsoft.SemanticKernel.Core": "1.40.0"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.SemanticKernel.PromptTemplates.Handlebars.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.SemanticKernel.PromptTemplates.Handlebars.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets/1.21.0": {
         "type": "package",
         "build": {
@@ -632,19 +729,19 @@
           }
         }
       },
-      "OllamaSharp/4.0.17": {
+      "OllamaSharp/5.0.7": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "8.0.0",
-          "Microsoft.Extensions.AI.Abstractions": "9.0.1-preview.1.24570.5"
+          "Microsoft.Bcl.AsyncInterfaces": "9.0.0",
+          "Microsoft.Extensions.AI.Abstractions": "9.3.0-preview.1.25114.11"
         },
         "compile": {
-          "lib/netstandard2.0/OllamaSharp.dll": {
+          "lib/net8.0/OllamaSharp.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.0/OllamaSharp.dll": {
+          "lib/net8.0/OllamaSharp.dll": {
             "related": ".xml"
           }
         }
@@ -664,6 +761,15 @@
           "lib/net8.0/OpenAI.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "Stef.Validation/0.1.1": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/Stef.Validation.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/Stef.Validation.dll": {}
         }
       },
       "Swashbuckle.AspNetCore/6.6.2": {
@@ -746,7 +852,7 @@
           }
         }
       },
-      "System.Diagnostics.DiagnosticSource/9.0.1": {
+      "System.Diagnostics.DiagnosticSource/9.0.2": {
         "type": "package",
         "compile": {
           "lib/net8.0/System.Diagnostics.DiagnosticSource.dll": {
@@ -769,7 +875,7 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "System.IO.Pipelines/9.0.1": {
+      "System.IO.Pipelines/9.0.2": {
         "type": "package",
         "compile": {
           "lib/net8.0/System.IO.Pipelines.dll": {
@@ -829,7 +935,19 @@
           "lib/netcoreapp2.0/_._": {}
         }
       },
-      "System.Text.Encodings.Web/9.0.1": {
+      "System.Runtime/4.3.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3"
+        },
+        "compile": {
+          "ref/netstandard1.5/System.Runtime.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "System.Text.Encodings.Web/9.0.2": {
         "type": "package",
         "compile": {
           "lib/net8.0/System.Text.Encodings.Web.dll": {
@@ -851,11 +969,11 @@
           }
         }
       },
-      "System.Text.Json/9.0.1": {
+      "System.Text.Json/9.0.2": {
         "type": "package",
         "dependencies": {
-          "System.IO.Pipelines": "9.0.1",
-          "System.Text.Encodings.Web": "9.0.1"
+          "System.IO.Pipelines": "9.0.2",
+          "System.Text.Encodings.Web": "9.0.2"
         },
         "compile": {
           "lib/net8.0/System.Text.Json.dll": {
@@ -871,7 +989,19 @@
           "buildTransitive/net8.0/System.Text.Json.targets": {}
         }
       },
-      "System.Threading.Channels/9.0.1": {
+      "System.Text.RegularExpressions/4.3.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Runtime": "4.3.1"
+        },
+        "compile": {
+          "ref/netcoreapp1.1/System.Text.RegularExpressions.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/System.Text.RegularExpressions.dll": {}
+        }
+      },
+      "System.Threading.Channels/9.0.2": {
         "type": "package",
         "compile": {
           "lib/net8.0/System.Threading.Channels.dll": {
@@ -1003,10 +1133,71 @@
         "lib/netstandard2.0/Google.Apis.CustomSearchAPI.v1.xml"
       ]
     },
-    "Microsoft.Bcl.AsyncInterfaces/8.0.0": {
-      "sha512": "3WA9q9yVqJp222P3x1wYIGDAkpjAku0TMUaaQV22g6L67AI0LdOIrVS7Ht2vJfLHGSPVuqN94vIr15qn+HEkHw==",
+    "Handlebars.Net/2.1.6": {
+      "sha512": "WsYWCEXsIM6hEOSOSRHtIYLjC8BnbT5MVmqhNKRqUI7qiv0t8x3nJiBTEv0ZZfvUAMAFnadGIzSsS/U2anVG1Q==",
       "type": "package",
-      "path": "microsoft.bcl.asyncinterfaces/8.0.0",
+      "path": "handlebars.net/2.1.6",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "handlebars.net.2.1.6.nupkg.sha512",
+        "handlebars.net.nuspec",
+        "hbnet-icon.png",
+        "lib/net451/Handlebars.dll",
+        "lib/net451/Handlebars.xml",
+        "lib/net6.0/Handlebars.dll",
+        "lib/net6.0/Handlebars.xml",
+        "lib/netstandard1.3/Handlebars.dll",
+        "lib/netstandard1.3/Handlebars.xml",
+        "lib/netstandard2.0/Handlebars.dll",
+        "lib/netstandard2.0/Handlebars.xml",
+        "lib/netstandard2.1/Handlebars.dll",
+        "lib/netstandard2.1/Handlebars.xml"
+      ]
+    },
+    "Handlebars.Net.Helpers/2.4.10": {
+      "sha512": "RKpqCkGsK56n8ddCe0O5ovlsBTFXKT5Q1pHUKmIUkSRYJc/0FWEBxAFrcE+2yNs06EODOYGfWC6ZKWLlP5dzXQ==",
+      "type": "package",
+      "path": "handlebars.net.helpers/2.4.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "handlebars.net.helpers.2.4.10.nupkg.sha512",
+        "handlebars.net.helpers.nuspec",
+        "lib/net451/Handlebars.Net.Helpers.dll",
+        "lib/net452/Handlebars.Net.Helpers.dll",
+        "lib/net46/Handlebars.Net.Helpers.dll",
+        "lib/net6.0/Handlebars.Net.Helpers.dll",
+        "lib/net8.0/Handlebars.Net.Helpers.dll",
+        "lib/netstandard1.3/Handlebars.Net.Helpers.dll",
+        "lib/netstandard2.0/Handlebars.Net.Helpers.dll",
+        "lib/netstandard2.1/Handlebars.Net.Helpers.dll"
+      ]
+    },
+    "Handlebars.Net.Helpers.Core/2.4.10": {
+      "sha512": "47Lf4GaKHHA2MhJ5iITJXctYQNBS20kxtn5nkc1K1Eh1RBOXDuArdSKNy+7SGgl3RyEuQVmsrl3EMVE1u/FBbA==",
+      "type": "package",
+      "path": "handlebars.net.helpers.core/2.4.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "handlebars.net.helpers.core.2.4.10.nupkg.sha512",
+        "handlebars.net.helpers.core.nuspec",
+        "lib/net451/HandlebarsDotNet.Helpers.Core.dll",
+        "lib/net452/HandlebarsDotNet.Helpers.Core.dll",
+        "lib/net46/HandlebarsDotNet.Helpers.Core.dll",
+        "lib/net6.0/HandlebarsDotNet.Helpers.Core.dll",
+        "lib/net8.0/HandlebarsDotNet.Helpers.Core.dll",
+        "lib/netstandard1.3/HandlebarsDotNet.Helpers.Core.dll",
+        "lib/netstandard2.0/HandlebarsDotNet.Helpers.Core.dll",
+        "lib/netstandard2.1/HandlebarsDotNet.Helpers.Core.dll"
+      ]
+    },
+    "Microsoft.Bcl.AsyncInterfaces/9.0.0": {
+      "sha512": "owmu2Cr3IQ8yQiBleBHlGk8dSQ12oaF2e7TpzwJKEl4m84kkZJjEY1n33L67Y3zM5jPOjmmbdHjbfiL0RqcMRQ==",
+      "type": "package",
+      "path": "microsoft.bcl.asyncinterfaces/9.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1016,13 +1207,15 @@
         "THIRD-PARTY-NOTICES.TXT",
         "buildTransitive/net461/Microsoft.Bcl.AsyncInterfaces.targets",
         "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/Microsoft.Bcl.AsyncInterfaces.targets",
         "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll",
         "lib/net462/Microsoft.Bcl.AsyncInterfaces.xml",
         "lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.dll",
         "lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.xml",
         "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll",
         "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.xml",
-        "microsoft.bcl.asyncinterfaces.8.0.0.nupkg.sha512",
+        "microsoft.bcl.asyncinterfaces.9.0.0.nupkg.sha512",
         "microsoft.bcl.asyncinterfaces.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -1081,10 +1274,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.AI/9.1.0-preview.1.25064.3": {
-      "sha512": "KtVp9GRTRuJFxka6EOik+Hy/riZ7Nwefmxez2moM7zrQz+7vsiLJ9VIVyEWhi9Vz65MNBxnT3jsqLeaXMM73lA==",
+    "Microsoft.Extensions.AI/9.3.0-preview.1.25114.11": {
+      "sha512": "bv2UzSonUENYNDIQLb7mzabkCAM+YyGTM9MSqhCSPzMTSLf29/jNX9emtNIePrcLdn2yjVhV/AYxw0WWyL2NmQ==",
       "type": "package",
-      "path": "microsoft.extensions.ai/9.1.0-preview.1.25064.3",
+      "path": "microsoft.extensions.ai/9.3.0-preview.1.25114.11",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1098,7 +1291,7 @@
         "lib/net9.0/Microsoft.Extensions.AI.xml",
         "lib/netstandard2.0/Microsoft.Extensions.AI.dll",
         "lib/netstandard2.0/Microsoft.Extensions.AI.xml",
-        "microsoft.extensions.ai.9.1.0-preview.1.25064.3.nupkg.sha512",
+        "microsoft.extensions.ai.9.3.0-preview.1.25114.11.nupkg.sha512",
         "microsoft.extensions.ai.nuspec"
       ]
     },
@@ -1354,10 +1547,10 @@
         "tools/netcoreapp2.1/System.Diagnostics.DiagnosticSource.dll"
       ]
     },
-    "Microsoft.Extensions.Caching.Abstractions/9.0.1": {
-      "sha512": "Eghsg9SyIvq0c8x6cUpe71BbQoOmsytXxqw2+ZNiTnP8a8SBLKgEor1zZeWhC0588IbS2M0PP4gXGAd9qF862Q==",
+    "Microsoft.Extensions.Caching.Abstractions/9.0.2": {
+      "sha512": "a7QhA25n+BzSM5r5d7JznfyluMBGI7z3qyLlFviZ1Eiqv6DdiK27sLZdP/rpYirBM6UYAKxu5TbmfhIy13GN9A==",
       "type": "package",
-      "path": "microsoft.extensions.caching.abstractions/9.0.1",
+      "path": "microsoft.extensions.caching.abstractions/9.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1377,7 +1570,7 @@
         "lib/net9.0/Microsoft.Extensions.Caching.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Caching.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Caching.Abstractions.xml",
-        "microsoft.extensions.caching.abstractions.9.0.1.nupkg.sha512",
+        "microsoft.extensions.caching.abstractions.9.0.2.nupkg.sha512",
         "microsoft.extensions.caching.abstractions.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -1515,10 +1708,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.1": {
-      "sha512": "Tr74eP0oQ3AyC24ch17N8PuEkrPbD0JqIfENCYqmgKYNOmL8wQKzLJu3ObxTUDrjnn4rHoR1qKa37/eQyHmCDA==",
+    "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.2": {
+      "sha512": "MNe7GSTBf3jQx5vYrXF0NZvn6l7hUKF6J54ENfAgCO8y6xjN1XUmKKWG464LP2ye6QqDiA1dkaWEZBYnhoZzjg==",
       "type": "package",
-      "path": "microsoft.extensions.dependencyinjection.abstractions/9.0.1",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/9.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1540,7 +1733,7 @@
         "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
         "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
         "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
-        "microsoft.extensions.dependencyinjection.abstractions.9.0.1.nupkg.sha512",
+        "microsoft.extensions.dependencyinjection.abstractions.9.0.2.nupkg.sha512",
         "microsoft.extensions.dependencyinjection.abstractions.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -1665,10 +1858,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Logging.Abstractions/9.0.1": {
-      "sha512": "w2gUqXN/jNIuvqYwX3lbXagsizVNXYyt6LlF57+tMve4JYCEgCMMAjRce6uKcDASJgpMbErRT1PfHy2OhbkqEA==",
+    "Microsoft.Extensions.Logging.Abstractions/9.0.2": {
+      "sha512": "dV9s2Lamc8jSaqhl2BQSPn/AryDIH2sSbQUyLitLXV0ROmsb+SROnn2cH939JFbsNrnf3mIM3GNRKT7P0ldwLg==",
       "type": "package",
-      "path": "microsoft.extensions.logging.abstractions/9.0.1",
+      "path": "microsoft.extensions.logging.abstractions/9.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1731,7 +1924,7 @@
         "lib/net9.0/Microsoft.Extensions.Logging.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.xml",
-        "microsoft.extensions.logging.abstractions.9.0.1.nupkg.sha512",
+        "microsoft.extensions.logging.abstractions.9.0.2.nupkg.sha512",
         "microsoft.extensions.logging.abstractions.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -1813,10 +2006,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Primitives/9.0.1": {
-      "sha512": "bHtTesA4lrSGD1ZUaMIx6frU3wyy0vYtTa/hM6gGQu5QNrydObv8T5COiGUWsisflAfmsaFOe9Xvw5NSO99z0g==",
+    "Microsoft.Extensions.Primitives/9.0.2": {
+      "sha512": "puBMtKe/wLuYa7H6docBkLlfec+h8L35DXqsDKKJgW0WY5oCwJ3cBJKcDaZchv6knAyqOMfsl6VUbaR++E5LXA==",
       "type": "package",
-      "path": "microsoft.extensions.primitives/9.0.1",
+      "path": "microsoft.extensions.primitives/9.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1836,7 +2029,7 @@
         "lib/net9.0/Microsoft.Extensions.Primitives.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Primitives.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Primitives.xml",
-        "microsoft.extensions.primitives.9.0.1.nupkg.sha512",
+        "microsoft.extensions.primitives.9.0.2.nupkg.sha512",
         "microsoft.extensions.primitives.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -1860,6 +2053,36 @@
         "microsoft.extensions.vectordata.abstractions.9.0.0-preview.1.25078.1.nupkg.sha512",
         "microsoft.extensions.vectordata.abstractions.nuspec",
         "neticon.png"
+      ]
+    },
+    "Microsoft.NETCore.Platforms/1.1.1": {
+      "sha512": "TMBuzAHpTenGbGgk0SMTwyEkyijY/Eae4ZGsFNYJvAr/LDn1ku3Etp3FPxChmDp5HHF3kzJuoaa08N0xjqAJfQ==",
+      "type": "package",
+      "path": "microsoft.netcore.platforms/1.1.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ThirdPartyNotices.txt",
+        "dotnet_library_license.txt",
+        "lib/netstandard1.0/_._",
+        "microsoft.netcore.platforms.1.1.1.nupkg.sha512",
+        "microsoft.netcore.platforms.nuspec",
+        "runtime.json"
+      ]
+    },
+    "Microsoft.NETCore.Targets/1.1.3": {
+      "sha512": "3Wrmi0kJDzClwAC+iBdUBpEKmEle8FQNsCs77fkiOIw/9oYA07bL1EZNX0kQ2OMN3xpwvl0vAtOCYY3ndDNlhQ==",
+      "type": "package",
+      "path": "microsoft.netcore.targets/1.1.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ThirdPartyNotices.txt",
+        "dotnet_library_license.txt",
+        "lib/netstandard1.0/_._",
+        "microsoft.netcore.targets.1.1.3.nupkg.sha512",
+        "microsoft.netcore.targets.nuspec",
+        "runtime.json"
       ]
     },
     "Microsoft.OpenApi/1.6.14": {
@@ -1911,10 +2134,10 @@
         "microsoft.semantickernel.connectors.azureopenai.nuspec"
       ]
     },
-    "Microsoft.SemanticKernel.Connectors.Ollama/1.36.1-alpha": {
-      "sha512": "PE6HqBmiZ9RBB+vPfF5M2iDIJA6fRjsluc3Y8764h2JWuFKOuNaOGB+OFQHkuALKrcT51iBmYL0pL4yAQwOiDA==",
+    "Microsoft.SemanticKernel.Connectors.Ollama/1.40.0-alpha": {
+      "sha512": "TuFez/NNl9T3xmV2ze6yRsQ1bI65DESDCK904+Sc35SaOyJNNLcZYjsfkVik1A7X3x9dyMH8PyjXUO5x/HvDNg==",
       "type": "package",
-      "path": "microsoft.semantickernel.connectors.ollama/1.36.1-alpha",
+      "path": "microsoft.semantickernel.connectors.ollama/1.40.0-alpha",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1924,7 +2147,7 @@
         "lib/net8.0/Microsoft.SemanticKernel.Connectors.Ollama.xml",
         "lib/netstandard2.0/Microsoft.SemanticKernel.Connectors.Ollama.dll",
         "lib/netstandard2.0/Microsoft.SemanticKernel.Connectors.Ollama.xml",
-        "microsoft.semantickernel.connectors.ollama.1.36.1-alpha.nupkg.sha512",
+        "microsoft.semantickernel.connectors.ollama.1.40.0-alpha.nupkg.sha512",
         "microsoft.semantickernel.connectors.ollama.nuspec"
       ]
     },
@@ -1962,6 +2185,23 @@
         "microsoft.semantickernel.core.nuspec"
       ]
     },
+    "Microsoft.SemanticKernel.Planners.Handlebars/1.40.0-preview": {
+      "sha512": "tZnLrlMiRC8bVRVwyczVmFMl7mPRiPXHAd/0ZA/X0Wr8658i363nsZBt3iGLhNL6D4xd2WMlDMjCTJl6EEDedw==",
+      "type": "package",
+      "path": "microsoft.semantickernel.planners.handlebars/1.40.0-preview",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NUGET.md",
+        "icon.png",
+        "lib/net8.0/Microsoft.SemanticKernel.Planners.Handlebars.dll",
+        "lib/net8.0/Microsoft.SemanticKernel.Planners.Handlebars.xml",
+        "lib/netstandard2.0/Microsoft.SemanticKernel.Planners.Handlebars.dll",
+        "lib/netstandard2.0/Microsoft.SemanticKernel.Planners.Handlebars.xml",
+        "microsoft.semantickernel.planners.handlebars.1.40.0-preview.nupkg.sha512",
+        "microsoft.semantickernel.planners.handlebars.nuspec"
+      ]
+    },
     "Microsoft.SemanticKernel.Plugins.Core/1.40.0-alpha": {
       "sha512": "iXzuPo0hLDyrLQYF9R7AkgA6OgCAEG+ELvauF1hV5eWMYWMrWZN+834gPty6xIxHdG48BnSeX2XUpfGG+QIeJQ==",
       "type": "package",
@@ -1994,6 +2234,23 @@
         "lib/netstandard2.0/Microsoft.SemanticKernel.Plugins.Web.xml",
         "microsoft.semantickernel.plugins.web.1.40.0-alpha.nupkg.sha512",
         "microsoft.semantickernel.plugins.web.nuspec"
+      ]
+    },
+    "Microsoft.SemanticKernel.PromptTemplates.Handlebars/1.40.0": {
+      "sha512": "yEOG0S3qsDQUruujR8NpjRdannp4ECTnp3GQ/BErs2Gx57ll6iBUaHHuRgEHEIoOsDKIIYpijTd6zyvL24RjAQ==",
+      "type": "package",
+      "path": "microsoft.semantickernel.prompttemplates.handlebars/1.40.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NUGET.md",
+        "icon.png",
+        "lib/net8.0/Microsoft.SemanticKernel.PromptTemplates.Handlebars.dll",
+        "lib/net8.0/Microsoft.SemanticKernel.PromptTemplates.Handlebars.xml",
+        "lib/netstandard2.0/Microsoft.SemanticKernel.PromptTemplates.Handlebars.dll",
+        "lib/netstandard2.0/Microsoft.SemanticKernel.PromptTemplates.Handlebars.xml",
+        "microsoft.semantickernel.prompttemplates.handlebars.1.40.0.nupkg.sha512",
+        "microsoft.semantickernel.prompttemplates.handlebars.nuspec"
       ]
     },
     "Microsoft.VisualStudio.Azure.Containers.Tools.Targets/1.21.0": {
@@ -2106,19 +2363,25 @@
         "packageIcon.png"
       ]
     },
-    "OllamaSharp/4.0.17": {
-      "sha512": "VZSrgYMyfxRG7aRoLQRV0KtgLuKjKAm98vPA+pGZ6R8H7XCjfsZGLc7GVVJh/kaV6cMTsswkEEcV3h81WcJpsA==",
+    "OllamaSharp/5.0.7": {
+      "sha512": "8OLcHEzGKj6vAO653LA5kWBYE8iAumeNo59PUoJhrYjTWle/Bau+PimPBOhBDQ+/oXckj2CsfJ+3QU4lTaypqw==",
       "type": "package",
-      "path": "ollamasharp/4.0.17",
+      "path": "ollamasharp/5.0.7",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE",
         "Ollama.png",
         "README.md",
+        "lib/net8.0/OllamaSharp.dll",
+        "lib/net8.0/OllamaSharp.xml",
+        "lib/net9.0/OllamaSharp.dll",
+        "lib/net9.0/OllamaSharp.xml",
         "lib/netstandard2.0/OllamaSharp.dll",
         "lib/netstandard2.0/OllamaSharp.xml",
-        "ollamasharp.4.0.17.nupkg.sha512",
+        "lib/netstandard2.1/OllamaSharp.dll",
+        "lib/netstandard2.1/OllamaSharp.xml",
+        "ollamasharp.5.0.7.nupkg.sha512",
         "ollamasharp.nuspec"
       ]
     },
@@ -2140,6 +2403,27 @@
         "lib/netstandard2.0/OpenAI.xml",
         "openai.2.2.0-beta.1.nupkg.sha512",
         "openai.nuspec"
+      ]
+    },
+    "Stef.Validation/0.1.1": {
+      "sha512": "Qecz9CHwt32dAU7MYWINU6QCRZ1B0/anPxzyEJGos9osyMhjrv6C+OZIl3Wl3kLtllu9cGaptTD6nOhW1rMlZw==",
+      "type": "package",
+      "path": "stef.validation/0.1.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net20/Stef.Validation.dll",
+        "lib/net35/Stef.Validation.dll",
+        "lib/net40/Stef.Validation.dll",
+        "lib/net5.0/Stef.Validation.dll",
+        "lib/net6.0/Stef.Validation.dll",
+        "lib/netcoreapp3.1/Stef.Validation.dll",
+        "lib/netstandard1.0/Stef.Validation.dll",
+        "lib/netstandard1.3/Stef.Validation.dll",
+        "lib/netstandard2.0/Stef.Validation.dll",
+        "lib/netstandard2.1/Stef.Validation.dll",
+        "stef.validation.0.1.1.nupkg.sha512",
+        "stef.validation.nuspec"
       ]
     },
     "Swashbuckle.AspNetCore/6.6.2": {
@@ -2262,10 +2546,10 @@
         "system.clientmodel.nuspec"
       ]
     },
-    "System.Diagnostics.DiagnosticSource/9.0.1": {
-      "sha512": "yOcDWx4P/s1I83+7gQlgQLmhny2eNcU0cfo1NBWi+en4EAI38Jau+/neT85gUW6w1s7+FUJc2qNOmmwGLIREqA==",
+    "System.Diagnostics.DiagnosticSource/9.0.2": {
+      "sha512": "z5CMQNLzk8UKnTEHRKb4nq03CCDWBMEF2gfP3oPKZn4F8wip6LFZCP5rF90DREHqdNddScIGAfszXJSjh4drSw==",
       "type": "package",
-      "path": "system.diagnostics.diagnosticsource/9.0.1",
+      "path": "system.diagnostics.diagnosticsource/9.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2289,15 +2573,15 @@
         "lib/net9.0/System.Diagnostics.DiagnosticSource.xml",
         "lib/netstandard2.0/System.Diagnostics.DiagnosticSource.dll",
         "lib/netstandard2.0/System.Diagnostics.DiagnosticSource.xml",
-        "system.diagnostics.diagnosticsource.9.0.1.nupkg.sha512",
+        "system.diagnostics.diagnosticsource.9.0.2.nupkg.sha512",
         "system.diagnostics.diagnosticsource.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.IO.Pipelines/9.0.1": {
-      "sha512": "uXf5o8eV/gtzDQY4lGROLFMWQvcViKcF8o4Q6KpIOjloAQXrnscQSu6gTxYJMHuNJnh7szIF9AzkaEq+zDLoEg==",
+    "System.IO.Pipelines/9.0.2": {
+      "sha512": "UIBaK7c/A3FyQxmX/747xw4rCUkm1BhNiVU617U5jweNJssNjLJkPUGhBsrlDG0BpKWCYKsncD+Kqpy4KmvZZQ==",
       "type": "package",
-      "path": "system.io.pipelines/9.0.1",
+      "path": "system.io.pipelines/9.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2317,7 +2601,7 @@
         "lib/net9.0/System.IO.Pipelines.xml",
         "lib/netstandard2.0/System.IO.Pipelines.dll",
         "lib/netstandard2.0/System.IO.Pipelines.xml",
-        "system.io.pipelines.9.0.1.nupkg.sha512",
+        "system.io.pipelines.9.0.2.nupkg.sha512",
         "system.io.pipelines.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -2422,10 +2706,102 @@
         "version.txt"
       ]
     },
-    "System.Text.Encodings.Web/9.0.1": {
-      "sha512": "XkspqduP2t1e1x2vBUAD/xZ5ZDvmywuUwsmB93MvyQLospJfqtX0GsR/kU0vUL2h4kmvf777z3txV2W4NrQ9Qg==",
+    "System.Runtime/4.3.1": {
+      "sha512": "abhfv1dTK6NXOmu4bgHIONxHyEqFjW8HwXPmpY9gmll+ix9UNo4XDcmzJn6oLooftxNssVHdJC1pGT9jkSynQg==",
       "type": "package",
-      "path": "system.text.encodings.web/9.0.1",
+      "path": "system.runtime/4.3.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ThirdPartyNotices.txt",
+        "dotnet_library_license.txt",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/net462/System.Runtime.dll",
+        "lib/portable-net45+win8+wp80+wpa81/_._",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/net462/System.Runtime.dll",
+        "ref/netcore50/System.Runtime.dll",
+        "ref/netcore50/System.Runtime.xml",
+        "ref/netcore50/de/System.Runtime.xml",
+        "ref/netcore50/es/System.Runtime.xml",
+        "ref/netcore50/fr/System.Runtime.xml",
+        "ref/netcore50/it/System.Runtime.xml",
+        "ref/netcore50/ja/System.Runtime.xml",
+        "ref/netcore50/ko/System.Runtime.xml",
+        "ref/netcore50/ru/System.Runtime.xml",
+        "ref/netcore50/zh-hans/System.Runtime.xml",
+        "ref/netcore50/zh-hant/System.Runtime.xml",
+        "ref/netstandard1.0/System.Runtime.dll",
+        "ref/netstandard1.0/System.Runtime.xml",
+        "ref/netstandard1.0/de/System.Runtime.xml",
+        "ref/netstandard1.0/es/System.Runtime.xml",
+        "ref/netstandard1.0/fr/System.Runtime.xml",
+        "ref/netstandard1.0/it/System.Runtime.xml",
+        "ref/netstandard1.0/ja/System.Runtime.xml",
+        "ref/netstandard1.0/ko/System.Runtime.xml",
+        "ref/netstandard1.0/ru/System.Runtime.xml",
+        "ref/netstandard1.0/zh-hans/System.Runtime.xml",
+        "ref/netstandard1.0/zh-hant/System.Runtime.xml",
+        "ref/netstandard1.2/System.Runtime.dll",
+        "ref/netstandard1.2/System.Runtime.xml",
+        "ref/netstandard1.2/de/System.Runtime.xml",
+        "ref/netstandard1.2/es/System.Runtime.xml",
+        "ref/netstandard1.2/fr/System.Runtime.xml",
+        "ref/netstandard1.2/it/System.Runtime.xml",
+        "ref/netstandard1.2/ja/System.Runtime.xml",
+        "ref/netstandard1.2/ko/System.Runtime.xml",
+        "ref/netstandard1.2/ru/System.Runtime.xml",
+        "ref/netstandard1.2/zh-hans/System.Runtime.xml",
+        "ref/netstandard1.2/zh-hant/System.Runtime.xml",
+        "ref/netstandard1.3/System.Runtime.dll",
+        "ref/netstandard1.3/System.Runtime.xml",
+        "ref/netstandard1.3/de/System.Runtime.xml",
+        "ref/netstandard1.3/es/System.Runtime.xml",
+        "ref/netstandard1.3/fr/System.Runtime.xml",
+        "ref/netstandard1.3/it/System.Runtime.xml",
+        "ref/netstandard1.3/ja/System.Runtime.xml",
+        "ref/netstandard1.3/ko/System.Runtime.xml",
+        "ref/netstandard1.3/ru/System.Runtime.xml",
+        "ref/netstandard1.3/zh-hans/System.Runtime.xml",
+        "ref/netstandard1.3/zh-hant/System.Runtime.xml",
+        "ref/netstandard1.5/System.Runtime.dll",
+        "ref/netstandard1.5/System.Runtime.xml",
+        "ref/netstandard1.5/de/System.Runtime.xml",
+        "ref/netstandard1.5/es/System.Runtime.xml",
+        "ref/netstandard1.5/fr/System.Runtime.xml",
+        "ref/netstandard1.5/it/System.Runtime.xml",
+        "ref/netstandard1.5/ja/System.Runtime.xml",
+        "ref/netstandard1.5/ko/System.Runtime.xml",
+        "ref/netstandard1.5/ru/System.Runtime.xml",
+        "ref/netstandard1.5/zh-hans/System.Runtime.xml",
+        "ref/netstandard1.5/zh-hant/System.Runtime.xml",
+        "ref/portable-net45+win8+wp80+wpa81/_._",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.runtime.4.3.1.nupkg.sha512",
+        "system.runtime.nuspec"
+      ]
+    },
+    "System.Text.Encodings.Web/9.0.2": {
+      "sha512": "/kCGdrXg0PXrvkHYyHubXJHcmCAvJrxTZ7g4XS6UCxY1JW79aMjtUW6UYNECHJmiyFZsZ/vUuWOM4CtNpiNt8Q==",
+      "type": "package",
+      "path": "system.text.encodings.web/9.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2449,15 +2825,15 @@
         "runtimes/browser/lib/net8.0/System.Text.Encodings.Web.xml",
         "runtimes/browser/lib/net9.0/System.Text.Encodings.Web.dll",
         "runtimes/browser/lib/net9.0/System.Text.Encodings.Web.xml",
-        "system.text.encodings.web.9.0.1.nupkg.sha512",
+        "system.text.encodings.web.9.0.2.nupkg.sha512",
         "system.text.encodings.web.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.Text.Json/9.0.1": {
-      "sha512": "eqWHDZqYPv1PvuvoIIx5pF74plL3iEOZOl/0kQP+Y0TEbtgNnM2W6k8h8EPYs+LTJZsXuWa92n5W5sHTWvE3VA==",
+    "System.Text.Json/9.0.2": {
+      "sha512": "4TY2Yokh5Xp8XHFhsY9y84yokS7B0rhkaZCXuRiKppIiKwPVH4lVSFD9EEFzRpXdBM5ZeZXD43tc2vB6njEwwQ==",
       "type": "package",
-      "path": "system.text.json/9.0.1",
+      "path": "system.text.json/9.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2520,15 +2896,99 @@
         "lib/net9.0/System.Text.Json.xml",
         "lib/netstandard2.0/System.Text.Json.dll",
         "lib/netstandard2.0/System.Text.Json.xml",
-        "system.text.json.9.0.1.nupkg.sha512",
+        "system.text.json.9.0.2.nupkg.sha512",
         "system.text.json.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.Threading.Channels/9.0.1": {
-      "sha512": "vpp0a6Prnrqza30863qzNXtb2TonmnJVdfGpIU99+wYyDyLJG3IyoxmjTxhInywqJ6G2HEV4yjZ6/Eo802qGpw==",
+    "System.Text.RegularExpressions/4.3.1": {
+      "sha512": "N0kNRrWe4+nXOWlpLT4LAY5brb8caNFlUuIRpraCVMDLYutKkol1aV079rQjLuSxKMJT2SpBQsYX9xbcTMmzwg==",
       "type": "package",
-      "path": "system.threading.channels/9.0.1",
+      "path": "system.text.regularexpressions/4.3.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ThirdPartyNotices.txt",
+        "dotnet_library_license.txt",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/net463/System.Text.RegularExpressions.dll",
+        "lib/netcore50/System.Text.RegularExpressions.dll",
+        "lib/netstandard1.6/System.Text.RegularExpressions.dll",
+        "lib/portable-net45+win8+wp8+wpa81/_._",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/net463/System.Text.RegularExpressions.dll",
+        "ref/netcore50/System.Text.RegularExpressions.dll",
+        "ref/netcore50/System.Text.RegularExpressions.xml",
+        "ref/netcore50/de/System.Text.RegularExpressions.xml",
+        "ref/netcore50/es/System.Text.RegularExpressions.xml",
+        "ref/netcore50/fr/System.Text.RegularExpressions.xml",
+        "ref/netcore50/it/System.Text.RegularExpressions.xml",
+        "ref/netcore50/ja/System.Text.RegularExpressions.xml",
+        "ref/netcore50/ko/System.Text.RegularExpressions.xml",
+        "ref/netcore50/ru/System.Text.RegularExpressions.xml",
+        "ref/netcore50/zh-hans/System.Text.RegularExpressions.xml",
+        "ref/netcore50/zh-hant/System.Text.RegularExpressions.xml",
+        "ref/netcoreapp1.1/System.Text.RegularExpressions.dll",
+        "ref/netstandard1.0/System.Text.RegularExpressions.dll",
+        "ref/netstandard1.0/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.0/de/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.0/es/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.0/fr/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.0/it/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.0/ja/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.0/ko/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.0/ru/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.0/zh-hans/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.0/zh-hant/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/System.Text.RegularExpressions.dll",
+        "ref/netstandard1.3/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/de/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/es/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/fr/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/it/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/ja/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/ko/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/ru/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/zh-hans/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.3/zh-hant/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/System.Text.RegularExpressions.dll",
+        "ref/netstandard1.6/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/de/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/es/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/fr/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/it/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/ja/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/ko/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/ru/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/zh-hans/System.Text.RegularExpressions.xml",
+        "ref/netstandard1.6/zh-hant/System.Text.RegularExpressions.xml",
+        "ref/portable-net45+win8+wp8+wpa81/_._",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.text.regularexpressions.4.3.1.nupkg.sha512",
+        "system.text.regularexpressions.nuspec"
+      ]
+    },
+    "System.Threading.Channels/9.0.2": {
+      "sha512": "pUmqkuBS9OxWHOlfNad09Oxc8gRbxgN9UQtsqHPst4jfcgZRxQetNcsT2oe+VnUpEFAtBy1FZcJZiOscrBmA7g==",
+      "type": "package",
+      "path": "system.threading.channels/9.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2550,7 +3010,7 @@
         "lib/netstandard2.0/System.Threading.Channels.xml",
         "lib/netstandard2.1/System.Threading.Channels.dll",
         "lib/netstandard2.1/System.Threading.Channels.xml",
-        "system.threading.channels.9.0.1.nupkg.sha512",
+        "system.threading.channels.9.0.2.nupkg.sha512",
         "system.threading.channels.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -2596,7 +3056,8 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "Microsoft.SemanticKernel.Connectors.AzureOpenAI >= 1.40.0",
-      "Microsoft.SemanticKernel.Connectors.Ollama >= 1.36.1-alpha",
+      "Microsoft.SemanticKernel.Connectors.Ollama >= 1.40.0-alpha",
+      "Microsoft.SemanticKernel.Planners.Handlebars >= 1.40.0-preview",
       "Microsoft.SemanticKernel.Plugins.Core >= 1.40.0-alpha",
       "Microsoft.SemanticKernel.Plugins.Web >= 1.40.0-alpha",
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets >= 1.21.0",
@@ -2659,7 +3120,11 @@
           },
           "Microsoft.SemanticKernel.Connectors.Ollama": {
             "target": "Package",
-            "version": "[1.36.1-alpha, )"
+            "version": "[1.40.0-alpha, )"
+          },
+          "Microsoft.SemanticKernel.Planners.Handlebars": {
+            "target": "Package",
+            "version": "[1.40.0-preview, )"
           },
           "Microsoft.SemanticKernel.Plugins.Core": {
             "target": "Package",

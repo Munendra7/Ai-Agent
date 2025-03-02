@@ -17,30 +17,27 @@ namespace SemanticKernel.AIAgentBackend.Repositories
 
             if (modelType == "AzureOpenAI")
             {
-                var azureConfig = _configuration.GetSection("AzureOpenAI");
                 kernelBuilder.AddAzureOpenAIChatCompletion(
-                    azureConfig["DeploymentName"]!,
-                    azureConfig["Endpoint"]!,
-                    azureConfig["ApiKey"]!
+                    _configuration["AzureOpenAI:DeploymentName"]!,
+                    _configuration["AzureOpenAI:Endpoint"]!,
+                    _configuration["AzureOpenAI:ApiKey"]!
                 );
             }
             else if (modelType == "Ollama")
             {
-                var ollamaConfig = _configuration.GetSection("Ollama");
                 #pragma warning disable SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                 kernelBuilder.AddOllamaChatCompletion(
-                    modelId: ollamaConfig["ModelId"]!,
-                    endpoint: new Uri(ollamaConfig["Endpoint"]!)
+                    modelId: _configuration["Ollama:ModelId"]!,
+                    endpoint: new Uri(_configuration["Ollama:Endpoint"]!)
                 );
                 #pragma warning restore SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             }
             else if (modelType == "OpenAI")
             {
-                var openAIConfig = _configuration.GetSection("OpenAI");
                 kernelBuilder.AddOpenAIChatCompletion(
-                    openAIConfig["DeploymentName"]!,
-                    openAIConfig["ApiKey"]!,
-                    openAIConfig["OrgId"]!
+                    _configuration["OpenAI:DeploymentName"]!,
+                    _configuration["OpenAI:ApiKey"]!,
+                    _configuration["OpenAI:OrgId"]!
                 );
             }
             else
