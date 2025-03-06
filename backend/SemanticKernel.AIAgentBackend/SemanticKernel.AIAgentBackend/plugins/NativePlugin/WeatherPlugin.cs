@@ -12,17 +12,19 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
     {
         private readonly HttpClient _httpClient;
         private readonly IKernelService _kernel;
+        private readonly string _modelName;
         private readonly IConfiguration _configuration;
 
-        public WeatherPlugin(IConfiguration configuration, IKernelService kernel)
+        public WeatherPlugin(IConfiguration configuration, IKernelService kernel, string modelName)
         {
             _httpClient = new HttpClient();
             _kernel = kernel;
+            _modelName = modelName;
             _configuration = configuration;
         }
 
         [KernelFunction("GetWeather"), Description("Gets the weather information for a given city.")]
-        public async Task<string> GetWeatherAsync([Description("Query of User")] string query, string modelName)
+        public async Task<string> GetWeatherAsync([Description("Query of User")] string query)
         {
             if (string.IsNullOrWhiteSpace(query))
             {
@@ -35,7 +37,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             string pluginPath = Path.Combine(basePath, "plugins", "WeatherExtractPlugin");
 
 
-            var kernel = _kernel.GetKernel(modelName);
+            var kernel = _kernel.GetKernel(_modelName);
 
             var weatherExtractPlugin = kernel.ImportPluginFromPromptDirectory(pluginPath, "WeatherExtractPlugin");
 

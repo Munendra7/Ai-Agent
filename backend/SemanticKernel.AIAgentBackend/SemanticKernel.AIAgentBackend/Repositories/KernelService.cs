@@ -20,7 +20,8 @@ namespace SemanticKernel.AIAgentBackend.Repositories
                 kernelBuilder.AddAzureOpenAIChatCompletion(
                     _configuration["AzureOpenAI:DeploymentName"]!,
                     _configuration["AzureOpenAI:Endpoint"]!,
-                    _configuration["AzureOpenAI:ApiKey"]!
+                    _configuration["AzureOpenAI:ApiKey"]!,
+                    modelId: "gpt-4o"
                 );
             }
             else if (modelType == "Ollama")

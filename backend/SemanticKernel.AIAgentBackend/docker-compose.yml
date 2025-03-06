@@ -1,0 +1,34 @@
+version: '3.4'
+
+services:
+  semantickernel.aiagentbackend:
+    image: ${DOCKER_REGISTRY-}semantickernelaiagentbackend
+    build:
+      context: .
+      dockerfile: SemanticKernel.AIAgentBackend/Dockerfile
+    depends_on:
+      - agenticaisqlserver
+    networks:
+      - app_network
+
+  agenticaisqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: agenticaisqlserver
+    restart: always
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+    networks:
+      - app_network
+
+volumes:
+  sqlserverdata:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge

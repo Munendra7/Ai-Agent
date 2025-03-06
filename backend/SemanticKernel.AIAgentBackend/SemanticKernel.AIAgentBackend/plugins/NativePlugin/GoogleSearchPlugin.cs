@@ -13,17 +13,19 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
     {
         private readonly HttpClient _httpClient;
         private readonly IKernelService _kernel;
+        private readonly string _modelName;
         private readonly IConfiguration _configuration;
 
-        public GoogleSearchPlugin(IConfiguration configuration, IKernelService kernel)
+        public GoogleSearchPlugin(IConfiguration configuration, IKernelService kernel, string modelName)
         {
             _httpClient = new HttpClient();
             _kernel = kernel;
+            _modelName = modelName;
             _configuration = configuration;
         }
 
         [KernelFunction("search"), Description("Searches the web based on user query")]
-        public async Task<string> SearchAsync([Description("user query")] string query, string modelName)
+        public async Task<string> SearchAsync([Description("user query")] string query)
         {
             string _apiKey = _configuration["GoogleSearch:ApiKey"]!;
             string _searchEngineId = _configuration["GoogleSearch:SearchEngineId"]!;
@@ -50,7 +52,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                     var searchResult = $"{title.GetString()} ({link.GetString()})";
                     // Generate semantic response
 
-                    var kernel = _kernel.GetKernel(modelName);
+                    var kernel = _kernel.GetKernel(_modelName);
                     var semanticFunction = kernel.CreateFunctionFromPrompt(
                         "Based on user query {{$query}} Generate a concise, informative response based on the following search result:\n\n{{$searchResult}}\n\nEnsure the response is clear and engaging."
                     );
