@@ -1,6 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using SemanticKernel.AIAgentBackend.CustomActionFilters;
 using SemanticKernel.AIAgentBackend.Models.DTO;

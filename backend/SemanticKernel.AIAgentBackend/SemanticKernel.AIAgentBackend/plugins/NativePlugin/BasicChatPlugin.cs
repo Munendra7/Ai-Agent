@@ -3,7 +3,6 @@ using System.ComponentModel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using System.Text;
 using ChatHistory = Microsoft.SemanticKernel.ChatCompletion.ChatHistory;
-using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 
 namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin

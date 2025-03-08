@@ -1,10 +1,5 @@
-﻿using Azure;
-using Microsoft.SemanticKernel;
-using OpenAI.Chat;
-using OpenAI;
+﻿using Microsoft.SemanticKernel;
 using System.ComponentModel;
-using SemanticKernel.AIAgentBackend.Repositories;
-using Microsoft.OpenApi.Services;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {

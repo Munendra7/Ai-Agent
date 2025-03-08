@@ -1,11 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Net.Http;
+﻿using System.ComponentModel;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.OpenApi.Services;
 using Microsoft.SemanticKernel;
-using SemanticKernel.AIAgentBackend.Repositories;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {

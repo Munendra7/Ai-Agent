@@ -1,7 +1,5 @@
 ﻿using Microsoft.SemanticKernel;
-using Microsoft.Extensions.Configuration;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
-using System;
 
 namespace SemanticKernel.AIAgentBackend.Factories.Factory
 {

@@ -1,9 +1,6 @@
 ﻿using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.AI;
 using System.ComponentModel;
 using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
