@@ -1,8 +1,8 @@
 using SemanticKernel.AIAgentBackend.Data;
 using SemanticKernel.AIAgentBackend.Middlewares;
-using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Repositories;
-using Microsoft.EntityFrameworkCore; // Add this using directive
+using Microsoft.EntityFrameworkCore;
+using Qdrant.Client; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +18,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AppDBConnectionString"));
 });
 
-builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<QdrantClient>(provider =>
+{
+    var qdrantUri = new Uri(builder.Configuration["Qdrant:Endpoint"] ?? "http://localhost:6333"); // Ensure correct Qdrant URL
+    return new QdrantClient(qdrantUri);
+});
+
 
 builder.Services.AddScoped<IKernelService, KernelService>();
+builder.Services.AddScoped<IKernelEmbeddingService, KernelEmbeddingService>();
+
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();

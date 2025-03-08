@@ -19,6 +19,26 @@ services:
         source: sqlserverdata
         target: /var/opt/mssql
         volume: {}
+  qdrant:
+    container_name: qdrant
+    image: qdrant/qdrant:v1.12.4
+    networks:
+      app_network: null
+    ports:
+      - mode: ingress
+        target: 6333
+        published: "6333"
+        protocol: tcp
+      - mode: ingress
+        target: 6334
+        published: "6334"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: qdrant_data
+        target: /qdrant/storage
+        volume: {}
   semantickernel.aiagentbackend:
     build:
       context: D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend
@@ -33,6 +53,9 @@ services:
     container_name: SemanticKernel.AIAgentBackend
     depends_on:
       agenticaisqlserver:
+        condition: service_started
+        required: true
+      qdrant:
         condition: service_started
         required: true
     entrypoint:
@@ -133,6 +156,9 @@ networks:
     name: dockercompose16813498347866987284_app_network
     driver: bridge
 volumes:
+  qdrant_data:
+    name: dockercompose16813498347866987284_qdrant_data
+    driver: local
   sqlserverdata:
     name: dockercompose16813498347866987284_sqlserverdata
     driver: local

@@ -50,6 +50,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "DocumentFormat.OpenXml": {
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
             "Microsoft.Azure.Cosmos": {
               "target": "Package",
               "version": "[3.47.2, )"
@@ -68,6 +72,10 @@
               "target": "Package",
               "version": "[9.0.2, )"
             },
+            "Microsoft.KernelMemory.Abstractions": {
+              "target": "Package",
+              "version": "[0.97.250211.1, )"
+            },
             "Microsoft.SemanticKernel.Connectors.AzureOpenAI": {
               "target": "Package",
               "version": "[1.40.0, )"
@@ -75,6 +83,10 @@
             "Microsoft.SemanticKernel.Connectors.Ollama": {
               "target": "Package",
               "version": "[1.40.0-alpha, )"
+            },
+            "Microsoft.SemanticKernel.Connectors.OpenAI": {
+              "target": "Package",
+              "version": "[1.40.1, )"
             },
             "Microsoft.SemanticKernel.Planners.Handlebars": {
               "target": "Package",
@@ -91,6 +103,14 @@
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.21.0, )"
+            },
+            "PdfPig": {
+              "target": "Package",
+              "version": "[0.1.9, )"
+            },
+            "Qdrant.Client": {
+              "target": "Package",
+              "version": "[1.13.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

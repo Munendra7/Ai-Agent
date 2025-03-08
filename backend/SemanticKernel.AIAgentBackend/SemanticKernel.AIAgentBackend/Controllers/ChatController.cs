@@ -19,12 +19,14 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         private readonly IKernelService _kernel;
         private readonly IConfiguration _configuration;
         private readonly IChatService _chatService;
+        private readonly IEmbeddingService embeddingService;
 
-        public ChatController(IKernelService kernel, IConfiguration configuration, IChatService chatService)
+        public ChatController(IKernelService kernel, IConfiguration configuration, IChatService chatService, IEmbeddingService embeddingService)
         {
             _kernel = kernel;
             _configuration = configuration;
             _chatService = chatService;
+            this.embeddingService = embeddingService;
         }
 
         [HttpPost]
@@ -48,11 +50,13 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 var chatPlugin = new BasicChatPlugin(_kernel, userQueryDTO.Model, _chatService, hardcodeduserId);
                 var weatherPlugin = new WeatherPlugin(_configuration, _kernel, userQueryDTO.Model);
                 var googleSearchPlugin = new GoogleSearchPlugin(_configuration, _kernel, userQueryDTO.Model);
+                var ragPlugin = new RAGPlugin(_kernel, embeddingService);
 
 
                 kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
                 kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
                 kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
+                kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
 
                 #pragma warning disable SKEXP0060 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                 var planner = new HandlebarsPlanner(new HandlebarsPlannerOptions() { AllowLoops = true });
