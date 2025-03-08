@@ -1,6 +1,6 @@
 ﻿using SemanticKernel.AIAgentBackend.Models.Domain;
 
-namespace SemanticKernel.AIAgentBackend.Repositories
+namespace SemanticKernel.AIAgentBackend.Repositories.Interface
 {
     public interface IChatService
     {

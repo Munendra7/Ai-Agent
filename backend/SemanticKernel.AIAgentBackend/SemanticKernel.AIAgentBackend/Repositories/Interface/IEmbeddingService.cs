@@ -2,7 +2,7 @@
 using Qdrant.Client.Grpc;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 
-namespace SemanticKernel.AIAgentBackend.Repositories
+namespace SemanticKernel.AIAgentBackend.Repositories.Interface
 {
     public interface IEmbeddingService
     {

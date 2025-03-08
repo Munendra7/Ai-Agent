@@ -1,23 +1,22 @@
 ﻿using Microsoft.SemanticKernel;
-using SemanticKernel.AIAgentBackend.Repositories;
 using System.ComponentModel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using System.Text;
 using ChatHistory = Microsoft.SemanticKernel.ChatCompletion.ChatHistory;
+using SemanticKernel.AIAgentBackend.Factories.Interface;
+using SemanticKernel.AIAgentBackend.Repositories.Interface;
 
 namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin
 {
     public class BasicChatPlugin
     {
-        private readonly IKernelService _kernel;
-        private readonly string _modelName;
+        private readonly Kernel _kernel;
         private readonly IChatService _chatService;
         private readonly string userId;
 
-        public BasicChatPlugin(IKernelService kernel, string modelName, IChatService chatService, string userId)
+        public BasicChatPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IChatService chatService, string userId)
         {
             _kernel = kernel;
-            _modelName = modelName;
             _chatService = chatService;
             this.userId = userId;
         }
@@ -27,8 +26,7 @@ namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin
         {
             try
             {
-                var kernel = _kernel.GetKernel(_modelName);
-                var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+                var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
 
                 ChatHistory chatHistory = new ChatHistory();
 
@@ -45,7 +43,7 @@ namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin
                 //current user message
                 chatHistory.AddUserMessage(query);
 
-                var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory: chatHistory, kernel: kernel);
+                var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory: chatHistory, kernel: _kernel);
 
                 var response = new StringBuilder();
                 await foreach (var chunk in result)

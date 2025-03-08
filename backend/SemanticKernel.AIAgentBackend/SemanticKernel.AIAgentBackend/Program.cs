@@ -1,8 +1,13 @@
 using SemanticKernel.AIAgentBackend.Data;
 using SemanticKernel.AIAgentBackend.Middlewares;
-using SemanticKernel.AIAgentBackend.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Qdrant.Client; // Add this using directive
+using Qdrant.Client;
+using SemanticKernel.AIAgentBackend.Factories.Interface;
+using SemanticKernel.AIAgentBackend.Factories.Factory;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Embeddings;
+using SemanticKernel.AIAgentBackend.Repositories.Interface;
+using SemanticKernel.AIAgentBackend.Repositories.Repository; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,13 +25,29 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<QdrantClient>(provider =>
 {
-    var qdrantUri = new Uri(builder.Configuration["Qdrant:Endpoint"] ?? "http://localhost:6333"); // Ensure correct Qdrant URL
+    var qdrantUri = new Uri(builder.Configuration["Qdrant:Endpoint"] ?? "http://localhost:6334");
     return new QdrantClient(qdrantUri);
 });
 
 
-builder.Services.AddScoped<IKernelService, KernelService>();
-builder.Services.AddScoped<IKernelEmbeddingService, KernelEmbeddingService>();
+builder.Services.AddKeyedScoped<Kernel>("LLMKernel", (sp, key) =>
+{
+    var factory = sp.GetRequiredService<IKernelFactory>();
+    return factory.CreateKernel();
+});
+
+builder.Services.AddScoped(sp =>
+{
+    var factory = sp.GetRequiredService<IEmbeddingKernelFactory>();
+    var Kernel = factory.CreateKernel();
+    #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    var _embeddingGenerator = Kernel.Services.GetRequiredService<ITextEmbeddingGenerationService>();
+    #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    return _embeddingGenerator;
+});
+
+builder.Services.AddScoped<IKernelFactory, KernelFactory>();
+builder.Services.AddScoped<IEmbeddingKernelFactory, EmbeddingKernelFactory>();
 
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();

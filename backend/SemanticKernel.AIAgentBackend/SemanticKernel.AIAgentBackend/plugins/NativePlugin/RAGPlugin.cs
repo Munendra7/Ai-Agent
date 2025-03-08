@@ -1,21 +1,21 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.AI;
-using SemanticKernel.AIAgentBackend.Repositories;
 using System.ComponentModel;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using SemanticKernel.AIAgentBackend.Repositories.Interface;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
     public class RAGPlugin
     {
-        private readonly IKernelService kernelService;
+        private readonly Kernel _kernel;
         private readonly IEmbeddingService embeddingService;
 
-        public RAGPlugin(IKernelService kernelService, IEmbeddingService embeddingService)
+        public RAGPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IEmbeddingService embeddingService)
         {
-            this.kernelService = kernelService;
+            _kernel = kernel;
             this.embeddingService = embeddingService;
         }
 
@@ -24,7 +24,6 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         {
             try
             {
-                
                 var searchResults = await embeddingService.SimilaritySearch(query).ConfigureAwait(false);
 
                 if (searchResults == null || !searchResults.Any())
@@ -32,7 +31,6 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                     return "I'm sorry, but I couldn't find relevant information to answer your query.";
                 }
 
-                
                 var builder = new StringBuilder();
                 foreach (var result in searchResults)
                 {
@@ -44,9 +42,6 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 }
 
                 string searchResultsText = builder.ToString();
-
-                
-                var ollamaKernel = this.kernelService.GetKernel("Ollama");
                 
                 var promptTemplate = """
                     Context: {{$searchResults}}
@@ -54,9 +49,9 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                     Provide a clear and concise response (max 50 words).
                 """;
 
-                var semanticFunction = ollamaKernel.CreateFunctionFromPrompt(promptTemplate);
+                var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
 
-                var finalResponse = await ollamaKernel.InvokeAsync(
+                var finalResponse = await _kernel.InvokeAsync(
                     semanticFunction,
                     new KernelArguments
                     {

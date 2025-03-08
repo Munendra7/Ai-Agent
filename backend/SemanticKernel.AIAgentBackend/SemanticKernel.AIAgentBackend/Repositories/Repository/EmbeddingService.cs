@@ -9,22 +9,28 @@ using Microsoft.SemanticKernel.Embeddings;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
 using SemanticKernel.AIAgentBackend.Models.DTO;
+using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using System.Text;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 
-namespace SemanticKernel.AIAgentBackend.Repositories
+namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 {
     public class EmbeddingService : IEmbeddingService
     {
-        private readonly IKernelEmbeddingService _kernel;
         private readonly QdrantClient _qdrantClient;
-        private const string CollectionName = "document_embeddings";
+        private readonly IConfiguration _configuration;
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        private readonly ITextEmbeddingGenerationService _embeddingGenerator;
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-        public EmbeddingService(IKernelEmbeddingService kernel, QdrantClient qdrantClient)
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        public EmbeddingService(ITextEmbeddingGenerationService embeddingGenerator, QdrantClient qdrantClient, IConfiguration configuration)
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         {
-            _kernel = kernel;
             _qdrantClient = qdrantClient;
+            _configuration = configuration;
+            _embeddingGenerator = embeddingGenerator;
         }
 
         public async Task<IActionResult> ProcessFileAsync(FileUploadDTO fileDTO)
@@ -43,10 +49,6 @@ namespace SemanticKernel.AIAgentBackend.Repositories
             // Generate embeddings for each chunk
             var embeddings = new List<float[]>();
             var chunkTexts = new List<string>();
-            var kernel = _kernel.GetKernel(fileDTO.Model);
-            #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-            var _embeddingGenerator = kernel.Services.GetRequiredService<ITextEmbeddingGenerationService>();
-            #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             foreach (var chunk in textChunks)
             {
                 var embedding = await _embeddingGenerator.GenerateEmbeddingAsync(chunk);
@@ -134,6 +136,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories
 
         private async Task StoreEmbeddingAsync(string fileName, string? fileDescription, List<float[]> embeddings, List<string> chunkTexts)
         {
+            var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
             var points = new List<PointStruct>();
             for (int i = 0; i < embeddings.Count; i++)
             {
@@ -153,28 +156,24 @@ namespace SemanticKernel.AIAgentBackend.Repositories
             }
 
             var existingCollections = await _qdrantClient.ListCollectionsAsync();
-            if (!existingCollections.Any(name => name == CollectionName))
+            if (!existingCollections.Any(name => name == collectionName))
             {
-                await _qdrantClient.CreateCollectionAsync(CollectionName, new VectorParams
+                await _qdrantClient.CreateCollectionAsync(collectionName, new VectorParams
                 {
                     Size = 768,
                     Distance = Distance.Cosine
                 });
             }
-            await _qdrantClient.UpsertAsync(CollectionName, points);
+            await _qdrantClient.UpsertAsync(collectionName, points);
         }
 
         public async Task<IReadOnlyList<ScoredPoint>> SimilaritySearch(string prompt)
         {
-            var kernel = _kernel.GetKernel("Ollama");
-            #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-            var _embeddingGenerator = kernel.Services.GetRequiredService<ITextEmbeddingGenerationService>();
-            #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.var _embeddingGenerator = kernel.Services.GetRequiredService<ITextEmbeddingGenerationService>();
-
             var promptEmbedding = await _embeddingGenerator.GenerateEmbeddingAsync(prompt);
+            var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
 
             var returnedLocations = await _qdrantClient.QueryAsync(
-                collectionName: CollectionName,
+                collectionName: collectionName,
                 query: promptEmbedding.ToArray(),
                 limit: 5
             );

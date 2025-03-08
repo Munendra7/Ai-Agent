@@ -176,6 +176,10 @@ DocProject/Help/*.hhp
 DocProject/Help/Html2
 DocProject/Help/html
 
+#appsettings
+appsettings.json
+appsettings.Development.json
+
 # Click-Once directory
 publish/
 

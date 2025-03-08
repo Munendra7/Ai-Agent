@@ -12,8 +12,8 @@ namespace SemanticKernel.AIAgentBackend.Models.DTO
 
         public string? FileDescription { get; set; }
 
-        [Required]
-        [EnumDataType(typeof(AIModel), ErrorMessage = "Invalid model type. Allowed values: AzureOpenAI, Ollama, OpenAI")]
-        public required string Model { get; set; }
+        //[Required]
+        //[EnumDataType(typeof(AIModel), ErrorMessage = "Invalid model type. Allowed values: AzureOpenAI, Ollama, OpenAI")]
+        //public required string Model { get; set; }
     }
 }

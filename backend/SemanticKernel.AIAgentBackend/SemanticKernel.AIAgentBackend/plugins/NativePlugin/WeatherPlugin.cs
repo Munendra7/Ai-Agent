@@ -11,15 +11,13 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
     public class WeatherPlugin
     {
         private readonly HttpClient _httpClient;
-        private readonly IKernelService _kernel;
-        private readonly string _modelName;
+        private readonly Kernel _kernel;
         private readonly IConfiguration _configuration;
 
-        public WeatherPlugin(IConfiguration configuration, IKernelService kernel, string modelName)
+        public WeatherPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration)
         {
             _httpClient = new HttpClient();
             _kernel = kernel;
-            _modelName = modelName;
             _configuration = configuration;
         }
 
@@ -36,10 +34,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             string basePath = AppContext.BaseDirectory;  // Get base directory
             string pluginPath = Path.Combine(basePath, "plugins", "WeatherExtractPlugin");
 
-
-            var kernel = _kernel.GetKernel(_modelName);
-
-            var weatherExtractPlugin = kernel.ImportPluginFromPromptDirectory(pluginPath, "WeatherExtractPlugin");
+            var weatherExtractPlugin = _kernel.ImportPluginFromPromptDirectory(pluginPath, "WeatherExtractPlugin");
 
             var extractCityPlugin = weatherExtractPlugin["ExtractCity"];
 
@@ -48,7 +43,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 ["query"] = query
             };
 
-            string city = (await kernel.InvokeAsync(extractCityPlugin, arguments)).ToString();
+            string city = (await _kernel.InvokeAsync(extractCityPlugin, arguments)).ToString();
 
             string url = $"http://api.weatherstack.com/current?access_key={apikey}&query={city}";
 
@@ -74,11 +69,11 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 ";
 
                 // Generate semantic response
-                var semanticFunction = kernel.CreateFunctionFromPrompt(
+                var semanticFunction = _kernel.CreateFunctionFromPrompt(
                     "Based on the user query {{$query}}, generate a concise and informative response not more than 50 words using the following search results:\n\n {{$searchResult}} \n\n Ensure the response is clear, engaging, and to the point. If no relevant answer is found, politely acknowledge it by stating that you don't know."
                 );
 
-                var finalResponse = await kernel.InvokeAsync(semanticFunction, new() { ["searchResult"] = weatherResponse.ToString(), ["query"] = query });
+                var finalResponse = await _kernel.InvokeAsync(semanticFunction, new() { ["searchResult"] = weatherResponse.ToString(), ["query"] = query });
 
                 return finalResponse.ToString();
             }

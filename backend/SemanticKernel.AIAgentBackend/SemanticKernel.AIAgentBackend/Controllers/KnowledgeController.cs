@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using SemanticKernel.AIAgentBackend.CustomActionFilters;
 using SemanticKernel.AIAgentBackend.Models.DTO;
-using SemanticKernel.AIAgentBackend.Repositories;
+using SemanticKernel.AIAgentBackend.Repositories.Interface;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {

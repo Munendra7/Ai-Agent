@@ -12,15 +12,13 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
     public class GoogleSearchPlugin
     {
         private readonly HttpClient _httpClient;
-        private readonly IKernelService _kernel;
-        private readonly string _modelName;
+        private readonly Kernel _kernel;
         private readonly IConfiguration _configuration;
 
-        public GoogleSearchPlugin(IConfiguration configuration, IKernelService kernel, string modelName)
+        public GoogleSearchPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration)
         {
             _httpClient = new HttpClient();
             _kernel = kernel;
-            _modelName = modelName;
             _configuration = configuration;
         }
 
@@ -52,12 +50,11 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                     var searchResult = $"{title.GetString()} ({link.GetString()})";
                     // Generate semantic response
 
-                    var kernel = _kernel.GetKernel(_modelName);
-                    var semanticFunction = kernel.CreateFunctionFromPrompt(
+                    var semanticFunction = _kernel.CreateFunctionFromPrompt(
                         "Based on user query {{$query}} Generate a concise, informative response based on the following search result:\n\n{{$searchResult}}\n\nEnsure the response is clear and engaging."
                     );
 
-                    var finalResponse = await kernel.InvokeAsync(semanticFunction, new() { ["searchResult"] = searchResult.ToString(), ["query"] = query });
+                    var finalResponse = await _kernel.InvokeAsync(semanticFunction, new() { ["searchResult"] = searchResult.ToString(), ["query"] = query });
 
                     return finalResponse.ToString();
                 }

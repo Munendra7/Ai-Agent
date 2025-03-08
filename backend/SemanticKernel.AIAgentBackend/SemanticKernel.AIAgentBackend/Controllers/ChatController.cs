@@ -4,10 +4,11 @@ using Microsoft.OpenApi.Services;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Planning.Handlebars;
 using SemanticKernel.AIAgentBackend.CustomActionFilters;
+using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Plugins.NativePlugin;
-using SemanticKernel.AIAgentBackend.Repositories;
+using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using System.Threading.Tasks;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
@@ -16,12 +17,12 @@ namespace SemanticKernel.AIAgentBackend.Controllers
     [ApiController]
     public class ChatController : ControllerBase
     {
-        private readonly IKernelService _kernel;
+        private readonly Kernel _kernel;
         private readonly IConfiguration _configuration;
         private readonly IChatService _chatService;
         private readonly IEmbeddingService embeddingService;
 
-        public ChatController(IKernelService kernel, IConfiguration configuration, IChatService chatService, IEmbeddingService embeddingService)
+        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatService chatService, IEmbeddingService embeddingService)
         {
             _kernel = kernel;
             _configuration = configuration;
@@ -42,21 +43,19 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             var hardcodeduserId = "1234";
 
             await _chatService.AddMessageAsync(hardcodeduserId, userQueryDTO.Query, "User");
-
-            var kernel = _kernel.GetKernel(userQueryDTO.Model);
             try
             {
 
-                var chatPlugin = new BasicChatPlugin(_kernel, userQueryDTO.Model, _chatService, hardcodeduserId);
-                var weatherPlugin = new WeatherPlugin(_configuration, _kernel, userQueryDTO.Model);
-                var googleSearchPlugin = new GoogleSearchPlugin(_configuration, _kernel, userQueryDTO.Model);
+                var chatPlugin = new BasicChatPlugin(_kernel, _chatService, hardcodeduserId);
+                var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
+                var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
                 var ragPlugin = new RAGPlugin(_kernel, embeddingService);
 
 
-                kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
-                kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
-                kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
-                kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
+                _kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
+                _kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
+                _kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
+                _kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
 
                 #pragma warning disable SKEXP0060 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                 var planner = new HandlebarsPlanner(new HandlebarsPlannerOptions() { AllowLoops = true });
@@ -64,14 +63,14 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
                 // Suppress the diagnostic warning for CreatePlanAsync
                 #pragma warning disable SKEXP0060
-                var plan = await planner.CreatePlanAsync(kernel, userQueryDTO.Query);
+                var plan = await planner.CreatePlanAsync(_kernel, userQueryDTO.Query);
                 #pragma warning restore SKEXP0060
 
                 var serializedPlan = plan.ToString();
 
                 // Suppress the diagnostic warning for InvokeAsync
                 #pragma warning disable SKEXP0060
-                var result = await plan.InvokeAsync(kernel);
+                var result = await plan.InvokeAsync(_kernel);
                 #pragma warning restore SKEXP0060
 
                 var chatResponse = result.ToString();
@@ -93,7 +92,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             {
                 try
                 {
-                    var chatResponse = await kernel.InvokeAsync("BasicChatPlugin", "chat", new() { ["query"] = userQueryDTO.Query });
+                    var chatResponse = await _kernel.InvokeAsync("BasicChatPlugin", "chat", new() { ["query"] = userQueryDTO.Query });
 
                     var response = new ChatResponseDTO()
                     {

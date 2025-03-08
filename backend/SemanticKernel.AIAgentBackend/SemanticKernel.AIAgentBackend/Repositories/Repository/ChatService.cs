@@ -2,8 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using SemanticKernel.AIAgentBackend.Data;
 using SemanticKernel.AIAgentBackend.Models.Domain;
+using SemanticKernel.AIAgentBackend.Repositories.Interface;
 
-namespace SemanticKernel.AIAgentBackend.Repositories
+namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 {
     public class ChatService : IChatService
     {
