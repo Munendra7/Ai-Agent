@@ -46,7 +46,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                     // Generate semantic response
 
                     var semanticFunction = _kernel.CreateFunctionFromPrompt(
-                        "Based on user query {{$query}} Generate a concise, informative response based on the following search result:\n\n{{$searchResult}}\n\nEnsure the response is clear and engaging."
+                        "Based on user query {{$query}} Generate a concise, informative response based on the following search result:\n\n{{$searchResult}}\n\nEnsure the response is clear and engaging, not more than 50 words."
                     );
 
                     var finalResponse = await _kernel.InvokeAsync(semanticFunction, new() { ["searchResult"] = searchResult.ToString(), ["query"] = query });

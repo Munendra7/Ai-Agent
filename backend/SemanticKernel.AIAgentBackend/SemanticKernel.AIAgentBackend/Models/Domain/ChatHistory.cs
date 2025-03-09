@@ -7,7 +7,7 @@ namespace SemanticKernel.AIAgentBackend.Models.Domain
     {
         public Guid Id { get; set; }
 
-        public string? UserId { get; set; }
+        public Guid SessionId { get; set; }
 
         public string? Message { get; set; }
 

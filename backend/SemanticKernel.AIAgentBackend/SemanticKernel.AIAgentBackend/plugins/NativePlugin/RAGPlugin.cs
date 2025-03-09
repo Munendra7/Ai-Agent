@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Text;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
+using OpenAI.Chat;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
@@ -16,7 +18,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             this.embeddingService = embeddingService;
         }
 
-        [KernelFunction("answer"), Description("Generates an answer from RAG based on user query.")]
+        [KernelFunction("answer"), Description("Gets data from documents provided by user and generates an answer from RAG based on user query.")]
         public async Task<string> AnswerAsync([Description("User query")] string query)
         {
             try
@@ -43,7 +45,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 var promptTemplate = """
                     Context: {{$searchResults}}
                     Question: {{$query}}
-                    Provide a clear and concise response (max 50 words).
+                    Provide a clear and concise response (max 50 words) only from Context.
                 """;
 
                 var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
