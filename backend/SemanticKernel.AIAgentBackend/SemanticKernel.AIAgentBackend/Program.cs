@@ -7,11 +7,22 @@ using SemanticKernel.AIAgentBackend.Factories.Factory;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
-using SemanticKernel.AIAgentBackend.Repositories.Repository; // Add this using directive
+using SemanticKernel.AIAgentBackend.Repositories.Repository;
+using Serilog; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/AIAgent_log.txt", rollingInterval: RollingInterval.Day)
+    .MinimumLevel.Information()
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -30,6 +41,10 @@ builder.Services.AddScoped<QdrantClient>(provider =>
 });
 
 
+builder.Services.AddScoped<IKernelFactory, KernelFactory>();
+builder.Services.AddScoped<IEmbeddingKernelFactory, EmbeddingKernelFactory>();
+builder.Services.AddScoped<IDocumentsProcessFactory, DocumentsProcessFactory>();
+
 builder.Services.AddKeyedScoped<Kernel>("LLMKernel", (sp, key) =>
 {
     var factory = sp.GetRequiredService<IKernelFactory>();
@@ -46,8 +61,6 @@ builder.Services.AddScoped(sp =>
     return _embeddingGenerator;
 });
 
-builder.Services.AddScoped<IKernelFactory, KernelFactory>();
-builder.Services.AddScoped<IEmbeddingKernelFactory, EmbeddingKernelFactory>();
 
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();

@@ -24,7 +24,6 @@ namespace SemanticKernel.AIAgentBackend.Middlewares
             {
                 var errorId = Guid.NewGuid();
 
-
                 logger.LogError(ex, $"{errorId} : ${ex.Message}");
 
                 httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;

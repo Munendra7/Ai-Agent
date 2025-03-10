@@ -11,6 +11,7 @@ using SemanticKernel.AIAgentBackend.Plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Repository;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
@@ -22,14 +23,16 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         private readonly Kernel _kernel;
         private readonly IConfiguration _configuration;
         private readonly IChatService _chatService;
-        private readonly IEmbeddingService embeddingService;
+        private readonly IEmbeddingService _embeddingService;
+        private readonly ILogger _logger;
 
-        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatService chatService, IEmbeddingService embeddingService)
+        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatService chatService, IEmbeddingService embeddingService, ILogger<ChatController> logger)
         {
             _kernel = kernel;
             _configuration = configuration;
             _chatService = chatService;
-            this.embeddingService = embeddingService;
+            _embeddingService = embeddingService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -56,7 +59,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 var chatPlugin = new BasicChatPlugin(_kernel, _chatService, sessionId);
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
-                var ragPlugin = new RAGPlugin(_kernel, embeddingService);
+                var ragPlugin = new RAGPlugin(_kernel, _embeddingService);
 
                 _kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
                 _kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
@@ -112,6 +115,8 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
             catch (Exception ex)
             {
+                var errorId = Guid.NewGuid();
+                _logger.LogError(ex, $"{errorId} : ${ex.Message}");
                 try
                 {
                     var chatResponse = await _kernel.InvokeAsync("BasicChatPlugin", "chat", new() { ["query"] = userQueryDTO.Query });
@@ -144,8 +149,10 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     return Ok(response);
                 }
 
-                catch (Exception)
+                catch (Exception exe)
                 {
+                    _logger.LogError(ex, $"{errorId} : ${exe.Message}");
+
                     return StatusCode(500, new
                     {
                         error = "Something went wrong on our end. Please try again later.",

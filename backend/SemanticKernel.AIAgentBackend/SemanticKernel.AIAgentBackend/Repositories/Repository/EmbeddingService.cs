@@ -5,6 +5,7 @@ using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel.Embeddings;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
+using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using System.Text;
@@ -17,16 +18,18 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
     {
         private readonly QdrantClient _qdrantClient;
         private readonly IConfiguration _configuration;
+        private readonly IDocumentsProcessFactory _documentsProcessFactory;
         #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         private readonly ITextEmbeddingGenerationService _embeddingGenerator;
         #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
         #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-        public EmbeddingService(ITextEmbeddingGenerationService embeddingGenerator, QdrantClient qdrantClient, IConfiguration configuration)
-#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        public EmbeddingService(ITextEmbeddingGenerationService embeddingGenerator, QdrantClient qdrantClient, IConfiguration configuration, IDocumentsProcessFactory documentsProcessFactory)
+        #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         {
             _qdrantClient = qdrantClient;
             _configuration = configuration;
+            _documentsProcessFactory = documentsProcessFactory;
             _embeddingGenerator = embeddingGenerator;
         }
 
@@ -37,7 +40,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 return new BadRequestObjectResult("Invalid file.");
             }
 
-            List<string> textChunks = ExtractTextChunksFromFile(fileDTO.File).ToList();
+            List<string> textChunks = _documentsProcessFactory.ExtractTextChunksFromFile(fileDTO.File).ToList();
             if (textChunks.Count == 0)
             {
                 return new BadRequestObjectResult("Could not extract text from the file.");
@@ -57,78 +60,6 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             await StoreEmbeddingAsync(fileDTO.FileName, fileDTO.FileDescription, embeddings, chunkTexts);
 
             return new OkObjectResult("File processed and embeddings stored successfully.");
-        }
-
-        private IEnumerable<string> ExtractTextChunksFromFile(IFormFile file, int chunkSize = 512)
-        {
-            using var stream = file.OpenReadStream();
-            if (file.FileName.EndsWith(".txt"))
-            {
-                return ExtractTextChunksFromTxt(stream, chunkSize);
-            }
-            else if (file.FileName.EndsWith(".pdf"))
-            {
-                return ExtractTextChunksFromPdf(stream, chunkSize);
-            }
-            else if (file.FileName.EndsWith(".docx"))
-            {
-                return ExtractTextChunksFromDocx(stream, chunkSize);
-            }
-            return Enumerable.Empty<string>();
-        }
-
-        private IEnumerable<string> ExtractTextChunksFromTxt(Stream stream, int chunkSize)
-        {
-            using var reader = new StreamReader(stream);
-            return ChunkText(reader.ReadToEnd(), chunkSize);
-        }
-
-        private IEnumerable<string> ExtractTextChunksFromPdf(Stream stream, int chunkSize)
-        {
-            using var pdfDocument = PdfDocument.Open(stream);
-            var text = new StringBuilder();
-            foreach (var page in pdfDocument.GetPages())
-            {
-                text.Append(ContentOrderTextExtractor.GetText(page));
-            }
-            return ChunkText(text.ToString(), chunkSize);
-        }
-
-        private IEnumerable<string> ExtractTextChunksFromDocx(Stream stream, int chunkSize)
-        {
-            StringBuilder text = new StringBuilder();
-            using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(stream, false))
-            {
-                var body = wordDoc.MainDocumentPart?.Document.Body;
-                if (body != null)
-                {
-                    foreach (var para in body.Elements<Paragraph>())
-                    {
-                        text.AppendLine(para.InnerText);
-                    }
-                }
-            }
-            return ChunkText(text.ToString(), chunkSize);
-        }
-
-        private IEnumerable<string> ChunkText(string text, int chunkSize)
-        {
-            List<string> chunks = new();
-            StringBuilder currentChunk = new();
-            foreach (var word in text.Split(' '))
-            {
-                if (currentChunk.Length + word.Length > chunkSize)
-                {
-                    chunks.Add(currentChunk.ToString());
-                    currentChunk.Clear();
-                }
-                currentChunk.Append(word).Append(" ");
-            }
-            if (currentChunk.Length > 0)
-            {
-                chunks.Add(currentChunk.ToString());
-            }
-            return chunks;
         }
 
         private async Task StoreEmbeddingAsync(string fileName, string? fileDescription, List<float[]> embeddings, List<string> chunkTexts)
