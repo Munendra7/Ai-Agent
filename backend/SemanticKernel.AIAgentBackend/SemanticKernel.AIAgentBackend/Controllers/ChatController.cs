@@ -52,6 +52,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     MaxTokens = 1000,
                     Temperature = 0.2,
                     TopP = 0.5,
+                    ChatSystemPrompt = "You are an AI Agent that provides precise, professional, and context-aware responses. Maintain conversation history, summarize key points when needed, and ensure concise yet informative answers."
                 };
 
                 var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);

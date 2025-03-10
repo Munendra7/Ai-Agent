@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -14,6 +14,7 @@
     "@azure/msal-react": "^3.0.5",
     "@reduxjs/toolkit": "^2.6.0",
     "@tailwindcss/vite": "^4.0.9",
+    "axios": "^1.8.2",
     "lucide-react": "^0.476.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.9",

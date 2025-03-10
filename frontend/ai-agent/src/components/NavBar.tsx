@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SignOutButton } from "./MSAuthentication/SignOutButton";
-import Copilot from "../assets/copilot.svg";
+import Copilot from "../assets/AIAgent.svg";
 import { Menu, X } from "lucide-react"; // For mobile menu icons
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { SignInButton } from "./MSAuthentication/SignInButton";
@@ -16,7 +16,7 @@ const NavBar: React.FC<{}> = () => {
         {/* Logo Section */}
         <div className="flex items-center">
           <img src={Copilot} alt="AI Agent Logo" className="h-10 w-10 mr-2" />
-          <h1 className="text-xl font-bold">AIAgent Copilot</h1>
+          <h1 className="text-xl font-bold">AI Agent</h1>
         </div>
 
         {/* Mobile Menu Toggle */}

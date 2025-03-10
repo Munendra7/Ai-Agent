@@ -1,8 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
+import axios from 'axios';
+import { useMsal } from '@azure/msal-react';
+
+const apiUrl = (import.meta as any).env.VITE_AIAgent_URL;
 
 const ChatPlayground: React.FC = () => {
-    const [messages, setMessages] = useState<{ text: string; type: 'user' | 'bot'; persona: string }[]>([]);
+    const { accounts } = useMsal();
+    const sessionId = useRef<string>('');
+    const [messages, setMessages] = useState<{ text: string; type: 'user' | 'bot'; persona: string }[]>([{ text: `Hi ${accounts.length>0?accounts[0]?.name??"":""}, how can i assist you?`, type: 'bot' as 'bot', persona: 'AI Agent' }]);
     const [input, setInput] = useState('');
     const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -11,19 +17,50 @@ const ChatPlayground: React.FC = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    useEffect(() => {
+        sessionId.current = crypto.randomUUID();
+    }, []);
+
+    function formatChatResponse(text: string): string {
+        return text
+          .replace(/- \*\*(.*?)\*\*/g, "\n- **`$1`**") // Ensure backticks around commands
+          .replace(/ - /g, "\n- ") // Ensure new lines for each list item
+          .trim();
+      }
+
+    const fetchAgentResponse = async()=>{
+        setIsWaitingForResponse(true);
+        try{
+            const response = await axios.post(`${apiUrl}/api/chat`,
+                { 
+                    sessionId: sessionId.current, 
+                    query: input 
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+            const data = await response.data;
+            const botResponse = { text: formatChatResponse(data.response), type: 'bot' as 'bot', persona: 'AI Agent' };
+            setMessages(prev => [...prev, botResponse]);
+            setInput('');
+            setIsWaitingForResponse(false);
+        }catch(error:any){
+            const errorMessage = { text: error.message, type: 'bot' as 'bot', persona: 'AI Agent' };
+            setMessages(prev => [...prev, errorMessage]);
+            setInput('');
+            setIsWaitingForResponse(false);
+        }
+    }
+
     const handleSendMessage = () => {
         if (input.trim() === '') return;
 
         const userMessage = { text: input, type: 'user' as 'user', persona: 'You' };
         setMessages([...messages, userMessage]);
-        setInput('');
-        setIsWaitingForResponse(true);
-
-        setTimeout(() => {
-            const botResponse = { text: 'This is AI Agent response!', type: 'bot' as 'bot', persona: 'AI Agent' };
-            setMessages(prev => [...prev, botResponse]);
-            setIsWaitingForResponse(false);
-        }, 1000);
+        fetchAgentResponse();
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -33,12 +70,12 @@ const ChatPlayground: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen pt-16 bg-gray-900 text-white p-4">
+        <div className="flex flex-col h-screen pt-16 ml-16 bg-gray-900 text-white p-4">
             <div className="flex-1 overflow-y-auto space-y-4 p-4 custom-scrollbar">
                 {messages.map((msg, index) => (
                     <div
                         key={index}
-                        className={`max-w-lg p-4 rounded-xl shadow-lg ${msg.type === 'user' ? 'bg-blue-500 text-white self-start text-left' : 'bg-gray-800 text-gray-200 self-end text-right ml-auto'}`}
+                        className={`max-w-lg p-4 rounded-xl shadow-lg ${msg.type === 'user' ? 'bg-blue-500 text-white self-start text-left' : 'bg-gray-800 text-gray-200 self-end ml-auto'}`}
                     >
                         <span className="block font-bold mb-1">{msg.persona}</span>
                         {msg.text}

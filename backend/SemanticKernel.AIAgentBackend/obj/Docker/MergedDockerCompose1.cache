@@ -19,6 +19,23 @@ services:
         source: sqlserverdata
         target: /var/opt/mssql
         volume: {}
+  aiagent-client:
+    build:
+      context: D:\Code Files\Learning\Semantic kernel\frontend\ai-agent\dockerfile
+      dockerfile: Dockerfile
+    container_name: aiagentclient
+    depends_on:
+      semantickernel.aiagentbackend:
+        condition: service_started
+        required: true
+    image: aiagent-client
+    networks:
+      app_network: null
+    ports:
+      - mode: ingress
+        target: 5173
+        published: "5173"
+        protocol: tcp
   qdrant:
     container_name: qdrant
     image: qdrant/qdrant:v1.12.4

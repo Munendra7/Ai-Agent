@@ -1,14 +1,32 @@
-version: '3.4'
-
 services:
-  semantickernel.aiagentbackend:
-    image: ${DOCKER_REGISTRY-}semantickernelaiagentbackend
+  semantickernelaiagentbackend:
+    image: semantickernel-aiagentbackend
+    container_name: semantickernelaiagentbackend
     build:
-      context: .
+      context: ./backend/SemanticKernel.AIAgentBackend
       dockerfile: SemanticKernel.AIAgentBackend/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__AppDBConnectionString=Server=agenticaisqlserver,1433;Database=AgenticAIDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
     depends_on:
       - agenticaisqlserver
       - qdrant
+    networks:
+      - app_network
+
+  aiagent-client:
+    image: aiagent-client
+    container_name: aiagentclient
+    build:
+      context: ./frontend/ai-agent
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - semantickernelaiagentbackend
     networks:
       - app_network
 

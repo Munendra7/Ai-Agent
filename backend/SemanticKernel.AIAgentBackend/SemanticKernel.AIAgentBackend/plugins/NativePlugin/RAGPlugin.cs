@@ -18,7 +18,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             this.embeddingService = embeddingService;
         }
 
-        [KernelFunction("answer"), Description("Gets data from documents provided by user and generates an answer from RAG based on user query.")]
+        [KernelFunction("answer"), Description("Acts as the AI knowledge base by retrieving relevant information from user-provided documents using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query.")]
         public async Task<string> AnswerAsync([Description("User query")] string query)
         {
             try
@@ -45,7 +45,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 var promptTemplate = """
                     Context: {{$searchResults}}
                     Question: {{$query}}
-                    Provide a clear and concise response (max 50 words) only from Context.
+                    Provide a clear and concise response (max 40 words) only from Context.
                 """;
 
                 var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
