@@ -22,12 +22,6 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             dbContext.ChatHistory.Add(chatHistory);
             await dbContext.SaveChangesAsync();
         }
-        
-        public async Task AddKernelPlannarLogsAsync(KernelPlannarLogs kernelPlannarLogs)
-        {
-            dbContext.KernelPlannarLogs.Add(kernelPlannarLogs);
-            await dbContext.SaveChangesAsync();
-        }
 
         public async Task AddMessagesAsync(List<ChatHistory> chatHistories)
         {

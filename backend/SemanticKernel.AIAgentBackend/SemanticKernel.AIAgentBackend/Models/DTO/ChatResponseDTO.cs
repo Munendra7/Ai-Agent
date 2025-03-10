@@ -3,6 +3,5 @@
     public class ChatResponseDTO
     {
         public string? Response { get; set; }
-        public string? SerializedPlan { get; set; }
     }
 }

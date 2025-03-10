@@ -29,7 +29,7 @@ namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin
         {
             try
             {
-                var executionSettings = new OpenAIPromptExecutionSettings
+                var openAIPromptExecutionSettings = new OpenAIPromptExecutionSettings
                 {
                     Temperature = 0.7,
                     TopP = 0.9,
@@ -54,15 +54,17 @@ namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin
                 //current user message
                 chatHistory.AddUserMessage(query);
 
-                var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory: chatHistory, kernel: _kernel, executionSettings: executionSettings);
+                var result = await chatCompletionService.GetChatMessageContentAsync(chatHistory: chatHistory, kernel: _kernel, executionSettings: openAIPromptExecutionSettings);
 
-                var response = new StringBuilder();
-                await foreach (var chunk in result)
-                {
-                    response.Append(chunk);
-                }
+                //var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory: chatHistory, kernel: _kernel, executionSettings: openAIPromptExecutionSettings);
 
-                return response.ToString();
+                //var response = new StringBuilder();
+                //await foreach (var chunk in result)
+                //{
+                //    response.Append(chunk);
+                //}
+
+                return result.ToString();
             }
             catch (Exception ex)
             {

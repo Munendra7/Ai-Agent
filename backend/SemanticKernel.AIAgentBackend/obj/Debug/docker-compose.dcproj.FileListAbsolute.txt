@@ -78,9 +78,3 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.Extensions.FileSystemGlobbing.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.Extensions.Configuration.FileExtensions.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Grpc.Net.Common.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.SemanticKernel.Planners.Handlebars.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.SemanticKernel.PromptTemplates.Handlebars.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Handlebars.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\HandlebarsDotNet.Helpers.Core.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Handlebars.Net.Helpers.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Stef.Validation.dll

@@ -7,8 +7,6 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Interface
     {
         public Task AddMessageAsync(ChatHistory chatHistory);
 
-        public Task AddKernelPlannarLogsAsync(KernelPlannarLogs kernelPlannarLogs);
-
         public Task AddMessagesAsync(List<ChatHistory> chatHistories);
 
         public Task<IEnumerable<ChatHistory>> GetMessagesAsync(Guid sessionId, int lastChats);
