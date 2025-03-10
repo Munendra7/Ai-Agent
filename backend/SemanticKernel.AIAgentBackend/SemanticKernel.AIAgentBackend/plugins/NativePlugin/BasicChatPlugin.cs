@@ -11,13 +11,13 @@ namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin
     public class BasicChatPlugin
     {
         private readonly Kernel _kernel;
-        private readonly IChatService _chatService;
+        private readonly IChatHistoryService _chatService;
         private readonly Guid sessionId;
         private const string SystemMessage =
         "You are an AI assistant that provides precise, professional, and context-aware responses. " +
         "Maintain conversation history, summarize key points when needed, and ensure concise yet informative answers.";
 
-        public BasicChatPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IChatService chatService, Guid sessionId)
+        public BasicChatPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IChatHistoryService chatService, Guid sessionId)
         {
             _kernel = kernel;
             _chatService = chatService;

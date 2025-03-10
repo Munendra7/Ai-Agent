@@ -8,11 +8,11 @@ using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 
 namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 {
-    public class ChatService : IChatService
+    public class ChatHistoryService : IChatHistoryService
     {
         private readonly AppDbContext dbContext;
 
-        public ChatService(AppDbContext dbContext)
+        public ChatHistoryService(AppDbContext dbContext)
         {
             this.dbContext = dbContext;
         }

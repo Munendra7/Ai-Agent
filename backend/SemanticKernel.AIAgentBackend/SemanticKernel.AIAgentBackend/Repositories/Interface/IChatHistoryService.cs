@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace SemanticKernel.AIAgentBackend.Repositories.Interface
 {
-    public interface IChatService
+    public interface IChatHistoryService
     {
         public Task AddMessageAsync(ChatHistory chatHistory);
 

@@ -22,11 +22,11 @@ namespace SemanticKernel.AIAgentBackend.Controllers
     {
         private readonly Kernel _kernel;
         private readonly IConfiguration _configuration;
-        private readonly IChatService _chatService;
+        private readonly IChatHistoryService _chatService;
         private readonly IEmbeddingService _embeddingService;
         private readonly ILogger _logger;
 
-        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatService chatService, IEmbeddingService embeddingService, ILogger<ChatController> logger)
+        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatHistoryService chatService, IEmbeddingService embeddingService, ILogger<ChatController> logger)
         {
             _kernel = kernel;
             _configuration = configuration;
@@ -43,8 +43,6 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             {
                 return BadRequest("Question cannot be empty.");
             }
-
-            var sessionId = new Guid("4963c532-26f9-4bea-92ae-67c0c3c05700");
             
             try
             {
@@ -56,7 +54,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     TopP = 0.5,
                 };
 
-                var chatPlugin = new BasicChatPlugin(_kernel, _chatService, sessionId);
+                var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
                 var ragPlugin = new RAGPlugin(_kernel, _embeddingService);
@@ -70,7 +68,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
                 Microsoft.SemanticKernel.ChatCompletion.ChatHistory chatHistory = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
 
-                var userChatHistory = await _chatService.GetMessagesAsync(sessionId, 10);
+                var userChatHistory = await _chatService.GetMessagesAsync(userQueryDTO.SessionId, 10);
 
                 foreach (var chat in userChatHistory)
                 {
@@ -95,14 +93,14 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     {
                         new ChatHistory()
                         {
-                            SessionId = sessionId,
+                            SessionId = userQueryDTO.SessionId,
                             Message = userQueryDTO.Query,
                             Sender = "User",
                             Timestamp = DateTime.Now
                         },
                         new ChatHistory()
                         {
-                            SessionId = sessionId,
+                            SessionId = userQueryDTO.SessionId,
                             Message = result?.Content?.ToString() ?? string.Empty,
                             Sender = "Assistant",
                             Timestamp = DateTime.Now
@@ -131,14 +129,14 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                         {
                             new ChatHistory()
                             {
-                                SessionId = sessionId,
+                                SessionId = userQueryDTO.SessionId,
                                 Message = userQueryDTO.Query,
                                 Sender = "User",
                                 Timestamp = DateTime.Now
                             },
                             new ChatHistory()
                             {
-                                SessionId = sessionId,
+                                SessionId = userQueryDTO.SessionId,
                                 Message = chatResponse.ToString(),
                                 Sender = "Assistant",
                                 Timestamp = DateTime.Now

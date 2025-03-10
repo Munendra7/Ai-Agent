@@ -62,7 +62,7 @@ builder.Services.AddScoped(sp =>
 });
 
 
-builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IChatHistoryService, ChatHistoryService>();
 builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
 
 builder.Services.AddHttpClient();

@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SemanticKernel.AIAgentBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80b3ca041f35142dc64f4bf23120867bc8b5ac38")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+62c4b75b61f3c6775536b785d1df836d1c548056")]
 [assembly: System.Reflection.AssemblyProductAttribute("SemanticKernel.AIAgentBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SemanticKernel.AIAgentBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -8,6 +8,9 @@ namespace SemanticKernel.AIAgentBackend.Models.DTO
         [MaxLength(500, ErrorMessage = "Prompt cannot be greater than 500 characters")]
         public required string Query { get; set; }
 
+        [Required]
+        public Guid SessionId { get; set; }
+
         //[Required]
         //[EnumDataType(typeof(AIModel), ErrorMessage = "Invalid model type. Allowed values: AzureOpenAI, Ollama, OpenAI")]
         //public required string Model { get; set; }
