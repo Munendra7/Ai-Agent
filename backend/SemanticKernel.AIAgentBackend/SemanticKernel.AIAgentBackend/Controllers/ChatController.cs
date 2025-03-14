@@ -2,16 +2,11 @@
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Microsoft.SemanticKernel.Planning.Handlebars;
 using SemanticKernel.AIAgentBackend.CustomActionFilters;
-using SemanticKernel.AIAgentBackend.Models.Domain;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
-using SemanticKernel.AIAgentBackend.Repositories.Repository;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
@@ -21,14 +16,16 @@ namespace SemanticKernel.AIAgentBackend.Controllers
     public class ChatController : ControllerBase
     {
         private readonly Kernel _kernel;
+        private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly IChatHistoryService _chatService;
         private readonly IEmbeddingService _embeddingService;
         private readonly ILogger _logger;
 
-        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatHistoryService chatService, IEmbeddingService embeddingService, ILogger<ChatController> logger)
+        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, HttpClient httpClient, IConfiguration configuration, IChatHistoryService chatService, IEmbeddingService embeddingService, ILogger<ChatController> logger)
         {
             _kernel = kernel;
+            _httpClient = httpClient;
             _configuration = configuration;
             _chatService = chatService;
             _embeddingService = embeddingService;
@@ -59,11 +56,13 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
                 var ragPlugin = new RAGPlugin(_kernel, _embeddingService);
+                var emailwriterPlugin = new EmailWriterPlugin(_kernel, _httpClient, _configuration);
 
                 _kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
                 _kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
                 _kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
                 _kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
+                _kernel.ImportPluginFromObject(emailwriterPlugin, "EmailWriterPlugin");
 
                 var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
 
