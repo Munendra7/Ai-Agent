@@ -65,6 +65,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
         private async Task StoreEmbeddingAsync(string fileName, string? fileDescription, List<float[]> embeddings, List<string> chunkTexts)
         {
             var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
+            ulong vectorSize = _configuration["Qdrant:VectorSize"] != null ? ulong.Parse(_configuration["Qdrant:VectorSize"]!) : 768;
             var points = new List<PointStruct>();
             for (int i = 0; i < embeddings.Count; i++)
             {
@@ -88,7 +89,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             {
                 await _qdrantClient.CreateCollectionAsync(collectionName, new VectorParams
                 {
-                    Size = 768,
+                    Size = vectorSize,
                     Distance = Distance.Cosine
                 });
             }
