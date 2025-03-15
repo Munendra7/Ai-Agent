@@ -8,5 +8,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Interface
     {
         Task<IActionResult> ProcessFileAsync(FileUploadDTO fileDTO);
         Task<IReadOnlyList<ScoredPoint>> SimilaritySearch(string prompt);
+        Task<List<string>> GetAllDocumentsAsync();
+        Task<List<string>> RetrieveDocumentChunksAsync(string documentName);
     }
 }

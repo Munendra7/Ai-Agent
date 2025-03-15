@@ -20,15 +20,10 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             this.configuration = configuration;
         }
 
-        [KernelFunction("SendEmail"), Description("Prepares an email for sending. Always confirm the email body with the user before sending.")]
-        public async Task<string> SendEmailAsync(string to, string body, bool confirmAndSend = false)
+        [KernelFunction("SendEmail"), Description("Always take user consent before sending email, Prepares an email for sending.")]
+        public async Task<string> SendEmailAsync(string to, string subject, string body)
         {
-            if (!confirmAndSend)
-            {
-                return $"Preview Email:\nTo: {to}\nBody: {body}\n\nPlease confirm before sending.";
-            }
-
-            var emailRequest = new { to, emailBody = body };
+            var emailRequest = new { to,subject, emailBody = body };
             var response = await httpClient.PostAsync(configuration["AgentEmailUrl_PowerAutomate"]!,
                 new StringContent(JsonConvert.SerializeObject(emailRequest), Encoding.UTF8, "application/json"));
 

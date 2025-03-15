@@ -4,6 +4,7 @@ using System.Text;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using OpenAI.Chat;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Qdrant.Client.Grpc;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
@@ -18,7 +19,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             this.embeddingService = embeddingService;
         }
 
-        [KernelFunction("answer"), Description("Acts as the AI knowledge base by retrieving relevant information from user-provided documents using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query.")]
+        [KernelFunction("answerfromKnowledge"), Description("Acts as the AI knowledge base by retrieving relevant information from user-provided information and documents using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query.")]
         public async Task<string> AnswerAsync([Description("User query")] string query)
         {
             try
@@ -66,6 +67,58 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             {
                 return "An unexpected error occurred. Please try again.";
             }
+        }
+
+        [KernelFunction("list_documents"), Description("Lists all stored documents in AI Agent Knowledge.")]
+        public async Task<List<string>> ListDocumentsAsync()
+        {
+            return await embeddingService.GetAllDocumentsAsync();
+        }
+
+        [KernelFunction("summarize_document"), Description("Retrieves document content by name from Qdrant and summarizes its content. Use this only when user want to summarize document content.")]
+        public async Task<string> SummarizeDocumentAsync([Description("Name of the document to summarize")] string documentName)
+        {
+            try
+            {
+                var documentChunks = await embeddingService.RetrieveDocumentChunksAsync(documentName);
+
+                // Step 2: Summarize each chunk
+                var chunkSummaries = new List<string>();
+                foreach (var chunk in documentChunks)
+                {
+                    string summary = await SummarizeChunkAsync(chunk);
+                    chunkSummaries.Add(summary);
+                }
+
+                // Step 3: Generate final summary from chunk summaries
+                string combinedSummary = string.Join("\n", chunkSummaries);
+                string finalSummary = await SummarizeChunkAsync(combinedSummary);
+
+                return finalSummary;
+            }
+            catch (Exception)
+            {
+                return "Error retrieving and summarizing document.";
+            }
+        }
+
+        private async Task<string> SummarizeChunkAsync(string chunk)
+        {
+            var promptTemplate = """
+                Summarize the following text while keeping key details:
+                {{$chunk}}
+
+                Provide a concise summary within 100 words.
+            """;
+
+            var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
+
+            var summaryResponse = await _kernel.InvokeAsync(
+                semanticFunction,
+                new KernelArguments { ["chunk"] = chunk }
+            ).ConfigureAwait(false);
+
+            return summaryResponse.ToString();
         }
     }
 }

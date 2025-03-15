@@ -109,5 +109,45 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 
             return returnedLocations;
         }
+
+        public async Task<List<string>> GetAllDocumentsAsync()
+        {
+            var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
+            var scrollPoints = new ScrollPoints
+            {
+                CollectionName = collectionName,
+                WithPayload = new WithPayloadSelector { Enable = true },
+                Limit = 10 // Adjust based on expected number of documents
+            };
+
+            var scrollResponse = await _qdrantClient.ScrollAsync(collectionName, filter: null, limit: scrollPoints.Limit, offset: scrollPoints.Offset, payloadSelector: scrollPoints.WithPayload);
+
+            return scrollResponse.Result
+                .Select(p => p.Payload["FileName"].StringValue)
+                .Distinct()
+                .ToList();
+        }
+
+        public async Task<List<string>> RetrieveDocumentChunksAsync(string documentName)
+        {
+            var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
+            var scrollPoints = new ScrollPoints
+            {
+                CollectionName = collectionName,
+                WithPayload = new WithPayloadSelector { Enable = true },
+                Limit = 10
+            };
+
+            var scrollResponse = await _qdrantClient.ScrollAsync(collectionName, filter: null, limit: scrollPoints.Limit, offset: scrollPoints.Offset, payloadSelector: scrollPoints.WithPayload);
+
+            var documentChunks = scrollResponse.Result
+                .Where(p => p.Payload["FileName"].StringValue == documentName)
+                .OrderBy(p => int.Parse(p.Payload["ChunkIndex"].StringValue))
+                .Select(p => p.Payload["Chunk"].StringValue)
+                .ToList();
+
+            return documentChunks;
+        }
+
     }
 }
