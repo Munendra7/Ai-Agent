@@ -75,7 +75,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             return await embeddingService.GetAllDocumentsAsync();
         }
 
-        [KernelFunction("summarize_document"), Description("Retrieves document content by name from Qdrant and summarizes its content. Use this only when user want to summarize document content.")]
+        [KernelFunction("summarize_document"), Description("Use this function ONLY when the user explicitly asks to summarize a document and provides a document name. Do NOT use this for general document queries.")]
         public async Task<string> SummarizeDocumentAsync([Description("Name of the document to summarize")] string documentName)
         {
             try

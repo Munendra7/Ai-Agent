@@ -104,7 +104,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             var returnedLocations = await _qdrantClient.QueryAsync(
                 collectionName: collectionName,
                 query: promptEmbedding.ToArray(),
-                limit: 5
+                limit: 10
             );
 
             return returnedLocations;
@@ -113,41 +113,86 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
         public async Task<List<string>> GetAllDocumentsAsync()
         {
             var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
-            var scrollPoints = new ScrollPoints
+            var allDocuments = new HashSet<string>();
+            int limit = 100;
+            PointId? nextOffset = null;
+
+            do
             {
-                CollectionName = collectionName,
-                WithPayload = new WithPayloadSelector { Enable = true },
-                Limit = 10 // Adjust based on expected number of documents
-            };
+                var scrollResponse = await _qdrantClient.ScrollAsync(
+                    collectionName,
+                    filter: null,
+                    limit: (uint)limit,
+                    offset: nextOffset,
+                    payloadSelector: new WithPayloadSelector { Enable = true }
+                );
 
-            var scrollResponse = await _qdrantClient.ScrollAsync(collectionName, filter: null, limit: scrollPoints.Limit, offset: scrollPoints.Offset, payloadSelector: scrollPoints.WithPayload);
+                if (scrollResponse?.Result == null || !scrollResponse.Result.Any())
+                    break; // Stop if no more results
 
-            return scrollResponse.Result
-                .Select(p => p.Payload["FileName"].StringValue)
-                .Distinct()
-                .ToList();
+                foreach (var point in scrollResponse.Result)
+                {
+                    if (point.Payload.TryGetValue("FileName", out var fileName) && !string.IsNullOrEmpty(fileName.StringValue))
+                        allDocuments.Add(fileName.StringValue);
+                }
+
+                nextOffset = scrollResponse.NextPageOffset;
+            } while (nextOffset != null);
+
+            return allDocuments.ToList();
         }
 
         public async Task<List<string>> RetrieveDocumentChunksAsync(string documentName)
         {
             var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
-            var scrollPoints = new ScrollPoints
+            var allChunks = new List<(int ChunkIndex, string ChunkText)>();
+            int limit = 100; // Fetch up to 100 chunks per request
+            PointId? nextOffset = null;
+
+            var filter = new Filter
             {
-                CollectionName = collectionName,
-                WithPayload = new WithPayloadSelector { Enable = true },
-                Limit = 10
+                Must = { new Condition
+                {
+                    Field = new FieldCondition
+                    {
+                        Key = "FileName",
+                        Match = new Match
+                        {
+                            Text = documentName // Filter chunks by document name
+                        }
+                    }
+                }}
             };
 
-            var scrollResponse = await _qdrantClient.ScrollAsync(collectionName, filter: null, limit: scrollPoints.Limit, offset: scrollPoints.Offset, payloadSelector: scrollPoints.WithPayload);
+            do
+            {
+                var scrollResponse = await _qdrantClient.ScrollAsync(
+                    collectionName,
+                    filter: filter,
+                    limit: (uint)limit,
+                    offset: nextOffset,
+                    payloadSelector: new WithPayloadSelector { Enable = true }
+                );
 
-            var documentChunks = scrollResponse.Result
-                .Where(p => p.Payload["FileName"].StringValue == documentName)
-                .OrderBy(p => int.Parse(p.Payload["ChunkIndex"].StringValue))
-                .Select(p => p.Payload["Chunk"].StringValue)
-                .ToList();
+                if (scrollResponse?.Result == null || !scrollResponse.Result.Any())
+                    break;
 
-            return documentChunks;
+                foreach (var point in scrollResponse.Result)
+                {
+                    if (point.Payload.TryGetValue("Chunk", out var chunk) &&
+                        point.Payload.TryGetValue("ChunkIndex", out var chunkIndex) &&
+                        !string.IsNullOrEmpty(chunk.StringValue) &&
+                        int.TryParse(chunkIndex.StringValue, out int index))
+                    {
+                        allChunks.Add((index, chunk.StringValue));
+                    }
+                }
+
+                nextOffset = scrollResponse.NextPageOffset;
+
+            } while (nextOffset != null);
+
+            return allChunks.OrderBy(c => c.ChunkIndex).Select(c => c.ChunkText).ToList();
         }
-
     }
 }

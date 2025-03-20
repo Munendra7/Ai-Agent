@@ -1,12 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using Google.Apis.CustomSearchAPI.v1.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Interfaces;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.VisualBasic;
 using SemanticKernel.AIAgentBackend.CustomActionFilters;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System;
+using UglyToad.PdfPig;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
@@ -49,7 +56,10 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     MaxTokens = 1000,
                     Temperature = 0.2,
                     TopP = 0.5,
-                    ChatSystemPrompt = "You are an AI Agent that provides precise, professional, and context-aware responses. Maintain conversation history, summarize key points when needed, and ensure concise yet informative answers."
+                    ChatSystemPrompt = @"You are an intelligent AI assistant that prioritizes answering queries using retrieved knowledge from an external knowledge base (RAG). Always rely on retrieved information first, using internal knowledge only when necessary. Ensure responses are accurate, relevant, and well-grounded in context.
+                                        Utilize the RAG plugin to fetch and analyze relevant inforamtion before generating a response.Maintain conversation history for continuity, summarize key insights when needed, and deliver concise, well - structured answers.
+                                        When a query requires execution, leverage available plugins.If sufficient information is unavailable, acknowledge limitations and suggest next steps.
+                                        Your goal is to provide clear, precise, and context - aware responses, ensuring every interaction is informative and effective."
                 };
 
                 var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
@@ -58,10 +68,10 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 var ragPlugin = new RAGPlugin(_kernel, _embeddingService);
                 var emailwriterPlugin = new EmailWriterPlugin(_kernel, _httpClient, _configuration);
 
+                _kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
                 _kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
                 _kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
                 _kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
-                _kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
                 _kernel.ImportPluginFromObject(emailwriterPlugin, "EmailWriterPlugin");
 
                 var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();

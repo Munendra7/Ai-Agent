@@ -37,7 +37,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
         private void ValidateFileUpload(FileUploadDTO request)
         {
-            var allowedExtentions = new string[] { ".pdf", ".docx" , ".txt" };
+            var allowedExtentions = new string[] { ".pdf", ".docx" , ".txt", ".xlsx", ".csv" };
 
             if (!allowedExtentions.Contains(Path.GetExtension(request.File.FileName)))
             {

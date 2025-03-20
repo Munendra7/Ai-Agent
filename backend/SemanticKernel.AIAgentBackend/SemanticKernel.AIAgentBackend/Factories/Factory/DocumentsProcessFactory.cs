@@ -4,6 +4,10 @@ using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using UglyToad.PdfPig;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using DocumentFormat.OpenXml.Drawing;
+using System.Formats.Asn1;
+using System.Globalization;
+using OfficeOpenXml;
+using CsvHelper;
 
 namespace SemanticKernel.AIAgentBackend.Factories.Factory
 {
@@ -26,8 +30,63 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             {
                 return ExtractTextChunksFromDocx(stream, chunkSize);
             }
+            else if (file.FileName.EndsWith(".xlsx") || file.FileName.EndsWith(".xls"))
+            {
+                return ExtractStructuredDataFromExcel(stream);
+            }
+            else if (file.FileName.EndsWith(".csv"))
+            {
+                return ExtractStructuredDataFromCsv(stream);
+            }
             return Enumerable.Empty<string>();
         }
+
+        private IEnumerable<string> ExtractStructuredDataFromExcel(Stream stream)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using var package = new ExcelPackage(stream);
+            var structuredData = new List<string>();
+            foreach (var worksheet in package.Workbook.Worksheets)
+            {
+                int rowCount = worksheet.Dimension?.Rows ?? 0;
+                int colCount = worksheet.Dimension?.Columns ?? 0;
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var rowData = new List<string>();
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        rowData.Add($"{worksheet.Cells[1, col].Text}:{worksheet.Cells[row, col].Text}");
+                    }
+                    structuredData.Add(string.Join(" | ", rowData));
+                }
+            }
+            return structuredData;
+        }
+
+        private IEnumerable<string> ExtractStructuredDataFromCsv(Stream stream)
+        {
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            var structuredData = new List<string>();
+
+            if (!csv.Read() || !csv.ReadHeader())
+                return structuredData;
+
+            var headers = csv.HeaderRecord;
+
+            while (csv.Read())
+            {
+                var rowData = new List<string>();
+                for (int i = 0; i < headers?.Length; i++)
+                {
+                    rowData.Add($"{headers[i]}:{csv.GetField(i)}");
+                }
+                structuredData.Add(string.Join(" | ", rowData));
+            }
+
+            return structuredData;
+        }
+
 
         private IEnumerable<string> ExtractTextChunksFromTxt(Stream stream, int chunkSize)
         {

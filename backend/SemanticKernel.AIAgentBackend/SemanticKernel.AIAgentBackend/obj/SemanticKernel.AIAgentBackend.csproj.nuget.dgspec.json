@@ -50,9 +50,17 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "CsvHelper": {
+              "target": "Package",
+              "version": "[33.0.1, )"
+            },
             "DocumentFormat.OpenXml": {
               "target": "Package",
               "version": "[3.3.0, )"
+            },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.7.0, )"
             },
             "Microsoft.Azure.Cosmos": {
               "target": "Package",

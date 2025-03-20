@@ -81,3 +81,11 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Serilog.Sinks.File.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Serilog.Extensions.Logging.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Newtonsoft.Json.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\EPPlus.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\CsvHelper.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\EPPlus.Interfaces.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\EPPlus.System.Drawing.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.IO.RecyclableMemoryStream.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\System.Security.Cryptography.Pkcs.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\System.Drawing.Common.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.Win32.SystemEvents.dll
