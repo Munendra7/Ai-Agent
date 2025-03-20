@@ -56,10 +56,9 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     MaxTokens = 1000,
                     Temperature = 0.2,
                     TopP = 0.5,
-                    ChatSystemPrompt = @"You are an intelligent AI assistant that prioritizes answering queries using retrieved knowledge from an external knowledge base (RAG). Always rely on retrieved information first, using internal knowledge only when necessary. Ensure responses are accurate, relevant, and well-grounded in context.
-                                        Utilize the RAG plugin to fetch and analyze relevant inforamtion before generating a response.Maintain conversation history for continuity, summarize key insights when needed, and deliver concise, well - structured answers.
-                                        When a query requires execution, leverage available plugins.If sufficient information is unavailable, acknowledge limitations and suggest next steps.
-                                        Your goal is to provide clear, precise, and context - aware responses, ensuring every interaction is informative and effective."
+                    ChatSystemPrompt = "You are an intelligent AI assistant that prioritizes answering queries using retrieved knowledge from your knowledge base (RAG)."
+                    +"Always rely on retrieved information first. Utilize the RAG plugin to fetch and analyze relevant inforamtion before generating a response. When a query requires execution, leverage available plugins.If sufficient information is unavailable, acknowledge limitations and suggest next steps."
+                    +"Your goal is to provide clear, precise, and context - aware responses, ensuring every interaction is informative and effective."
                 };
 
                 var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
