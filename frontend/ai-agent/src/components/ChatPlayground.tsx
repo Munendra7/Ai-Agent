@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 import { useMsal } from '@azure/msal-react';
 
 const apiUrl = (import.meta as any).env.VITE_AIAgent_URL;
@@ -26,7 +27,7 @@ const ChatPlayground: React.FC = () => {
           .replace(/- \*\*(.*?)\*\*/g, "\n- **`$1`**") // Ensure backticks around commands
           .replace(/ - /g, "\n- ") // Ensure new lines for each list item
           .trim();
-      }
+    }
 
     const fetchAgentResponse = async()=>{
         setIsWaitingForResponse(true);
@@ -78,7 +79,7 @@ const ChatPlayground: React.FC = () => {
                         className={`max-w-lg p-4 rounded-xl shadow-lg ${msg.type === 'user' ? 'bg-blue-500 text-white self-start text-left' : 'bg-gray-800 text-gray-200 self-end ml-auto'}`}
                     >
                         <span className="block font-bold mb-1">{msg.persona}</span>
-                        {msg.text}
+                        <ReactMarkdown>{msg.text}</ReactMarkdown>
                     </div>
                 ))}
                 <div ref={messagesEndRef} />

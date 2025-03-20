@@ -41,6 +41,7 @@ const SideNavPanel: React.FC = () => {
             setIsUploadModalOpen(false);
             setFile(null);
             setDescription('');
+            setIsOpen(false);
         } catch (error) {
             toast.error("File upload failed!");
         }
@@ -72,7 +73,7 @@ const SideNavPanel: React.FC = () => {
                             className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg mb-4"
                         ></textarea>
                         <div className="flex justify-end gap-2">
-                            <button onClick={() => setIsUploadModalOpen(false)} className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600">Cancel</button>
+                            <button onClick={() => {setIsUploadModalOpen(false); setIsOpen(false);}} className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600">Cancel</button>
                             <button onClick={handleUpload} className="p-2 bg-blue-600 rounded-lg hover:bg-blue-700">Upload</button>
                         </div>
                     </div>
