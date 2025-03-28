@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
     <PackageReference Include="EPPlus" Version="7.7.0" />
@@ -30,6 +31,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.8.1" />
     <PackageReference Include="Microsoft.KernelMemory.Abstractions" Version="0.97.250211.1" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureOpenAI" Version="1.40.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.40.0-alpha" />

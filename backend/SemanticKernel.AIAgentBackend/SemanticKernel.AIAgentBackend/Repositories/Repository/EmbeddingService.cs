@@ -33,17 +33,17 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             _embeddingGenerator = embeddingGenerator;
         }
 
-        public async Task<IActionResult> ProcessFileAsync(FileUploadDTO fileDTO)
+        public async Task<string> ProcessFileAsync(FileUploadDTO fileDTO, string filePath)
         {
             if (fileDTO == null || fileDTO.File.Length == 0)
             {
-                return new BadRequestObjectResult("Invalid file.");
+                return "Invalid file.";
             }
 
             List<string> textChunks = _documentsProcessFactory.ExtractTextChunksFromFile(fileDTO.File).ToList();
             if (textChunks.Count == 0)
             {
-                return new BadRequestObjectResult("Could not extract text from the file.");
+                return "Could not extract text from the file.";
             }
 
             // Generate embeddings for each chunk
@@ -57,12 +57,12 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             }
 
             // Store in Qdrant
-            await StoreEmbeddingAsync(fileDTO.FileName, fileDTO.FileDescription, embeddings, chunkTexts);
+            await StoreEmbeddingAsync(fileDTO.FileName, fileDTO.FileDescription, embeddings, chunkTexts, filePath);
 
-            return new OkObjectResult("File processed and embeddings stored successfully.");
+            return "File processed and embeddings stored successfully.";
         }
 
-        private async Task StoreEmbeddingAsync(string fileName, string? fileDescription, List<float[]> embeddings, List<string> chunkTexts)
+        private async Task StoreEmbeddingAsync(string fileName, string? fileDescription, List<float[]> embeddings, List<string> chunkTexts, string filePath)
         {
             var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
             ulong vectorSize = _configuration["Qdrant:VectorSize"] != null ? ulong.Parse(_configuration["Qdrant:VectorSize"]!) : 768;
@@ -75,6 +75,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                     Payload =
                     {
                         ["FileName"] = fileName,
+                        ["FilePath"] = filePath,
                         ["FileDescription"] = fileDescription ?? string.Empty,
                         ["ChunkIndex"] = i.ToString(),
                         ["Chunk"] = chunkTexts[i]

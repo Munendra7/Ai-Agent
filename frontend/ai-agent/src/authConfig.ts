@@ -1,10 +1,10 @@
-import { PublicClientApplication, Configuration } from "@azure/msal-browser";
+import { PublicClientApplication, Configuration, EventType, AuthenticationResult } from "@azure/msal-browser";
 
 export const msalConfig: Configuration = {
   auth: {
     clientId: import.meta.env.VITE_MSAL_ClientId,
     authority: import.meta.env.VITE_MSAL_Authority,
-    redirectUri: import.meta.env.VITE_MSAL_RedirectUri, // Adjust for production
+    redirectUri: import.meta.env.VITE_MSAL_RedirectUri,
   },
   cache: {
     cacheLocation: "sessionStorage",
@@ -22,6 +22,10 @@ export const loginRequest = {
     scopes: ["User.Read"]
 };
 
+export const backendAPILoginRequest = {
+  scopes: [import.meta.env.VITE_Backend_Scope]
+};
+
 /**
  * Add here the scopes to request when obtaining an access token for MS Graph API. For more information, see:
  * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-browser/docs/resources-and-scopes.md
@@ -31,3 +35,13 @@ export const graphConfig = {
 };
 
 export const msalInstance = new PublicClientApplication(msalConfig);
+if(!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
+  msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
+}
+
+msalInstance.addEventCallback((event) => {
+  if(event.eventType === EventType.LOGIN_SUCCESS && event.payload && (event.payload as AuthenticationResult).account) {
+    const account = (event.payload as AuthenticationResult)?.account;
+    msalInstance.setActiveAccount(account);
+  }
+});

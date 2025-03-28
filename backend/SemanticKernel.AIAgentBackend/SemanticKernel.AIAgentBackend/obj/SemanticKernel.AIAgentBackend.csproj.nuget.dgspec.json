@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj": {}
+    "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent - Copy\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj": {}
   },
   "projects": {
-    "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj": {
+    "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent - Copy\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj",
+        "projectUniqueName": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent - Copy\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj",
         "projectName": "SemanticKernel.AIAgentBackend",
-        "projectPath": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj",
+        "projectPath": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent - Copy\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj",
         "packagesPath": "C:\\Users\\Munendra\\.nuget\\packages\\",
-        "outputPath": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\obj\\",
+        "outputPath": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent - Copy\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -50,6 +50,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Azure.Storage.Blobs": {
+              "target": "Package",
+              "version": "[12.24.0, )"
+            },
             "CsvHelper": {
               "target": "Package",
               "version": "[33.0.1, )"
@@ -79,6 +83,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[9.0.2, )"
+            },
+            "Microsoft.Identity.Web": {
+              "target": "Package",
+              "version": "[3.8.1, )"
             },
             "Microsoft.KernelMemory.Abstractions": {
               "target": "Package",

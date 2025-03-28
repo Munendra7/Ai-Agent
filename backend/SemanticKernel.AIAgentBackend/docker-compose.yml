@@ -7,8 +7,9 @@ services:
       context: .
       dockerfile: SemanticKernel.AIAgentBackend/Dockerfile
     depends_on:
-      - agenticaisqlserver
       - qdrant
+      - blobstorage
+      - agenticaisqlserver
     networks:
       - app_network
 
@@ -38,10 +39,24 @@ services:
     networks:
       - app_network
 
+  blobstorage:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: blobstorage
+    restart: always
+    ports:
+      - "10000:10000"   # Blob Storage
+    volumes:
+      - blobstorage_data:/data
+    networks:
+      - app_network
+    command: "azurite --blobHost 0.0.0.0 --loose"
+
 volumes:
   sqlserverdata:
     driver: local
   qdrant_data:
+    driver: local
+  blobstorage_data:
     driver: local
 
 networks:

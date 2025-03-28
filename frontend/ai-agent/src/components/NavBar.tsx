@@ -7,8 +7,9 @@ import { SignInButton } from "./MSAuthentication/SignInButton";
 
 const NavBar: React.FC<{}> = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
+  const{ instance } = useMsal();
+  const activeAccount = instance.getActiveAccount();
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-gray-900 text-white shadow-lg z-50">
@@ -29,7 +30,7 @@ const NavBar: React.FC<{}> = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden sm:flex items-center gap-4">
-          {isAuthenticated?<><span className="text-sm md:text-base">Welcome, {accounts.length>0?accounts[0]?.name??"":""}</span>
+          {isAuthenticated?<><span className="text-sm md:text-base">Welcome, {activeAccount?.name}</span>
           <SignOutButton /></>:<><SignInButton/></>}
         </div>
       </div>
@@ -37,7 +38,7 @@ const NavBar: React.FC<{}> = () => {
       {/* Mobile Dropdown Menu */}
       {isOpen && (
         <div className="sm:hidden flex flex-col items-center bg-gray-800 py-4">
-          {isAuthenticated?<><span className="text-sm mb-2">Welcome, {accounts.length>0?accounts[0]?.name??"":""}</span>
+          {isAuthenticated?<><span className="text-sm mb-2">Welcome, {activeAccount?.name}</span>
           <SignOutButton /></>:<><SignInButton/></>}
         </div>
       )}

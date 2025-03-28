@@ -1,14 +1,17 @@
-using SemanticKernel.AIAgentBackend.Data;
-using SemanticKernel.AIAgentBackend.Middlewares;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Qdrant.Client;
-using SemanticKernel.AIAgentBackend.Factories.Interface;
-using SemanticKernel.AIAgentBackend.Factories.Factory;
+using Microsoft.Identity.Web;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
+using Qdrant.Client;
+using SemanticKernel.AIAgentBackend.Data;
+using SemanticKernel.AIAgentBackend.Factories.Factory;
+using SemanticKernel.AIAgentBackend.Factories.Interface;
+using SemanticKernel.AIAgentBackend.Middlewares;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Repository;
-using Serilog; // Add this using directive
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +32,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("AppDBConnectionString"));
@@ -38,6 +44,12 @@ builder.Services.AddScoped<QdrantClient>(provider =>
 {
     var qdrantUri = new Uri(builder.Configuration["Qdrant:Endpoint"] ?? "http://localhost:6334");
     return new QdrantClient(qdrantUri);
+});
+
+builder.Services.AddScoped<BlobServiceClient>(provider =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("AzureBlobStorage");
+    return new BlobServiceClient(connectionString);
 });
 
 
@@ -64,6 +76,7 @@ builder.Services.AddScoped(sp =>
 
 builder.Services.AddScoped<IChatHistoryService, ChatHistoryService>();
 builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
+builder.Services.AddScoped<IBlobService, BlobService>();
 
 builder.Services.AddHttpClient();
 
@@ -82,12 +95,14 @@ app.UseCors(builder => builder
 //     app.UseSwaggerUI();
 // }
 
- app.UseSwagger();
+app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionHandlerMiddleware>();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

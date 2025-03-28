@@ -5,6 +5,13 @@ using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using OpenAI.Chat;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Qdrant.Client.Grpc;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.ExtendedProperties;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using DocumentFormat.OpenXml.Office2019.Excel.ThreadedComments;
+using Microsoft.VisualBasic;
+using OpenAI.Assistants;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
@@ -40,14 +47,16 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                         builder.AppendLine($"{fileName.StringValue}: {chunk.StringValue}");
                     }
                 }
-
                 string searchResultsText = builder.ToString();
-                
-                var promptTemplate = """
+                string promptTemplate = @"
+                    You are an AI assistant that answers questions based only on the given context.
+    
                     Context: {{$searchResults}}
                     Question: {{$query}}
-                    Provide a clear and concise response (max 40 words) only from Context.
-                """;
+    
+                    Provide a clear and concise response (maximum 40 words) strictly based on the provided Context.  
+                    Mention the file name where it is located.'
+                ";
 
                 var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
 

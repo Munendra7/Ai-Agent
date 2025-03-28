@@ -15,11 +15,13 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System;
 using UglyToad.PdfPig;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ChatController : ControllerBase
     {
         private readonly Kernel _kernel;
@@ -50,18 +52,26 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             
             try
             {
+                string ChatSystemPrompt = @"
+                You are an AI assistant that answers queries strictly using retrieved knowledge. 
+
+                - Use the RAGPlugin to fetch relevant information before responding.  
+                - If data is insufficient, say 'No relevant information found'—do not speculate.  
+                - Execute queries and actions via plugins when required.  
+                - Keep responses factual, concise, and context-aware.  
+                ";
+
+
                 OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
                 {
                     FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
                     MaxTokens = 1000,
                     Temperature = 0.2,
                     TopP = 0.5,
-                    ChatSystemPrompt = "You are an intelligent AI assistant that prioritizes answering queries using retrieved knowledge from your knowledge base (RAG)."
-                    +"Always rely on retrieved information first. Utilize the RAG plugin to fetch and analyze relevant inforamtion before generating a response. When a query requires execution, leverage available plugins.If sufficient information is unavailable, acknowledge limitations and suggest next steps."
-                    +"Your goal is to provide clear, precise, and context - aware responses, ensuring every interaction is informative and effective."
+                    ChatSystemPrompt = ChatSystemPrompt
                 };
 
-                var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
+                //var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
                 var ragPlugin = new RAGPlugin(_kernel, _embeddingService);
@@ -70,7 +80,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 _kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
                 _kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
                 _kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
-                _kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
+                //_kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
                 _kernel.ImportPluginFromObject(emailwriterPlugin, "EmailWriterPlugin");
 
                 var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();

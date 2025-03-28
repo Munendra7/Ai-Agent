@@ -3,30 +3,49 @@ import { Send, Loader2, Bot } from "lucide-react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { useMsal } from "@azure/msal-react";
+import { backendAPILoginRequest } from "../authConfig";
 
 const apiUrl = (import.meta as any).env.VITE_AIAgent_URL;
 
 const ChatPlayground: React.FC = () => {
-  const { accounts } = useMsal();
-  const sessionId = useRef<string>("");
+  const { instance} = useMsal();
+  const activeAccount = instance.getActiveAccount();
+  const sessionId = useRef<string>(crypto.randomUUID());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [messages, setMessages] = useState<{ text: string; type: "user" | "bot"; persona: string; isLoading?: boolean }[]>
   ([
     {
-      text: `Hi ${accounts.length > 0 ? accounts[0]?.name ?? "" : ""}, how can I assist you?`,
+      text: `Hi ${activeAccount?.name}, how can I assist you?`,
       type: "bot",
       persona: "AI Agent",
     },
   ]);
   const [input, setInput] = useState("");
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Fetch Access Token Once
   useEffect(() => {
-    sessionId.current = crypto.randomUUID();
+    const fetchToken = async () => {
+      try {
+        const response = await instance.acquireTokenSilent({
+          ...backendAPILoginRequest,
+          account: activeAccount!,
+        });
+        setAccessToken(response.accessToken);
+      } catch (error) {
+        console.error("Token acquisition failed", error);
+      }
+    };
+
+    if (activeAccount) {
+      fetchToken();
+    }
   }, []);
 
   function formatChatResponse(text: string): string {
@@ -34,6 +53,11 @@ const ChatPlayground: React.FC = () => {
   }
 
   const fetchAgentResponse = async () => {
+    if (!accessToken) {
+      console.error("Access token not available");
+      return;
+    }
+
     setIsWaitingForResponse(true);
     setMessages((prev) => [...prev, { text: "", type: "bot", persona: "AI Agent", isLoading: true }]);
 
@@ -41,10 +65,20 @@ const ChatPlayground: React.FC = () => {
       const response = await axios.post(
         `${apiUrl}/api/chat`,
         { sessionId: sessionId.current, query: input },
-        { headers: { "Content-Type": "application/json" } }
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
-      setMessages((prev) => [...prev.slice(0, -1), { text: formatChatResponse(response.data.response), type: "bot", persona: "AI Agent" }]);
+
+      setMessages((prev) => [
+        ...prev.slice(0, -1),
+        { text: formatChatResponse(response.data.response), type: "bot", persona: "AI Agent" },
+      ]);
     } catch (error: any) {
+      console.error("Error fetching agent response", error);
       setMessages((prev) => [...prev.slice(0, -1), { text: error.message, type: "bot", persona: "AI Agent" }]);
     } finally {
       setInput("");
@@ -70,8 +104,8 @@ const ChatPlayground: React.FC = () => {
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`flex items-start max-w-lg p-4 rounded-xl shadow-md transition-all duration-300 
-              ${msg.type === "bot" ? "bg-gradient-to-r from-indigo-600 to-blue-500 text-white self-start text-left" : "bg-gray-700 text-gray-200 self-end ml-auto"}`}
+            className={`flex items-start overflow-x-auto custom-scrollbar p-4 rounded-xl shadow-md transition-all duration-300 
+              ${msg.type === "bot" ? "bg-gray-800 text-white self-start text-left max-w-max" : "bg-blue-600 text-white self-end ml-auto max-w-lg"}`}
           >
             {msg.type === "bot" && (
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-opacity-20 mr-2">

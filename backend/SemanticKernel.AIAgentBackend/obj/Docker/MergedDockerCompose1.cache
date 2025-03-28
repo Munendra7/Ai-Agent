@@ -1,4 +1,4 @@
-name: dockercompose16813498347866987284
+name: dockercompose783932097001924696
 services:
   agenticaisqlserver:
     container_name: agenticaisqlserver
@@ -19,23 +19,6 @@ services:
         source: sqlserverdata
         target: /var/opt/mssql
         volume: {}
-  aiagent-client:
-    build:
-      context: D:\Code Files\Learning\Semantic kernel\frontend\ai-agent\dockerfile
-      dockerfile: Dockerfile
-    container_name: aiagentclient
-    depends_on:
-      semantickernel.aiagentbackend:
-        condition: service_started
-        required: true
-    image: aiagent-client
-    networks:
-      app_network: null
-    ports:
-      - mode: ingress
-        target: 5173
-        published: "5173"
-        protocol: tcp
   qdrant:
     container_name: qdrant
     image: qdrant/qdrant:v1.12.4
@@ -58,7 +41,7 @@ services:
         volume: {}
   semantickernel.aiagentbackend:
     build:
-      context: D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend
+      context: D:\Code Files\Learning\Semantic kernel\AI-Agent - Copy\backend\SemanticKernel.AIAgentBackend
       dockerfile: SemanticKernel.AIAgentBackend/Dockerfile
       args:
         BUILD_CONFIGURATION: Debug
@@ -118,12 +101,12 @@ services:
         bind:
           create_host_path: true
       - type: bind
-        source: D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend
+        source: D:\Code Files\Learning\Semantic kernel\AI-Agent - Copy\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend
         target: /app
         bind:
           create_host_path: true
       - type: bind
-        source: D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend
+        source: D:\Code Files\Learning\Semantic kernel\AI-Agent - Copy\backend\SemanticKernel.AIAgentBackend
         target: /src
         bind:
           create_host_path: true
@@ -170,12 +153,12 @@ services:
           create_host_path: true
 networks:
   app_network:
-    name: dockercompose16813498347866987284_app_network
+    name: dockercompose783932097001924696_app_network
     driver: bridge
 volumes:
   qdrant_data:
-    name: dockercompose16813498347866987284_qdrant_data
+    name: dockercompose783932097001924696_qdrant_data
     driver: local
   sqlserverdata:
-    name: dockercompose16813498347866987284_sqlserverdata
+    name: dockercompose783932097001924696_sqlserverdata
     driver: local

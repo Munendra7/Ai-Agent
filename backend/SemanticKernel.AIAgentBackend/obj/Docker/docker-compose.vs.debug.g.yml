@@ -15,8 +15,8 @@ services:
       - ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS=true
       - NUGET_FALLBACK_PACKAGES=/.nuget/fallbackpackages
     volumes:
-      - D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend:/app:rw
-      - D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend:/src:rw
+      - D:\Code Files\Learning\Semantic kernel\AI-Agent - Copy\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend:/app:rw
+      - D:\Code Files\Learning\Semantic kernel\AI-Agent - Copy\backend\SemanticKernel.AIAgentBackend:/src:rw
       - C:\Users\Munendra\vsdbg\vs2017u5:/remote_debugger:rw
       - C:\Users\Munendra\.nuget\packages:/.nuget/packages:ro
       - C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages:/.nuget/fallbackpackages:ro
