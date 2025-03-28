@@ -2,20 +2,17 @@
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using System.ComponentModel;
-using System.Net.Mail;
 using System.Text;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
     public class EmailWriterPlugin
     {
-        private readonly Kernel kernel;
         private readonly HttpClient httpClient;
         private readonly IConfiguration configuration;
 
-        public EmailWriterPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, HttpClient httpClient, IConfiguration configuration)
+        public EmailWriterPlugin(HttpClient httpClient, IConfiguration configuration)
         {
-            this.kernel = kernel;
             this.httpClient = httpClient;
             this.configuration = configuration;
         }

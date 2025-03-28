@@ -4,5 +4,7 @@
     {
         public const string KnowledgeContainerName = "knowledge";
         public const string TemplateContainerName = "templates";
+        public const string GeneratedDocsContainerName = "generateddocs";
+        public const string StorageImageName = "blobstorage";
     }
 }

@@ -13,7 +13,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class KnowledgeController : ControllerBase
     {
         private readonly IEmbeddingService embeddingService;

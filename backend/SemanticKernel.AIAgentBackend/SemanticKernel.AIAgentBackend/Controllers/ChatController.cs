@@ -1,27 +1,20 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using Google.Apis.CustomSearchAPI.v1.Data;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Microsoft.VisualBasic;
 using SemanticKernel.AIAgentBackend.CustomActionFilters;
+using SemanticKernel.AIAgentBackend.Factories.Factory;
+using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
-using SemanticKernel.AIAgentBackend.Plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System;
-using UglyToad.PdfPig;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
-using Microsoft.AspNetCore.Authorization;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ChatController : ControllerBase
     {
         private readonly Kernel _kernel;
@@ -29,15 +22,19 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         private readonly IConfiguration _configuration;
         private readonly IChatHistoryService _chatService;
         private readonly IEmbeddingService _embeddingService;
+        private readonly IBlobService _blobService;
         private readonly ILogger _logger;
+        private readonly IDocumentsProcessFactory _documentsProcessFactory;
 
-        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, HttpClient httpClient, IConfiguration configuration, IChatHistoryService chatService, IEmbeddingService embeddingService, ILogger<ChatController> logger)
+        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, HttpClient httpClient, IConfiguration configuration, IChatHistoryService chatService, IEmbeddingService embeddingService, IBlobService blobService, IDocumentsProcessFactory documentsProcessFactory, ILogger<ChatController> logger)
         {
             _kernel = kernel;
             _httpClient = httpClient;
             _configuration = configuration;
             _chatService = chatService;
             _embeddingService = embeddingService;
+            _blobService = blobService;
+            _documentsProcessFactory = documentsProcessFactory;
             _logger = logger;
         }
 
@@ -75,13 +72,15 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
                 var ragPlugin = new RAGPlugin(_kernel, _embeddingService);
-                var emailwriterPlugin = new EmailWriterPlugin(_kernel, _httpClient, _configuration);
+                var emailwriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
+                var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _documentsProcessFactory);
 
                 _kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
                 _kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
                 _kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
                 //_kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
                 _kernel.ImportPluginFromObject(emailwriterPlugin, "EmailWriterPlugin");
+                _kernel.ImportPluginFromObject(documentGenerationPlugin, "DocumentGenerationPlugin");
 
                 var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
 

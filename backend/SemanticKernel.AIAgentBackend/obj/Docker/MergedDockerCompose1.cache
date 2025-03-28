@@ -1,4 +1,4 @@
-name: dockercompose783932097001924696
+name: dockercompose16813498347866987284
 services:
   agenticaisqlserver:
     container_name: agenticaisqlserver
@@ -18,6 +18,27 @@ services:
       - type: volume
         source: sqlserverdata
         target: /var/opt/mssql
+        volume: {}
+  blobstorage:
+    command:
+      - azurite
+      - --blobHost
+      - 0.0.0.0
+      - --loose
+    container_name: blobstorage
+    image: mcr.microsoft.com/azure-storage/azurite
+    networks:
+      app_network: null
+    ports:
+      - mode: ingress
+        target: 10000
+        published: "10000"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: blobstorage_data
+        target: /data
         volume: {}
   qdrant:
     container_name: qdrant
@@ -41,7 +62,7 @@ services:
         volume: {}
   semantickernel.aiagentbackend:
     build:
-      context: D:\Code Files\Learning\Semantic kernel\AI-Agent - Copy\backend\SemanticKernel.AIAgentBackend
+      context: D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend
       dockerfile: SemanticKernel.AIAgentBackend/Dockerfile
       args:
         BUILD_CONFIGURATION: Debug
@@ -53,6 +74,9 @@ services:
     container_name: SemanticKernel.AIAgentBackend
     depends_on:
       agenticaisqlserver:
+        condition: service_started
+        required: true
+      blobstorage:
         condition: service_started
         required: true
       qdrant:
@@ -101,12 +125,12 @@ services:
         bind:
           create_host_path: true
       - type: bind
-        source: D:\Code Files\Learning\Semantic kernel\AI-Agent - Copy\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend
+        source: D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend
         target: /app
         bind:
           create_host_path: true
       - type: bind
-        source: D:\Code Files\Learning\Semantic kernel\AI-Agent - Copy\backend\SemanticKernel.AIAgentBackend
+        source: D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend
         target: /src
         bind:
           create_host_path: true
@@ -153,12 +177,15 @@ services:
           create_host_path: true
 networks:
   app_network:
-    name: dockercompose783932097001924696_app_network
+    name: dockercompose16813498347866987284_app_network
     driver: bridge
 volumes:
+  blobstorage_data:
+    name: dockercompose16813498347866987284_blobstorage_data
+    driver: local
   qdrant_data:
-    name: dockercompose783932097001924696_qdrant_data
+    name: dockercompose16813498347866987284_qdrant_data
     driver: local
   sqlserverdata:
-    name: dockercompose783932097001924696_sqlserverdata
+    name: dockercompose16813498347866987284_sqlserverdata
     driver: local
