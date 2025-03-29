@@ -582,3 +582,4 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\SemanticKernel.AIAgentBackend.pdb
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\SemanticKernel.AIAgentBackend.genruntimeconfig.cache
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\ref\SemanticKernel.AIAgentBackend.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\HtmlAgilityPack.NetCore.dll

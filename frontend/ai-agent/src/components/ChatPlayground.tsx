@@ -92,8 +92,8 @@ const ChatPlayground: React.FC = () => {
     fetchAgentResponse();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !isWaitingForResponse) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey && !isWaitingForResponse) {
       handleSendMessage();
     }
   };
@@ -120,7 +120,7 @@ const ChatPlayground: React.FC = () => {
                   <span>Thinking...</span>
                 </div>
               ) : (
-                <ReactMarkdown>{msg.text}</ReactMarkdown>
+                <ReactMarkdown>{msg.text.replace(/\n/g, "  \n")}</ReactMarkdown>
               )}
             </div>
           </div>
@@ -129,8 +129,8 @@ const ChatPlayground: React.FC = () => {
       </div>
 
       <div className="flex items-center bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
-        <input
-          type="text"
+        <textarea
+          rows={2}
           maxLength={499}
           className="flex-1 p-3 bg-gray-900 outline-none text-white placeholder-gray-400 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500"
           placeholder="Type a message..."

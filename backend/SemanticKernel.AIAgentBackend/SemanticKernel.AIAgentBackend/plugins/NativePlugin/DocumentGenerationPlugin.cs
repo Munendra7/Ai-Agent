@@ -39,7 +39,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         }
 
         [KernelFunction("GenerateDocument"), Description("Generate a document from a template with user input, it returns the URL of the file")]
-        public async Task<string> GenerateDocumentAsync(string templateFileName, Dictionary<string, object> dynamicInputs)
+        public async Task<string> GenerateDocumentAsync([Description("Will take template name and placeholders to replace template placeholders. Normal Text fields should be in the format {key:value} and Tabular Data should be in the format [{ColName1:'value1', ColName2:'value2'}, {ColName1:'value3', ColName2:'value4'}]. Both are part of my dynamicInputs variable")] string templateFileName, Dictionary<string, object> dynamicInputs)
         {
             var templateStream = await blobService.DownloadFileAsync(templateFileName, BlobStorageConstants.TemplateContainerName);
             if (templateStream.Content == null) return "Template not found.";
