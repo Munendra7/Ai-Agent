@@ -62,21 +62,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 10,
+          "SelectedChildIndex": 2,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "RAGPlugin.cs",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAFkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-29T11:17:03.479Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -101,6 +88,32 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-28T19:50:43.685Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ChatController.cs",
+              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
+              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
+              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
+              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAcwFQAAABhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-28T18:46:35.759Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "RAGPlugin.cs",
+              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
+              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
+              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
+              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAFkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-29T11:17:03.479Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -189,19 +202,6 @@
               "ViewState": "AgIAABwAAAAAAAAAAAAwwCYAAADXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-03-28T18:13:35.959Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ChatController.cs",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
-              "ViewState": "AgIAAD8AAAAAAAAAAAAAAEkAAABYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-28T18:46:35.759Z",
               "EditorCaption": ""
             },
             {

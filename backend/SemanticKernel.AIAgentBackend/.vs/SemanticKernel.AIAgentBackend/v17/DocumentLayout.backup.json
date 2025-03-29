@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\controllers\\chatcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\controllers\\chatcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\plugins\\nativeplugin\\ragplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\plugins\\nativeplugin\\ragplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -29,10 +33,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\controllers\\knowledgecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\controllers\\knowledgecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\controllers\\chatcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\controllers\\chatcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\factories\\interface\\idocumentsprocessfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -62,36 +62,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "RAGPlugin.cs",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
               "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
-              "ViewState": "AgIAADwAAAAAAAAAAAAAAFkAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAFkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-29T11:17:03.479Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "GoogleSearchPlugin.cs",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-28T19:50:01.202Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "DocumentGenerationPlugin.cs",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\DocumentGenerationPlugin.cs",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\DocumentGenerationPlugin.cs",
@@ -129,7 +117,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "DocumentsProcessFactory.cs",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Factories\\Factory\\DocumentsProcessFactory.cs",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Factories\\Factory\\DocumentsProcessFactory.cs",
@@ -142,7 +130,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "BlobStorageConstants.cs",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Constants\\BlobStorageConstants.cs",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Constants\\BlobStorageConstants.cs",
@@ -179,7 +167,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "EmailWriterPlugin.cs",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\EmailWriterPlugin.cs",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\EmailWriterPlugin.cs",
@@ -192,7 +180,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "appsettings.Development.json",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\appsettings.Development.json",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\appsettings.Development.json",
@@ -205,20 +193,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 0,
               "Title": "ChatController.cs",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
               "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Controllers\\ChatController.cs",
-              "ViewState": "AgIAAFcAAAAAAAAAAAD4v2oAAAASAAAAAAAAAA==",
+              "ViewState": "AgIAAD8AAAAAAAAAAAAAAEkAAABYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-28T18:46:35.759Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 11,
+              "Title": "GoogleSearchPlugin.cs",
+              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
+              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
+              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
+              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-28T19:50:01.202Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "KnowledgeController.cs",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\KnowledgeController.cs",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Controllers\\KnowledgeController.cs",
