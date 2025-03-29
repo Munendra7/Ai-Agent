@@ -71,7 +71,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 //var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
-                var ragPlugin = new RAGPlugin(_kernel, _embeddingService);
+                var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService);
                 var emailwriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
                 var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _documentsProcessFactory);
 

@@ -16,6 +16,18 @@ using Table = DocumentFormat.OpenXml.Wordprocessing.Table;
 using TableCell = DocumentFormat.OpenXml.Wordprocessing.TableCell;
 using TableRow = DocumentFormat.OpenXml.Wordprocessing.TableRow;
 using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
+using TableProperties = DocumentFormat.OpenXml.Wordprocessing.TableProperties;
+using TopBorder = DocumentFormat.OpenXml.Wordprocessing.TopBorder;
+using BottomBorder = DocumentFormat.OpenXml.Wordprocessing.BottomBorder;
+using LeftBorder = DocumentFormat.OpenXml.Wordprocessing.LeftBorder;
+using RightBorder = DocumentFormat.OpenXml.Wordprocessing.RightBorder;
+using InsideHorizontalBorder = DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder;
+using InsideVerticalBorder = DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder;
+using DocumentFormat.OpenXml;
+using System.Text.Json;
+using ParagraphProperties = DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties;
+using TableCellProperties = DocumentFormat.OpenXml.Wordprocessing.TableCellProperties;
+using RunProperties = DocumentFormat.OpenXml.Wordprocessing.RunProperties;
 
 namespace SemanticKernel.AIAgentBackend.Factories.Factory
 {
@@ -95,7 +107,6 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             return structuredData;
         }
 
-
         private IEnumerable<string> ExtractTextChunksFromTxt(Stream stream, int chunkSize)
         {
             using var reader = new StreamReader(stream);
@@ -150,9 +161,9 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             return chunks;
         }
 
-        public Dictionary<string, string> ExtractPlaceholders(Stream templateStream)
+        public HashSet<string> ExtractPlaceholders(Stream templateStream)
         {
-            var placeholders = new Dictionary<string, string>();
+            var placeholders = new HashSet<string>();
 
             using (var memoryStream = new MemoryStream())
             {
@@ -169,25 +180,10 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
 
                     var regex = new Regex(@"\{\{(.*?)\}\}", RegexOptions.Compiled);
 
-                    foreach (var paragraph in body.Descendants<Paragraph>())
+                    foreach (var element in body.Descendants<OpenXmlElement>())
                     {
-                        string paragraphText = string.Join("", paragraph.Descendants<Text>().Select(t => t.Text));
-                        ExtractMatches(regex, paragraphText, placeholders);
-                    }
-
-                    foreach (var table in body.Descendants<Table>())
-                    {
-                        foreach (var cell in table.Descendants<TableCell>())
-                        {
-                            string cellText = string.Join("", cell.Descendants<Text>().Select(t => t.Text));
-                            ExtractMatches(regex, cellText, placeholders, isTable: true);
-                        }
-                    }
-
-                    foreach (var sdt in body.Descendants<SdtElement>())
-                    {
-                        string sdtText = string.Join("", sdt.Descendants<Text>().Select(t => t.Text));
-                        ExtractMatches(regex, sdtText, placeholders);
+                        string elementText = GetFullText(element);
+                        ExtractMatches(regex, elementText, placeholders);
                     }
                 }
             }
@@ -195,103 +191,142 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             return placeholders;
         }
 
-        // Extracts and stores placeholders in the dictionary
-        private void ExtractMatches(Regex regex, string text, Dictionary<string, string> placeholders, bool isTable = false)
+        private void ExtractMatches(Regex regex, string text, HashSet<string> placeholders)
         {
-            if (!string.IsNullOrWhiteSpace(text))
+            foreach (Match match in regex.Matches(text))
             {
-                Console.WriteLine($"Checking text: {text}"); // Debugging
-
-                foreach (Match match in regex.Matches(text))
-                {
-                    string key = match.Groups[1].Value;
-                    placeholders[key] = isTable || key.StartsWith("Table:") ? "table" : "text";
-                }
+                placeholders.Add(match.Groups[1].Value.Trim()); // Store only the placeholder name
             }
         }
 
-        public MemoryStream ReplacePlaceholdersInDocx(Stream templateStream, Dictionary<string, string>? parameters, Dictionary<string, List<List<string>>>? tableInputs)
+        private string GetFullText(OpenXmlElement element)
+        {
+            return string.Join("", element.Descendants<Run>().Select(r => r.InnerText));
+        }
+
+        public MemoryStream ReplacePlaceholdersInDocx(Stream templateStream, Dictionary<string, object> dynamicInputs)
         {
             var outputStream = new MemoryStream();
 
-            // Ensure the template stream is seekable before resetting the position
             if (templateStream.CanSeek)
             {
                 templateStream.Position = 0;
             }
 
             templateStream.CopyTo(outputStream);
-            outputStream.Position = 0; // Reset after copying
+            outputStream.Position = 0;
 
             using (WordprocessingDocument doc = WordprocessingDocument.Open(outputStream, true))
             {
                 var body = doc.MainDocumentPart?.Document.Body;
-                if (body == null)
-                {
-                    return outputStream;
-                }
+                if (body == null) return outputStream;
 
-                if(parameters != null)
+                foreach (var key in dynamicInputs.Keys)
                 {
-                    foreach (var param in parameters)
+                    var value = dynamicInputs[key];
+
+                    if (value is JsonElement jsonElement)
+                    {
+                        if (jsonElement.ValueKind == JsonValueKind.String)
+                        {
+                            value = jsonElement.GetString();
+                        }
+                        else if (jsonElement.ValueKind == JsonValueKind.Array)
+                        {
+                            value = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(jsonElement.GetRawText());
+                        }
+                        else
+                        {
+                            value = jsonElement.ToString();
+                        }
+                    }
+
+                    if (value is string textValue)
                     {
                         foreach (var text in body.Descendants<Text>())
                         {
-                            if (!string.IsNullOrEmpty(text.Text) && text.Text.Contains($"{{{{{param.Key}}}}}"))
+                            if (!string.IsNullOrEmpty(text.Text) && text.Text.Contains($"{{{{{key}}}}}"))
                             {
-                                text.Text = text.Text.Replace($"{{{{{param.Key}}}}}", param.Value);
+                                text.Text = text.Text.Replace($"{{{{{key}}}}}", textValue);
                             }
                         }
                     }
-                }
-               
 
-                if(tableInputs != null)
-                {
-                    foreach (var tableKey in tableInputs.Keys)
+                    else if (value is List<Dictionary<string, string>> tableData && tableData.Count > 0)
                     {
-                        var table = body.Descendants<Table>()
-                            .FirstOrDefault(t => t.Descendants<TableCell>().Any(tc => tc.InnerText.Contains($"{{{{{tableKey}}}}}")));
+                        var headers = tableData[0].Keys.ToList();
 
-                        if (table != null)
+                        var placeholderParagraph = body.Descendants<Paragraph>()
+                            .FirstOrDefault(p => p.InnerText.Contains($"{{{{{key}}}}}"));
+
+                        if (placeholderParagraph != null)
                         {
-                            // Find the row that contains the placeholder
-                            var placeholderRow = table.Elements<TableRow>()
-                                .FirstOrDefault(tr => tr.InnerText.Contains($"{{{{{tableKey}}}}}"));
+                            var parentElement = placeholderParagraph.Parent;
+                            var nextSibling = placeholderParagraph.NextSibling();
 
-                            if (placeholderRow != null)
+                            parentElement?.RemoveChild(placeholderParagraph);
+
+                            var newTable = new Table(
+                                new TableProperties(
+                                    new TableWidth { Width = "100%", Type = TableWidthUnitValues.Pct },
+                                    new TableBorders(
+                                        new TopBorder { Val = BorderValues.Single, Size = 12 },
+                                        new BottomBorder { Val = BorderValues.Single, Size = 12 },
+                                        new LeftBorder { Val = BorderValues.Single, Size = 12 },
+                                        new RightBorder { Val = BorderValues.Single, Size = 12 },
+                                        new InsideHorizontalBorder { Val = BorderValues.Single, Size = 12 },
+                                        new InsideVerticalBorder { Val = BorderValues.Single, Size = 12 }
+                                    )
+                                )
+                            );
+
+                            var headerRow = new TableRow();
+                            foreach (var header in headers)
                             {
-                                // Clone the placeholder row structure for new rows (without placeholder text)
-                                var newRowTemplate = (TableRow)placeholderRow.CloneNode(true);
+                                var headerCell = new TableCell(
+                                    new TableCellProperties(new Shading { Fill = "BFBFBF", Val = ShadingPatternValues.Clear }),
+                                    new Paragraph(
+                                        new ParagraphProperties(new Justification { Val = JustificationValues.Center }),
+                                        new Run(new RunProperties(new Bold()), new Text(header))
+                                    )
+                                );
+                                headerRow.Append(headerCell);
+                            }
+                            newTable.Append(headerRow);
 
-                                // Remove the placeholder row
-                                table.RemoveChild(placeholderRow);
-
-                                // ✅ Insert new rows dynamically
-                                foreach (var rowData in tableInputs[tableKey])
+                            foreach (var rowData in tableData)
+                            {
+                                var newRow = new TableRow();
+                                foreach (var header in headers)
                                 {
-                                    var newRow = (TableRow)newRowTemplate.CloneNode(true); // Clone for structure
-                                    var cells = newRow.Elements<TableCell>().ToList();
-
-                                    for (int i = 0; i < rowData.Count && i < cells.Count; i++)
-                                    {
-                                        var cellText = cells[i].Descendants<Text>().FirstOrDefault();
-                                        if (cellText != null)
-                                        {
-                                            cellText.Text = rowData[i]; // Replace text inside cloned cell
-                                        }
-                                    }
-                                    table.AppendChild(newRow);
+                                    var cellValue = rowData.ContainsKey(header) ? rowData[header] : "";
+                                    var newCell = new TableCell(
+                                        new Paragraph(
+                                            new ParagraphProperties(new Justification { Val = JustificationValues.Left }),
+                                            new Run(new Text(cellValue))
+                                        )
+                                    );
+                                    newRow.Append(newCell);
                                 }
+                                newTable.Append(newRow);
+                            }
+
+                            if (nextSibling != null)
+                            {
+                                parentElement?.InsertBefore(newTable, nextSibling);
+                            }
+                            else
+                            {
+                                parentElement?.AppendChild(newTable);
                             }
                         }
                     }
                 }
 
-                doc?.MainDocumentPart?.Document.Save();
+                doc.MainDocumentPart?.Document.Save();
             }
 
-            outputStream.Position = 0; // Ensure stream is at the start for reading
+            outputStream.Position = 0;
             return outputStream;
         }
     }

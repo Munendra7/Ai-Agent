@@ -29,26 +29,23 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             return templates;
         }
 
-        [KernelFunction("ExtractTemplateParameters"), Description("Extract required parameters and tables from a selected template")]
-        public async Task<Dictionary<string, string>> ExtractTemplateParametersAsync(string templateFileName)
+        [KernelFunction("ExtractTemplateParameters"), Description("Extract all required placeholders (text and tables) from a selected template")]
+        public async Task<HashSet<string>> ExtractTemplateParametersAsync(string templateFileName)
         {
             var templateStream = await blobService.DownloadFileAsync(templateFileName, BlobStorageConstants.TemplateContainerName);
-            if (templateStream.Content == null) return new Dictionary<string, string>();
+            if (templateStream.Content == null) return new HashSet<string>();
 
             return documentsProcessFactory.ExtractPlaceholders(templateStream.Content);
         }
 
-        [KernelFunction("GenerateDocument"), Description("Generate a document from a template with user input, it returns the URL of File")]
-        public async Task<string> GenerateDocumentAsync([Description("TableInputs is Options, where the parameters repalces the place holders in the document")] string templateFileName, Dictionary<string, string>? userInputs, Dictionary<string, List<List<string>>>? tableInputs)
+        [KernelFunction("GenerateDocument"), Description("Generate a document from a template with user input, it returns the URL of the file")]
+        public async Task<string> GenerateDocumentAsync(string templateFileName, Dictionary<string, object> dynamicInputs)
         {
-            // Download template
             var templateStream = await blobService.DownloadFileAsync(templateFileName, BlobStorageConstants.TemplateContainerName);
             if (templateStream.Content == null) return "Template not found.";
 
-            // Replace placeholders in the document
-            var generatedDocStream = documentsProcessFactory.ReplacePlaceholdersInDocx(templateStream.Content, userInputs, tableInputs);
+            var generatedDocStream = documentsProcessFactory.ReplacePlaceholdersInDocx(templateStream.Content, dynamicInputs);
 
-            // Upload new document to Blob Storage
             string newFileName = $"Generated_{Guid.NewGuid()}.docx";
             string documentUrl = await blobService.UploadFileAsync(generatedDocStream, newFileName, BlobStorageConstants.GeneratedDocsContainerName);
 

@@ -12,6 +12,8 @@ using DocumentFormat.OpenXml.Office2019.Excel.ThreadedComments;
 using Microsoft.VisualBasic;
 using OpenAI.Assistants;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using SemanticKernel.AIAgentBackend.Constants;
+using SemanticKernel.AIAgentBackend.Repositories.Repository;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
@@ -19,11 +21,13 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
     {
         private readonly Kernel _kernel;
         private readonly IEmbeddingService embeddingService;
+        private readonly IBlobService blobService;
 
-        public RAGPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IEmbeddingService embeddingService)
+        public RAGPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IEmbeddingService embeddingService, IBlobService blobService)
         {
             _kernel = kernel;
             this.embeddingService = embeddingService;
+            this.blobService = blobService;
         }
 
         [KernelFunction("answerfromKnowledge"), Description("Acts as the AI knowledge base by retrieving relevant information from user-provided information and documents using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query.")]
@@ -81,7 +85,10 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         [KernelFunction("list_documents"), Description("Lists all stored documents in AI Agent Knowledge.")]
         public async Task<List<string>> ListDocumentsAsync()
         {
-            return await embeddingService.GetAllDocumentsAsync();
+            //return await embeddingService.GetAllDocumentsAsync();
+            var knowledgeDocuments = await blobService.ListFilesAsync(BlobStorageConstants.KnowledgeContainerName);
+
+            return knowledgeDocuments;
         }
 
         [KernelFunction("summarize_document"), Description("Use this function ONLY when the user explicitly asks to summarize a document and provides a document name. Do NOT use this for general document queries.")]
