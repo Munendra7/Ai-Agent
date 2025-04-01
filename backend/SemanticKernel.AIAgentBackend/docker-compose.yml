@@ -49,7 +49,7 @@ services:
       - blobstorage_data:/data
     networks:
       - app_network
-    command: "azurite --blobHost 0.0.0.0 --loose"
+    command: "azurite --blobHost 0.0.0.0 --loose --skipApiVersionCheck"
 
 volumes:
   sqlserverdata:
