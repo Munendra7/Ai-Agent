@@ -243,15 +243,29 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
 
                     if (value is string textValue)
                     {
-                        foreach (var text in body.Descendants<Text>())
+                        foreach (var paragraph in body.Descendants<Paragraph>())
                         {
-                            if (!string.IsNullOrEmpty(text.Text) && text.Text.Contains($"{{{{{key}}}}}"))
+                            var runs = paragraph.Elements<Run>().ToList();
+                            if (runs.Count == 0) continue;
+
+                            var fullText = string.Concat(runs.Select(r => r.InnerText));
+                            var placeholder = $"{{{{{key}}}}}";
+
+                            if (fullText.Contains(placeholder))
                             {
-                                text.Text = text.Text.Replace($"{{{{{key}}}}}", textValue);
+                                fullText = fullText.Replace(placeholder, textValue);
+
+                                // Remove all existing runs
+                                foreach (var run in runs)
+                                {
+                                    run.Remove();
+                                }
+
+                                // Add new run with replaced text
+                                paragraph.AppendChild(new Run(new Text(fullText)));
                             }
                         }
                     }
-
                     else if (value is List<Dictionary<string, string>> tableData && tableData.Count > 0)
                     {
                         var headers = tableData[0].Keys.ToList();
