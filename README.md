@@ -2,7 +2,8 @@
 
 **AI-Agent** is a full-stack project that leverages React for the frontend and .NET for the backend to deliver an intelligent, context-aware AI assistant.
 
-[![Watch the demo](https://drive.google.com/file/d/10Y2ilNIBCDYXUqLF2yZVyI8nqix0gC00/view?usp=sharing)]([https://www.youtube.com/watch?v=VIDEO_ID](https://drive.google.com/file/d/1BNx342cQbMi0Pnw9BZ0yc1Fk5wX7b6T1/view?usp=sharing))
+[![Watch the demo](https://via.placeholder.com/800x450.png?text=Watch+Demo)](https://drive.google.com/file/d/1BNx342cQbMi0Pnw9BZ0yc1Fk5wX7b6T1/view?usp=sharing)
+
 
 ## ✨ Features
 
