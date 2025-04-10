@@ -19,7 +19,7 @@
 
 - **Frontend**: React + MSAL (for authentication)
 - **Backend**: ASP.NET Core + Semantic Kernel
-- **AI/LLM**: You can use any LLM Model, Use GPT 4o for better performance
+- **AI/LLM**: You can use any LLM model. Use GPT-4o for better performance.
 - **Vector Store**: Qdrant
 - **Database**: SQL Server
 - **File Storage**: Azure Blob Storage
@@ -41,6 +41,7 @@ To run the project locally using Docker:
 
 ```bash
 docker-compose up --build
+```
 
 > ⚠️ **Before running, make sure to:**
 >
