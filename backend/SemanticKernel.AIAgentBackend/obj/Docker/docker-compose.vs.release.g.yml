@@ -1,6 +1,6 @@
 services:
   semantickernel.aiagentbackend:
-    container_name: "SemanticKernel.AIAgentBackend"
+    container_name: "SemanticKernel.AIAgentBackend_1"
     build:
       args:
         LAUNCHING_FROM_VS: true

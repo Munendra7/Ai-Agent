@@ -56,6 +56,7 @@ builder.Services.AddScoped<BlobServiceClient>(provider =>
 builder.Services.AddScoped<IKernelFactory, KernelFactory>();
 builder.Services.AddScoped<IEmbeddingKernelFactory, EmbeddingKernelFactory>();
 builder.Services.AddScoped<IDocumentsProcessFactory, DocumentsProcessFactory>();
+builder.Services.AddScoped<IAgentFactory, AgentFactory>();
 
 builder.Services.AddKeyedScoped<Kernel>("LLMKernel", (sp, key) =>
 {

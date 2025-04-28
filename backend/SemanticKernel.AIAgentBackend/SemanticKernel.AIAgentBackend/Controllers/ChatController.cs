@@ -3,10 +3,10 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using SemanticKernel.AIAgentBackend.CustomActionFilters;
-using SemanticKernel.AIAgentBackend.Factories.Factory;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
+using SemanticKernel.AIAgentBackend.Plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 
@@ -68,19 +68,21 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     ChatSystemPrompt = ChatSystemPrompt
                 };
 
-                //var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
+                var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
                 var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService);
                 var emailwriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
                 var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _documentsProcessFactory);
+                var excelDataAnalyzerPlugin = new ExcelDataAnalyzerPlugin(_kernel, _blobService);
 
                 _kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
                 _kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
                 _kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
-                //_kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
+                _kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
                 _kernel.ImportPluginFromObject(emailwriterPlugin, "EmailWriterPlugin");
                 _kernel.ImportPluginFromObject(documentGenerationPlugin, "DocumentGenerationPlugin");
+                _kernel.ImportPluginFromObject(excelDataAnalyzerPlugin, "ExcelDataAnalyzerPlugin");
 
                 var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
 
