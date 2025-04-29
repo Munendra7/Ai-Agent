@@ -180,7 +180,16 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                     The following C# code using Microsoft.Data.Analysis failed with: {ex.Message}
                     ```csharp
                     {currentCode}
-                    ```";
+                    ```
+                    Enusre:
+                        - Safe handling of nulls
+                        - No use of Console.WriteLine
+                        - Use LINQ
+                        - Only assign to 'result'
+                        - Do not include comments or print statements
+                        - Use valid Microsoft.Data.Analysis code
+                    ";
+
                     var fixRun = await _kernel.InvokePromptAsync(fixPrompt);
                     var fixRaw = fixRun.GetValue<string>() ?? "";
                     var fixLines = fixRaw.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
