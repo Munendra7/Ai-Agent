@@ -129,16 +129,19 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             var desc = string.Join(", ", _df.Columns.Select(c => $"{c.Name} ({GetTypeName(c)})"));
 
             var prompt = $@"
-                You have a DataFrame 'df' with columns: [{desc}].
-                Write valid C# code using only Microsoft.Data.Analysis APIs to answer: {query}.
-               Rules:
-                - When working with typed columns, cast them using 'as PrimitiveDataFrameColumn<T>' (e.g., double, long, DateTime).
-                - Aggregation methods like Max(), Min(), Sum(), and Average() return 'object' — so always cast them to the appropriate type explicitly (e.g., '(double)', '(long)').
-                - Use 'ElementwiseEquals', 'ElementwiseGreaterThan', or 'ElementwiseLessThan' directly on typed columns for comparisons.
-                - Use supported methods like 'Filter()', 'GroupBy()', 'Sort()', and 'AddColumn()'.
-                - When grouping columns, pass **multiple column names as a single array of strings** (e.g., `new string[] {{{{\""Year\"", \""Month Name\""}}}}`).
+                You are a C# Excel DataFrame expert. 
+                You have a DataFrame 'df' with columns: [{desc}], 
+                Given a user query: ""{query}"" generate valid C# code using Microsoft.Data.Analysis.
+                Rules:
                 - Assign the final result to a variable named 'result'.
-                - Return only the code body — no using statements, explanations, or comments.";
+                - Use LINQ for filtering and aggregates.
+                - Do not use Console.WriteLine or external libraries.
+                - Do not use reflection or dynamic typing.
+                - Always cast the result to string if needed.
+                - Never use direct indexing or out-of-bound operations.
+                - You must handle null values safely.
+                - Use Where() and Select() when applicable.
+                - Return only the code body — no using statements, class, explanations, or comments.";
 
             var run = await _kernel.InvokePromptAsync(prompt);
             var raw = run.GetValue<string>() ?? string.Empty;
@@ -156,7 +159,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 .AddImports("System", "System.Linq", "Microsoft.Data.Analysis");
 
             // Retry loop: execute & let LLM fix code on failures
-            const int MAX_EXEC_TRIES = 3;
+            const int MAX_EXEC_TRIES = 7;
             var currentCode = code;
             object? executionResult = null;
 
@@ -173,8 +176,8 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 {
                     // Ask LLM to correct the code
                     var fixPrompt = $@"
+                    You are a C# DataFrame fixer. The code has an error. Fix the issue and return correct code that assigns final output to 'result'
                     The following C# code using Microsoft.Data.Analysis failed with: {ex.Message}
-                    Please correct only the code so it compiles and assigns the correct `result` variable:
                     ```csharp
                     {currentCode}
                     ```";
