@@ -1,0 +1,23 @@
+{
+  "$schema": 1,
+  "type": "completion",
+  "description": "Analyze the provided code and resolve the issue based on the given error message.",
+  "execution_settings": {
+    "default": {
+      "max_tokens": 800,
+      "temperature": 0
+    }
+  },
+  "input_variables": [
+    {
+      "name": "currentCode",
+      "description": "The code that currently contains an error.",
+      "required": true
+    },
+    {
+      "name": "error",
+      "description": "The error message associated with the current code.",
+      "required": true
+    }
+  ]
+}

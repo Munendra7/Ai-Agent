@@ -1,0 +1,23 @@
+{
+  "$schema": 1,
+  "type": "completion",
+  "description": "Write C# code to analyze data from dataframe collection",
+  "execution_settings": {
+    "default": {
+      "max_tokens": 800,
+      "temperature": 0
+    }
+  },
+  "input_variables": [
+    {
+      "name": "query",
+      "description": "User's Query",
+      "required": true
+    },
+    {
+      "name": "columnsdesc",
+      "description": "Description of Dataframe Columns",
+      "required": true
+    }
+  ]
+}

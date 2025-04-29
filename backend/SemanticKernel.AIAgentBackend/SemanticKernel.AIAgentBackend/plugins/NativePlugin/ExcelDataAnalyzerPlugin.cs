@@ -22,6 +22,7 @@ using DocumentFormat.OpenXml.Office2016.Excel;
 using Microsoft.AspNetCore.Http.HttpResults;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Math;
+using Path = System.IO.Path;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
@@ -35,7 +36,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
     /// </summary>
     public static class DataFrameExcelLoader
     {
-        public static DataFrame LoadFromExcel(Stream excelStream)
+        public static DataFrame LoadFromExcel(Stream excelStream, string? sheetName = null)
         {
             System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             using var reader = ExcelReaderFactory.CreateReader(excelStream);
@@ -44,11 +45,29 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
             };
             var ds = reader.AsDataSet(config);
-            return ConvertTable(ds.Tables[0]);
+            var tableToUse = (System.Data.DataTable?)null; // Explicitly specify the type to resolve CS0815  
+            if (!string.IsNullOrWhiteSpace(sheetName) && ds.Tables.Contains(sheetName))
+            {
+                tableToUse = ds.Tables[sheetName];
+            }
+            else
+            {
+                tableToUse = ds.Tables[0];
+            }
+            return ConvertTable(tableToUse);
         }
 
-        private static DataFrame ConvertTable(System.Data.DataTable table)
+        private static DataFrame ConvertTable(System.Data.DataTable? table)
         {
+            if(table == null)
+                throw new ArgumentNullException(nameof(table), "DataTable cannot be null.");
+
+            // Sanitize column names
+            foreach (DataColumn col in table.Columns)
+            {
+                col.ColumnName = col.ColumnName.Replace("\r", "").Replace("\n", "").Trim();
+            }
+
             var columns = table.Columns.Cast<DataColumn>()
                 .Select(col => CreateColumn(col, table.Rows.Cast<DataRow>()))
                 .ToArray();
@@ -96,7 +115,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         }
 
         [KernelFunction("LoadExcel"), Description("Load an Excel xlsx file into a DataFrame")]
-        public async Task<string> LoadExcelAsync(string filename)
+        public async Task<string> LoadExcelAsync(string filename, [Description("Excel Sheet from which data will be loaded")] string? sheetName = null)
         {
             var (contentStream, _) = await _blobService.DownloadFileAsync(
                 filename,
@@ -106,7 +125,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             await contentStream.CopyToAsync(ms);
             ms.Position = 0;
 
-            _df = DataFrameExcelLoader.LoadFromExcel(ms);
+            _df = DataFrameExcelLoader.LoadFromExcel(ms, sheetName);
             return $"Loaded data: {_df.Rows.Count} rows, {_df.Columns.Count} columns.";
         }
 
@@ -126,33 +145,28 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             if (_df == null || _df.Rows.Count == 0)
                 return "Error: No data loaded. Please call LoadExcel first.";
 
+            string basePath = AppContext.BaseDirectory;
+            string pluginPath = Path.Combine(basePath, "plugins", "CodeWriterPlugin");
+
+            var plugin_CodeWriter = _kernel.ImportPluginFromPromptDirectory(pluginPath, "CodeWriterPlugin");
+
             var desc = string.Join(", ", _df.Columns.Select(c => $"{c.Name} ({GetTypeName(c)})"));
 
-            var prompt = $@"
-                You are a C# Excel DataFrame expert. 
-                You have a DataFrame 'df' with columns: [{desc}], 
-                Given a user query: ""{query}"" generate valid C# code using Microsoft.Data.Analysis.
-                Rules:
-                - Assign the final result to a variable named 'result'.
-                - Use LINQ for filtering and aggregates.
-                - Do not use Console.WriteLine or external libraries.
-                - Do not use reflection or dynamic typing.
-                - Always cast the result to string if needed.
-                - Never use direct indexing or out-of-bound operations.
-                - You must handle null values safely.
-                - Use Where() and Select() when applicable.
-                - Return only the code body — no using statements, class, explanations, or comments.";
+            var dataAnalysisExpert = plugin_CodeWriter["DataAnalysisExpert"];
 
-            var run = await _kernel.InvokePromptAsync(prompt);
-            var raw = run.GetValue<string>() ?? string.Empty;
+            string raw_code = (await _kernel.InvokeAsync(dataAnalysisExpert, new KernelArguments()
+            {
+                ["query"] = query,
+                ["columnsdesc"] = desc
+            })).ToString();
 
-            var lines = raw.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var lines = raw_code.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             var codeBody = string.Join("\n",
                 lines.SkipWhile(l => !l.TrimStart().StartsWith("```")).Skip(1)
                      .TakeWhile(l => !l.TrimStart().StartsWith("```")).Select(l =>
                         l.TrimStart().StartsWith("using ") ? string.Empty : l)
                      .Where(l => !string.IsNullOrWhiteSpace(l)));
-            var code = string.IsNullOrWhiteSpace(codeBody) ? raw : codeBody;
+            var code = string.IsNullOrWhiteSpace(codeBody) ? raw_code : codeBody;
 
             var options = ScriptOptions.Default
                 .AddReferences(typeof(DataFrame).Assembly)
@@ -174,31 +188,21 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 }
                 catch (Exception ex) when (attempt < MAX_EXEC_TRIES)
                 {
-                    // Ask LLM to correct the code
-                    var fixPrompt = $@"
-                    You are a C# DataFrame fixer. The code has an error. Fix the issue and return correct code that assigns final output to 'result'
-                    The following C# code using Microsoft.Data.Analysis failed with: {ex.Message}
-                    ```csharp
-                    {currentCode}
-                    ```
-                    Enusre:
-                        - Safe handling of nulls
-                        - No use of Console.WriteLine
-                        - Use LINQ
-                        - Only assign to 'result'
-                        - Do not include comments or print statements
-                        - Use valid Microsoft.Data.Analysis code
-                    ";
+                    var codeFixerExpert = plugin_CodeWriter["CodeFixer"];
 
-                    var fixRun = await _kernel.InvokePromptAsync(fixPrompt);
-                    var fixRaw = fixRun.GetValue<string>() ?? "";
-                    var fixLines = fixRaw.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    string fixed_raw_code = (await _kernel.InvokeAsync(dataAnalysisExpert, new KernelArguments()
+                    {
+                        ["currentCode"] = currentCode,
+                        ["error"] = ex.Message
+                    })).ToString();
+
+                    var fixLines = fixed_raw_code.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                     var fixBody = fixLines
                         .SkipWhile(l => !l.TrimStart().StartsWith("```")).Skip(1)
                         .TakeWhile(l => !l.TrimStart().StartsWith("```"))
                         .Where(l => !l.TrimStart().StartsWith("using "))
                         .ToArray();
-                    currentCode = fixBody.Length > 0 ? string.Join("\n", fixBody) : fixRaw;
+                    currentCode = fixBody.Length > 0 ? string.Join("\n", fixBody) : fixed_raw_code;
                 }
                 catch (Exception ex)
                 {
