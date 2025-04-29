@@ -52,7 +52,8 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 string ChatSystemPrompt = @"
                 You are an AI assistant that answers queries strictly using retrieved knowledge. 
 
-                - Use the RAGPlugin to fetch relevant information before responding.  
+                - Use the RAGPlugin to fetch relevant information before responding.
+                - Use ExcelDataAnalyzerPlugin for Excel-related queries.
                 - If data is insufficient, say 'No relevant information found'—do not speculate.  
                 - Execute queries and actions via plugins when required.  
                 - Keep responses factual, concise, and context-aware.  

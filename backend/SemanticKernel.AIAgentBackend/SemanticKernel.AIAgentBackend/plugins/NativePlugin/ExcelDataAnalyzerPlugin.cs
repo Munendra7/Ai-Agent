@@ -36,7 +36,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
     /// </summary>
     public static class DataFrameExcelLoader
     {
-        public static DataFrame LoadFromExcel(Stream excelStream, string? sheetName = null)
+        public static DataFrame LoadFromExcel(Stream excelStream, string sheetName)
         {
             System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             using var reader = ExcelReaderFactory.CreateReader(excelStream);
@@ -114,8 +114,8 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             _blobService = blobService;
         }
 
-        [KernelFunction("LoadExcel"), Description("Load an Excel xlsx file into a DataFrame")]
-        public async Task<string> LoadExcelAsync(string filename, [Description("Excel Sheet from which data will be loaded")] string? sheetName = null)
+        [KernelFunction("LoadExcel"), Description("Load an Excel xlsx file into a DataFrame from given sheet name")]
+        public async Task<string> LoadExcelAsync(string filename, [Description("Excel Sheet from which data will be loaded")] string sheetName)
         {
             var (contentStream, _) = await _blobService.DownloadFileAsync(
                 filename,
