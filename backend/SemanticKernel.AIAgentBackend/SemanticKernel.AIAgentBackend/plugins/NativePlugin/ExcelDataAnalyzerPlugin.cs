@@ -1,21 +1,88 @@
-﻿using ExcelDataReader;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Data;
+using System.Text;
+using System.Threading.Tasks;
+using ExcelDataReader;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Data.Analysis;
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.ComponentModel;
-using System.Data;
-using static UglyToad.PdfPig.Writer.PdfPageBuilder;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using DocumentFormat.OpenXml.Office2016.Excel;
+using Microsoft.AspNetCore.Http.HttpResults;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Math;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
     public class Globals
     {
-        public DataFrame? df;
+        public required DataFrame df { get; set; }
     }
 
+    /// <summary>
+    /// Helper to load an Excel stream into a DataFrame.
+    /// </summary>
+    public static class DataFrameExcelLoader
+    {
+        public static DataFrame LoadFromExcel(Stream excelStream)
+        {
+            System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            using var reader = ExcelReaderFactory.CreateReader(excelStream);
+            var config = new ExcelDataSetConfiguration
+            {
+                ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+            };
+            var ds = reader.AsDataSet(config);
+            return ConvertTable(ds.Tables[0]);
+        }
+
+        private static DataFrame ConvertTable(System.Data.DataTable table)
+        {
+            var columns = table.Columns.Cast<DataColumn>()
+                .Select(col => CreateColumn(col, table.Rows.Cast<DataRow>()))
+                .ToArray();
+            return new DataFrame(columns);
+        }
+
+        private static DataFrameColumn CreateColumn(DataColumn col, IEnumerable<DataRow> rows)
+        {
+            var name = col.ColumnName;
+            var data = rows.Select(r => r[col] is DBNull ? null : r[col]);
+
+            return col.DataType switch
+            {
+                Type t when t == typeof(bool) =>
+                    new BooleanDataFrameColumn(name, data.Cast<bool?>().ToArray()),
+
+                Type t when t == typeof(int) || t == typeof(long) =>
+                    new Int64DataFrameColumn(name, data.Cast<long?>().ToArray()),
+
+                Type t when t == typeof(float) || t == typeof(double) || t == typeof(decimal) =>
+                    new DoubleDataFrameColumn(name, data.Cast<double?>().ToArray()),
+
+                Type t when t == typeof(DateTime) =>
+                    new PrimitiveDataFrameColumn<DateTime>(name, data.Cast<DateTime?>().ToArray()),
+
+                _ =>
+                    new StringDataFrameColumn(name, data.Cast<string>().ToArray())
+            };
+        }
+    }
+
+    /// <summary>
+    /// Plugin for loading Excel data and querying it via Semantic Kernel.
+    /// </summary>
     public class ExcelDataAnalyzerPlugin
     {
         private DataFrame _df = new DataFrame();
@@ -28,131 +95,106 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             _blobService = blobService;
         }
 
-        [KernelFunction("LoadExcel"), Description("Load an Excel file of xlsx format into memory")]
+        [KernelFunction("LoadExcel"), Description("Load an Excel xlsx file into a DataFrame")]
         public async Task<string> LoadExcelAsync(string filename)
         {
-            var (contentStream, url) = await _blobService.DownloadFileAsync(filename, Constants.BlobStorageConstants.KnowledgeContainerName);
+            var (contentStream, _) = await _blobService.DownloadFileAsync(
+                filename,
+                Constants.BlobStorageConstants.KnowledgeContainerName);
 
-            using var memoryStream = new MemoryStream();
-            await contentStream.CopyToAsync(memoryStream);
-            memoryStream.Position = 0;
+            using var ms = new MemoryStream();
+            await contentStream.CopyToAsync(ms);
+            ms.Position = 0;
 
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-
-            using var reader = ExcelReaderFactory.CreateReader(memoryStream);
-
-            var ds = reader.AsDataSet(new ExcelDataSetConfiguration
-            {
-                ConfigureDataTable = (_) => new ExcelDataTableConfiguration
-                {
-                    UseHeaderRow = true
-                }
-            });
-
-            var table = ds.Tables[0];
-
-            // Convert DataTable to DataFrame
-            _df = DataTableToDataFrame(table);
-
+            _df = DataFrameExcelLoader.LoadFromExcel(ms);
             return $"Loaded data: {_df.Rows.Count} rows, {_df.Columns.Count} columns.";
         }
 
-        private DataFrame DataTableToDataFrame(DataTable table)
+        private static string GetTypeName(DataFrameColumn col) => col switch
         {
-            var df = new DataFrame();
-            foreach (DataColumn col in table.Columns)
-            {
-                Type dataType = col.DataType;
-
-                if (dataType == typeof(int) || dataType == typeof(long))
-                {
-                    var column = new Int64DataFrameColumn(col.ColumnName, table.Rows.Count);
-                    for (int i = 0; i < table.Rows.Count; i++)
-                    {
-                        var val = table.Rows[i][col];
-                        column[i] = val == DBNull.Value ? null : (long?)Convert.ToInt64(val);
-                    }
-                    df.Columns.Add(column);
-                }
-                else if (dataType == typeof(float) || dataType == typeof(double) || dataType == typeof(decimal))
-                {
-                    var column = new DoubleDataFrameColumn(col.ColumnName, table.Rows.Count);
-                    for (int i = 0; i < table.Rows.Count; i++)
-                    {
-                        var val = table.Rows[i][col];
-                        column[i] = val == DBNull.Value ? null : (double?)Convert.ToDouble(val);
-                    }
-                    df.Columns.Add(column);
-                }
-                else
-                {
-                    // Fallback for text columns
-                    var column = new StringDataFrameColumn(col.ColumnName, table.Rows.Count);
-                    for (int i = 0; i < table.Rows.Count; i++)
-                    {
-                        var val = table.Rows[i][col];
-                        column[i] = val == DBNull.Value ? null : val.ToString();
-                    }
-                    df.Columns.Add(column);
-                }
-            }
-            return df;
-        }
-
-
+            BooleanDataFrameColumn => "bool",
+            Int64DataFrameColumn => "long",
+            DoubleDataFrameColumn => "double",
+            PrimitiveDataFrameColumn<DateTime> => "DateTime",
+            StringDataFrameColumn => "string",
+            _ => "object"
+        };
 
         [KernelFunction("QueryData"), Description("Query loaded Excel data using natural language.")]
         public async Task<string> QueryDataAsync(string query)
         {
-            if (_df == null)
-            {
+            if (_df == null || _df.Rows.Count == 0)
                 return "Error: No data loaded. Please call LoadExcel first.";
-            }
 
-            // List column names dynamically
-            var cols = _df.Columns.Select(c => c.Name).ToArray();
-            var colsList = string.Join(", ", cols);
+            var desc = string.Join(", ", _df.Columns.Select(c => $"{c.Name} ({GetTypeName(c)})"));
 
-            var prompt = $@"You have a Microsoft.Data.Analysis.DataFrame named 'df' with columns: [{colsList}].
-            Write C# code using Microsoft.Data.Analysis to answer the question: {query}.
-            Write only the body of C# code (no `using` statements, no namespaces, no classes).
-            Assign the final result to a variable named 'result'.
-            Return only the C# code, no explanation.";
+            var prompt = $@"
+                You have a DataFrame 'df' with columns: [{desc}].
+                Write valid C# code using only Microsoft.Data.Analysis APIs to answer: {query}.
+               Rules:
+                - When working with typed columns, cast them using 'as PrimitiveDataFrameColumn<T>' (e.g., double, long, DateTime).
+                - Aggregation methods like Max(), Min(), Sum(), and Average() return 'object' — so always cast them to the appropriate type explicitly (e.g., '(double)', '(long)').
+                - Use 'ElementwiseEquals', 'ElementwiseGreaterThan', or 'ElementwiseLessThan' directly on typed columns for comparisons.
+                - Use supported methods like 'Filter()', 'GroupBy()', 'Sort()', and 'AddColumn()'.
+                - When grouping columns, pass **multiple column names as a single array of strings** (e.g., `new string[] {{{{\""Year\"", \""Month Name\""}}}}`).
+                - Assign the final result to a variable named 'result'.
+                - Return only the code body — no using statements, explanations, or comments.";
 
-            // Generate C# code via LLM
-            var runResult = await _kernel.InvokePromptAsync(prompt);
+            var run = await _kernel.InvokePromptAsync(prompt);
+            var raw = run.GetValue<string>() ?? string.Empty;
 
-            var code = runResult.GetValue<string>()?.Trim();
+            var lines = raw.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var codeBody = string.Join("\n",
+                lines.SkipWhile(l => !l.TrimStart().StartsWith("```")).Skip(1)
+                     .TakeWhile(l => !l.TrimStart().StartsWith("```")).Select(l =>
+                        l.TrimStart().StartsWith("using ") ? string.Empty : l)
+                     .Where(l => !string.IsNullOrWhiteSpace(l)));
+            var code = string.IsNullOrWhiteSpace(codeBody) ? raw : codeBody;
 
-            var cleanedCode = string.Join(Environment.NewLine,
-                (runResult.GetValue<string>() ?? "")
-                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                    .SkipWhile(line => !line.TrimStart().StartsWith("```"))
-                    .Skip(1)
-                    .TakeWhile(line => !line.TrimStart().StartsWith("```"))
-                    .Where(line => !line.TrimStart().StartsWith("using "))
-            );
-
-            // Prepare scripting options
-            var scriptOptions = ScriptOptions.Default
-                .AddReferences(typeof(DataFrame).Assembly, typeof(Enumerable).Assembly)
+            var options = ScriptOptions.Default
+                .AddReferences(typeof(DataFrame).Assembly)
                 .AddImports("System", "System.Linq", "Microsoft.Data.Analysis");
 
-            // Execute generated code with globals
-            var globals = new Globals { df = _df };
-            try
-            {
-                var script = CSharpScript.Create(cleanedCode, scriptOptions, typeof(Globals));
-                var state = await script.RunAsync(globals);
-                var result = state.Variables.FirstOrDefault(v => v.Name == "result")?.Value;
+            // Retry loop: execute & let LLM fix code on failures
+            const int MAX_EXEC_TRIES = 3;
+            var currentCode = code;
+            object? executionResult = null;
 
-                // Serialize result to JSON
-                return JsonConvert.SerializeObject(result);
-            }
-            catch (Exception ex)
+            for (int attempt = 1; attempt <= MAX_EXEC_TRIES; attempt++)
             {
-                return $"Code execution error: {ex.Message}";
+                try
+                {
+                    var script = CSharpScript.Create(currentCode, options, typeof(Globals));
+                    var state = await script.RunAsync(new Globals { df = _df });
+                    executionResult = state.Variables.FirstOrDefault(v => v.Name == "result")?.Value;
+                    break;
+                }
+                catch (Exception ex) when (attempt < MAX_EXEC_TRIES)
+                {
+                    // Ask LLM to correct the code
+                    var fixPrompt = $@"
+                    The following C# code using Microsoft.Data.Analysis failed with: {ex.Message}
+                    Please correct only the code so it compiles and assigns the correct `result` variable:
+                    ```csharp
+                    {currentCode}
+                    ```";
+                    var fixRun = await _kernel.InvokePromptAsync(fixPrompt);
+                    var fixRaw = fixRun.GetValue<string>() ?? "";
+                    var fixLines = fixRaw.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    var fixBody = fixLines
+                        .SkipWhile(l => !l.TrimStart().StartsWith("```")).Skip(1)
+                        .TakeWhile(l => !l.TrimStart().StartsWith("```"))
+                        .Where(l => !l.TrimStart().StartsWith("using "))
+                        .ToArray();
+                    currentCode = fixBody.Length > 0 ? string.Join("\n", fixBody) : fixRaw;
+                }
+                catch (Exception ex)
+                {
+                    return $"Code execution failed after {MAX_EXEC_TRIES} attempts: {ex.Message}";
+                }
             }
+
+            return JsonConvert.SerializeObject(executionResult);
         }
     }
 }

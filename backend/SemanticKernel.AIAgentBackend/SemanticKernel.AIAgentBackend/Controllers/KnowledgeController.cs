@@ -8,6 +8,7 @@ using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Repository;
 using SemanticKernel.AIAgentBackend.Constants;
+using Azure.Core;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
@@ -36,7 +37,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             {
                 var filePath = await blobService.UploadFileAsync(fileDTO.File.OpenReadStream(), fileDTO.File.FileName, BlobStorageConstants.KnowledgeContainerName);
 
-                var embeddingResponse = await embeddingService.ProcessFileAsync(fileDTO, filePath);
+                var embeddingResponse = KnowledgeContants.EmbeddingSupportedFiles.Contains(Path.GetExtension(fileDTO.File.FileName))?await embeddingService.ProcessFileAsync(fileDTO, filePath):"File Stored Successfully";
 
                 return Ok(new FileUploadResponseDTO()
                 {
@@ -71,9 +72,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
         private void ValidateFileUpload(FileUploadDTO request)
         {
-            var allowedExtentions = new string[] { ".pdf", ".docx", ".txt", ".xlsx", ".csv" };
-
-            if (!allowedExtentions.Contains(Path.GetExtension(request.File.FileName)))
+            if (!KnowledgeContants.AllowedDocumentExtensions.Contains(Path.GetExtension(request.File.FileName)))
             {
                 ModelState.AddModelError("file", "Unsuported File");
             }
@@ -86,9 +85,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
         private void ValidateTemplateUpload(TemplateUploadDTO request)
         {
-            var allowedExtentions = new string[] { ".docx" };
-
-            if (!allowedExtentions.Contains(Path.GetExtension(request.File.FileName)))
+            if (!KnowledgeContants.AllowedTemplateExtensions.Contains(Path.GetExtension(request.File.FileName)))
             {
                 ModelState.AddModelError("file", "Unsuported File");
             }

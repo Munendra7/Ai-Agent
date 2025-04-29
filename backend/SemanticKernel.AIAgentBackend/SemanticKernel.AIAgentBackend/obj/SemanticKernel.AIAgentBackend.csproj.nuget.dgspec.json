@@ -84,11 +84,11 @@
             },
             "Microsoft.CodeAnalysis.CSharp.Scripting": {
               "target": "Package",
-              "version": "[4.13.0, )"
+              "version": "[4.8.0, )"
             },
             "Microsoft.CodeAnalysis.Scripting": {
               "target": "Package",
-              "version": "[4.13.0, )"
+              "version": "[4.8.0, )"
             },
             "Microsoft.Data.Analysis": {
               "target": "Package",
