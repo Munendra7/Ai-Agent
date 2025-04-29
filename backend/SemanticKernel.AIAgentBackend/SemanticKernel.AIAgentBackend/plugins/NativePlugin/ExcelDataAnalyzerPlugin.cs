@@ -23,6 +23,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Math;
 using Path = System.IO.Path;
+using SemanticKernel.AIAgentBackend.Constants;
+using SemanticKernel.AIAgentBackend.Repositories.Repository;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
@@ -113,6 +115,42 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             _kernel = kernel;
             _blobService = blobService;
         }
+
+        [KernelFunction("ListExcelFiles"), Description("List available excel files available for analysis")]
+        public async Task<List<string>> ListTemplatesAsync()
+        {
+            var templates = await _blobService.ListFilesAsync(BlobStorageConstants.KnowledgeContainerName, new string[] { ".xlsx" });
+
+            return templates;
+        }
+
+        [KernelFunction("ListExcelSheets"), Description("List all sheet names from an Excel file")]
+        public async Task<List<string>> ListExcelSheetsAsync([Description("Excel file name to inspect")] string filename)
+        {
+            var (contentStream, _) = await _blobService.DownloadFileAsync(
+                filename,
+                Constants.BlobStorageConstants.KnowledgeContainerName);
+
+            System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            using var ms = new MemoryStream();
+            await contentStream.CopyToAsync(ms);
+            ms.Position = 0;
+
+            var sheetNames = new List<string>();
+
+            using (var reader = ExcelReaderFactory.CreateReader(ms))
+            {
+                var result = reader.AsDataSet();
+                foreach (System.Data.DataTable table in result.Tables)
+                {
+                    sheetNames.Add(table.TableName);
+                }
+            }
+
+            return sheetNames;
+        }
+
 
         [KernelFunction("LoadExcel"), Description("Load an Excel xlsx file into a DataFrame from given sheet name")]
         public async Task<string> LoadExcelAsync(string filename, [Description("Excel Sheet from which data will be loaded")] string sheetName)

@@ -42,7 +42,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             return (response.Value.Content, blobClient.Uri.ToString());
         }
 
-        public async Task<List<string>> ListFilesAsync(string containerName)
+        public async Task<List<string>> ListFilesAsync(string containerName, string[]? extensions = null)
         {
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
             await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
@@ -51,7 +51,10 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 
             await foreach (BlobItem blobItem in containerClient.GetBlobsAsync())
             {
-                fileNames.Add(blobItem.Name);
+                if (extensions == null || extensions.Length == 0 || extensions.Any(ext => blobItem.Name.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+                {
+                    fileNames.Add(blobItem.Name);
+                }
             }
 
             return fileNames;
