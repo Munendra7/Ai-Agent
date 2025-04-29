@@ -53,7 +53,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 You are an AI assistant that answers queries strictly using retrieved knowledge. 
 
                 - Use the RAGPlugin to fetch relevant information before responding.
-                - Use ExcelDataAnalyzerPlugin for Excel-related queries.
+                - Use ExcelDataAnalyzerPlugin for Excel-related queries and always ask excel file name and Sheet name before doing analysis.
                 - If data is insufficient, say 'No relevant information found'—do not speculate.  
                 - Execute queries and actions via plugins when required.  
                 - Keep responses factual, concise, and context-aware.  

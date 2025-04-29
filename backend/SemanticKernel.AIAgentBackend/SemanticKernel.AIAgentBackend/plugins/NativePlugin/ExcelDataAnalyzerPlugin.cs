@@ -152,7 +152,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         }
 
 
-        [KernelFunction("LoadExcel"), Description("Load an Excel xlsx file into a DataFrame from given sheet name")]
+        [KernelFunction("LoadExcel"), Description("Always ask Excel File Name and Sheet Name before loading an Excel file into a DataFrame")]
         public async Task<string> LoadExcelAsync(string filename, [Description("Excel Sheet from which data will be loaded")] string sheetName)
         {
             var (contentStream, _) = await _blobService.DownloadFileAsync(
