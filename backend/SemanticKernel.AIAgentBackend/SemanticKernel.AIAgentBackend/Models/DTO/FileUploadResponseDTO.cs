@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace SemanticKernel.AIAgentBackend.Models.DTO
+﻿namespace SemanticKernel.AIAgentBackend.Models.DTO
 {
     public class FileUploadResponseDTO
     {

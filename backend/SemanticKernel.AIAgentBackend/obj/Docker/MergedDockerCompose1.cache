@@ -25,6 +25,7 @@ services:
       - --blobHost
       - 0.0.0.0
       - --loose
+      - --skipApiVersionCheck
     container_name: blobstorage
     image: mcr.microsoft.com/azure-storage/azurite
     networks:
@@ -39,6 +40,23 @@ services:
       - type: volume
         source: blobstorage_data
         target: /data
+        volume: {}
+  ffmpeg-node:
+    build:
+      context: D:\Code Files\Learning\Semantic kernel\AI-Agent\ffmpeg-node-service
+      dockerfile: Dockerfile
+    container_name: ffmpeg-node
+    networks:
+      app_network: null
+    ports:
+      - mode: ingress
+        target: 5000
+        published: "5001"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: ffmpeg_data
+        target: /ffmpeg_data
         volume: {}
   qdrant:
     container_name: qdrant
@@ -182,6 +200,9 @@ networks:
 volumes:
   blobstorage_data:
     name: dockercompose16813498347866987284_blobstorage_data
+    driver: local
+  ffmpeg_data:
+    name: dockercompose16813498347866987284_ffmpeg_data
     driver: local
   qdrant_data:
     name: dockercompose16813498347866987284_qdrant_data

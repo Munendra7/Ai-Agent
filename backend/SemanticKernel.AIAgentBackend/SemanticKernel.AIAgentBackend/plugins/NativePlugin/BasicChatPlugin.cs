@@ -1,7 +1,6 @@
 ﻿using Microsoft.SemanticKernel;
 using System.ComponentModel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using System.Text;
 using ChatHistory = Microsoft.SemanticKernel.ChatCompletion.ChatHistory;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using Microsoft.SemanticKernel.Connectors.OpenAI;

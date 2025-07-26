@@ -1,12 +1,9 @@
-﻿using Azure.Storage.Blobs;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Microsoft.SemanticKernel;
 using SemanticKernel.AIAgentBackend.Constants;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using System.ComponentModel;
-using System.Text.RegularExpressions;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {

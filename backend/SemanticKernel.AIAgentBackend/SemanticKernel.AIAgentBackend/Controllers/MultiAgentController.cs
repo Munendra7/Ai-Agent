@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.Chat;
 using Microsoft.SemanticKernel.ChatCompletion;
-using OllamaSharp;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
-using System.Net.Http;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 
 namespace SemanticKernel.AIAgentBackend.Controllers

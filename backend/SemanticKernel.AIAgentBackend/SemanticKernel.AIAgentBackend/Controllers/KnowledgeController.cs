@@ -1,14 +1,9 @@
-﻿using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using SemanticKernel.AIAgentBackend.CustomActionFilters;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
-using SemanticKernel.AIAgentBackend.Repositories.Repository;
 using SemanticKernel.AIAgentBackend.Constants;
-using Azure.Core;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
@@ -19,11 +14,13 @@ namespace SemanticKernel.AIAgentBackend.Controllers
     {
         private readonly IEmbeddingService embeddingService;
         private readonly IBlobService blobService;
+        private readonly IVideoProcessingService videoProcessingService;
 
-        public KnowledgeController(IEmbeddingService embeddingService, IBlobService blobService)
+        public KnowledgeController(IEmbeddingService embeddingService, IBlobService blobService, IVideoProcessingService videoProcessingService)
         {
             this.embeddingService = embeddingService;
             this.blobService = blobService;
+            this.videoProcessingService = videoProcessingService;
         }
 
         [HttpPost]
@@ -37,7 +34,20 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             {
                 var filePath = await blobService.UploadFileAsync(fileDTO.File.OpenReadStream(), fileDTO.File.FileName, BlobStorageConstants.KnowledgeContainerName);
 
-                var embeddingResponse = KnowledgeContants.EmbeddingSupportedFiles.Contains(Path.GetExtension(fileDTO.File.FileName))?await embeddingService.ProcessFileAsync(fileDTO, filePath):"File Stored Successfully";
+                var embeddingResponse = "";
+
+                if (KnowledgeContants.AllowedVideoExtentions.Contains(Path.GetExtension(fileDTO.File.FileName).ToLower()))
+                {
+                    var transcriptionChunks = await this.videoProcessingService.ProcessVideo(fileDTO.File.FileName);
+                    embeddingResponse = await embeddingService.ProcessFileAsync(fileDTO, filePath, transcriptionChunks.ToList());
+                }
+
+                else
+                {
+                    embeddingResponse = KnowledgeContants.EmbeddingSupportedFiles.Contains(Path.GetExtension(fileDTO.File.FileName).ToLower()) ? await embeddingService.ProcessFileAsync(fileDTO, filePath) : "File Stored Successfully";
+                }
+
+                
 
                 return Ok(new FileUploadResponseDTO()
                 {
@@ -72,20 +82,20 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
         private void ValidateFileUpload(FileUploadDTO request)
         {
-            if (!KnowledgeContants.AllowedDocumentExtensions.Contains(Path.GetExtension(request.File.FileName)))
+            if (!KnowledgeContants.AllowedDocumentExtensions.Concat(KnowledgeContants.AllowedVideoExtentions).Contains(Path.GetExtension(request.File.FileName).ToLower()))
             {
                 ModelState.AddModelError("file", "Unsuported File");
             }
 
-            if (request.File.Length > 10485760)
-            {
-                ModelState.AddModelError("file", "Please add file less than 10 MB");
-            }
+            //if (request.File.Length > 10485760)
+            //{
+            //    ModelState.AddModelError("file", "Please add file less than 10 MB");
+            //}
         }
 
         private void ValidateTemplateUpload(TemplateUploadDTO request)
         {
-            if (!KnowledgeContants.AllowedTemplateExtensions.Contains(Path.GetExtension(request.File.FileName)))
+            if (!KnowledgeContants.AllowedTemplateExtensions.Contains(Path.GetExtension(request.File.FileName).ToLower()))
             {
                 ModelState.AddModelError("file", "Unsuported File");
             }

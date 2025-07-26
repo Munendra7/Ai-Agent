@@ -10,6 +10,7 @@ services:
       - qdrant
       - blobstorage
       - agenticaisqlserver
+      - ffmpeg-node
     networks:
       - app_network
 
@@ -51,12 +52,26 @@ services:
       - app_network
     command: "azurite --blobHost 0.0.0.0 --loose --skipApiVersionCheck"
 
+  ffmpeg-node:
+    build:
+     context:  ../../ffmpeg-node-service
+    container_name: ffmpeg-node
+    volumes:
+      - ffmpeg_data:/ffmpeg_data
+    ports:
+      - "5001:5000"
+    networks:
+      - app_network
+
+
 volumes:
   sqlserverdata:
     driver: local
   qdrant_data:
     driver: local
   blobstorage_data:
+    driver: local
+  ffmpeg_data:
     driver: local
 
 networks:

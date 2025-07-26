@@ -1,0 +1,25 @@
+{
+  "name": "ffmpeg-node-service",
+  "version": "1.0.0",
+  "description": "Video To Audio Service",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Munendra7/Ai-Agent.git"
+  },
+  "author": "Munendra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Munendra7/Ai-Agent/issues"
+  },
+  "homepage": "https://github.com/Munendra7/Ai-Agent#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "multer": "^1.4.4",
+    "uuid": "^11.1.0"
+  }
+}

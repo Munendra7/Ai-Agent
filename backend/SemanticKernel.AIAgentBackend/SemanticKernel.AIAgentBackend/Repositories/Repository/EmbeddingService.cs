@@ -1,16 +1,10 @@
-﻿using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Packaging;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.AI;
+﻿using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel.Embeddings;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
-using System.Text;
-using UglyToad.PdfPig;
-using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 
 namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 {
@@ -33,14 +27,18 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             _embeddingGenerator = embeddingGenerator;
         }
 
-        public async Task<string> ProcessFileAsync(FileUploadDTO fileDTO, string filePath)
+        public async Task<string> ProcessFileAsync(FileUploadDTO fileDTO, string filePath, List<string>? textChunks = null)
         {
             if (fileDTO == null || fileDTO.File.Length == 0)
             {
                 return "Invalid file.";
             }
 
-            List<string> textChunks = _documentsProcessFactory.ExtractTextChunksFromFile(fileDTO.File).ToList();
+            if (textChunks == null)
+            {
+                textChunks = _documentsProcessFactory.ExtractTextChunksFromFile(fileDTO.File).ToList();
+            }
+
             if (textChunks.Count == 0)
             {
                 return "Could not extract text from the file.";
@@ -106,6 +104,39 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 collectionName: collectionName,
                 query: promptEmbedding.ToArray(),
                 limit: 10
+            );
+
+            return returnedLocations;
+        }
+
+        public async Task<IReadOnlyList<ScoredPoint>> SimilaritySearchInFile(string prompt, string fileName)
+        {
+            var promptEmbedding = await _embeddingGenerator.GenerateEmbeddingAsync(prompt);
+            var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
+
+            var filter = new Filter
+            {
+                Must = 
+                {
+                    new Condition
+                    {
+                        Field = new FieldCondition
+                        {
+                            Key = "FileName",
+                            Match = new Match
+                            {
+                                Text = fileName // Filter chunks by document name
+                            }
+                        }
+                    } 
+                }
+            };
+
+            var returnedLocations = await _qdrantClient.QueryAsync(
+                collectionName: collectionName,
+                query: promptEmbedding.ToArray(),
+                limit: 10,
+                filter: filter
             );
 
             return returnedLocations;

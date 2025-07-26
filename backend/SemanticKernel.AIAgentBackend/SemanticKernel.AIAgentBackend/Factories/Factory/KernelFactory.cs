@@ -1,5 +1,7 @@
 ﻿using Microsoft.SemanticKernel;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
+using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
+using SemanticKernel.AIAgentBackend.Repositories.Interface;
 
 namespace SemanticKernel.AIAgentBackend.Factories.Factory
 {
@@ -7,9 +9,18 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
     {
         private readonly IConfiguration _configuration;
 
-        public KernelFactory(IConfiguration configuration)
+        private readonly HttpClient _httpClient;
+        private readonly IEmbeddingService _embeddingService;
+        private readonly IBlobService _blobService;
+        private readonly IDocumentsProcessFactory _documentsProcessFactory;
+
+        public KernelFactory(IConfiguration configuration, HttpClient httpClient, IEmbeddingService embeddingService, IBlobService blobService, IDocumentsProcessFactory documentsProcessFactory)
         {
             _configuration = configuration;
+            _httpClient = httpClient;
+            _embeddingService = embeddingService;
+            _blobService = blobService;
+            _documentsProcessFactory = documentsProcessFactory;
         }
 
         public Kernel CreateKernel()
@@ -45,7 +56,23 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
                     throw new ArgumentException("Invalid model type specified.");
             }
 
-            return kernelBuilder.Build();
+            var _kernel = kernelBuilder.Build();
+
+            var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
+            var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
+            var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService);
+            var emailwriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
+            var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _documentsProcessFactory);
+            var excelDataAnalyzerPlugin = new ExcelDataAnalyzerPlugin(_kernel, _blobService);
+
+            _kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
+            _kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
+            _kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
+            _kernel.ImportPluginFromObject(emailwriterPlugin, "EmailWriterPlugin");
+            _kernel.ImportPluginFromObject(documentGenerationPlugin, "DocumentGenerationPlugin");
+            _kernel.ImportPluginFromObject(excelDataAnalyzerPlugin, "ExcelDataAnalyzerPlugin");
+
+            return _kernel;
         }
     }
 }

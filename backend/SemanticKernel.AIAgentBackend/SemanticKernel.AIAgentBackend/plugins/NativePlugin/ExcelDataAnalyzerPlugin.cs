@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Data;
+﻿using System.Data;
 using System.Text;
-using System.Threading.Tasks;
 using ExcelDataReader;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
@@ -11,20 +7,10 @@ using Microsoft.Data.Analysis;
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.ComponentModel;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using DocumentFormat.OpenXml.Office2016.Excel;
-using Microsoft.AspNetCore.Http.HttpResults;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Math;
 using Path = System.IO.Path;
 using SemanticKernel.AIAgentBackend.Constants;
-using SemanticKernel.AIAgentBackend.Repositories.Repository;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {

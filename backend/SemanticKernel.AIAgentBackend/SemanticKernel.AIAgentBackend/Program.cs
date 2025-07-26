@@ -1,16 +1,15 @@
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
 using Qdrant.Client;
 using SemanticKernel.AIAgentBackend.Data;
-using SemanticKernel.AIAgentBackend.Factories.Factory;
+using SemanticKernel.AIAgentBackend.Extentions.cs;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Middlewares;
-using SemanticKernel.AIAgentBackend.Repositories.Interface;
-using SemanticKernel.AIAgentBackend.Repositories.Repository;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,11 +51,7 @@ builder.Services.AddScoped<BlobServiceClient>(provider =>
     return new BlobServiceClient(connectionString);
 });
 
-
-builder.Services.AddScoped<IKernelFactory, KernelFactory>();
-builder.Services.AddScoped<IEmbeddingKernelFactory, EmbeddingKernelFactory>();
-builder.Services.AddScoped<IDocumentsProcessFactory, DocumentsProcessFactory>();
-builder.Services.AddScoped<IAgentFactory, AgentFactory>();
+builder.Services.AddSemanticKernelServices(builder.Configuration);
 
 builder.Services.AddKeyedScoped<Kernel>("LLMKernel", (sp, key) =>
 {
@@ -74,12 +69,22 @@ builder.Services.AddScoped(sp =>
     return _embeddingGenerator;
 });
 
-
-builder.Services.AddScoped<IChatHistoryService, ChatHistoryService>();
-builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
-builder.Services.AddScoped<IBlobService, BlobService>();
-
 builder.Services.AddHttpClient();
+
+// 1 GB = 1073741824 bytes -- Only for Testing (Not recommeneded)
+const long Gigabyte = 1073741824L*3;
+
+// Allow large multipart form data
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = Gigabyte;
+});
+
+// Optional: increase Kestrel request body limit
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = Gigabyte;
+});
 
 var app = builder.Build();
 

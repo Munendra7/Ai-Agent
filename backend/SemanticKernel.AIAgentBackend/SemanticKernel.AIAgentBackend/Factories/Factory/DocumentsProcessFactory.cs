@@ -3,8 +3,6 @@ using System.Text;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using UglyToad.PdfPig;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
-using DocumentFormat.OpenXml.Drawing;
-using System.Formats.Asn1;
 using System.Globalization;
 using OfficeOpenXml;
 using CsvHelper;
@@ -141,7 +139,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             return ChunkText(text.ToString(), chunkSize);
         }
 
-        private IEnumerable<string> ChunkText(string text, int chunkSize)
+        public IEnumerable<string> ChunkText(string text, int chunkSize)
         {
             List<string> chunks = new();
             StringBuilder currentChunk = new();

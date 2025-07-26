@@ -47,6 +47,26 @@ namespace SemanticKernel.AIAgentBackend.Migrations
 
                     b.ToTable("ChatHistory");
                 });
+
+            modelBuilder.Entity("SemanticKernel.AIAgentBackend.Models.Domain.SessionSummary", b =>
+                {
+                    b.Property<Guid>("SessionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("SessionId");
+
+                    b.HasIndex("SessionId");
+
+                    b.ToTable("SessionSummaries");
+                });
 #pragma warning restore 612, 618
         }
     }

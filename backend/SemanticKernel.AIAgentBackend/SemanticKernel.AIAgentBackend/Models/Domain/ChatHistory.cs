@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-
-namespace SemanticKernel.AIAgentBackend.Models.Domain
+﻿namespace SemanticKernel.AIAgentBackend.Models.Domain
 {
     public class ChatHistory
     {

@@ -10,6 +10,8 @@ namespace SemanticKernel.AIAgentBackend.Data
         }
 
         public DbSet<ChatHistory> ChatHistory { get; set; }
+        public DbSet<SessionSummary> SessionSummaries { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,6 +20,9 @@ namespace SemanticKernel.AIAgentBackend.Data
             modelBuilder.Entity<ChatHistory>()
             .Property(u => u.Id)
             .HasDefaultValueSql("NEWID()");
+
+            modelBuilder.Entity<SessionSummary>().HasIndex(x => x.SessionId);
+            modelBuilder.Entity<SessionSummary>().HasKey(x => x.SessionId);
         }
     }
 }

@@ -2,18 +2,7 @@
 using System.ComponentModel;
 using System.Text;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
-using OpenAI.Chat;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Qdrant.Client.Grpc;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.ExtendedProperties;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using DocumentFormat.OpenXml.Office2019.Excel.ThreadedComments;
-using Microsoft.VisualBasic;
-using OpenAI.Assistants;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using SemanticKernel.AIAgentBackend.Constants;
-using SemanticKernel.AIAgentBackend.Repositories.Repository;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
@@ -31,11 +20,14 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         }
 
         [KernelFunction("answerfromKnowledge"), Description("Acts as the AI knowledge base by retrieving relevant information from user-provided information and documents using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query.")]
-        public async Task<string> AnswerAsync([Description("User query")] string query)
+        public async Task<string> AnswerAsync([Description("User query")] string query, [Description("Optional: restrict search to specific document name")] string? documentname = null)
         {
             try
             {
-                var searchResults = await embeddingService.SimilaritySearch(query).ConfigureAwait(false);
+                //var searchResults = await embeddingService.SimilaritySearch(query).ConfigureAwait(false);
+                var searchResults = string.IsNullOrEmpty(documentname)
+                ? await embeddingService.SimilaritySearch(query).ConfigureAwait(false)
+                : await embeddingService.SimilaritySearchInFile(query, documentname).ConfigureAwait(false);
 
                 if (searchResults == null || !searchResults.Any())
                 {

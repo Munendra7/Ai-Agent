@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using SemanticKernel.AIAgentBackend.CustomActionFilters;
-using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Models.DTO;
-using SemanticKernel.AIAgentBackend.plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Plugins.NativePlugin;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
@@ -14,27 +13,27 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ChatController : ControllerBase
     {
         private readonly Kernel _kernel;
-        private readonly HttpClient _httpClient;
+        //private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly IChatHistoryService _chatService;
-        private readonly IEmbeddingService _embeddingService;
-        private readonly IBlobService _blobService;
+        //private readonly IEmbeddingService _embeddingService;
+        //private readonly IBlobService _blobService;
         private readonly ILogger _logger;
-        private readonly IDocumentsProcessFactory _documentsProcessFactory;
+        //private readonly IDocumentsProcessFactory _documentsProcessFactory;
 
-        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, HttpClient httpClient, IConfiguration configuration, IChatHistoryService chatService, IEmbeddingService embeddingService, IBlobService blobService, IDocumentsProcessFactory documentsProcessFactory, ILogger<ChatController> logger)
+        public ChatController([FromKeyedServices("LLMKernel")] Kernel kernel, /*HttpClient httpClient,*/ IConfiguration configuration, IChatHistoryService chatService, /*IEmbeddingService embeddingService, IBlobService blobService, IDocumentsProcessFactory documentsProcessFactory*/ ILogger<ChatController> logger)
         {
             _kernel = kernel;
-            _httpClient = httpClient;
+            //_httpClient = httpClient;
             _configuration = configuration;
             _chatService = chatService;
-            _embeddingService = embeddingService;
-            _blobService = blobService;
-            _documentsProcessFactory = documentsProcessFactory;
+            //_embeddingService = embeddingService;
+            //_blobService = blobService;
+            //_documentsProcessFactory = documentsProcessFactory;
             _logger = logger;
         }
 
@@ -50,15 +49,15 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             try
             {
                 string ChatSystemPrompt = @"
-                You are an AI assistant that answers queries strictly using retrieved knowledge. 
+                    You are an AI assistant that answers queries strictly using retrieved knowledge. 
 
-                - Use the RAGPlugin to fetch relevant information before responding.
-                - Use ExcelDataAnalyzerPlugin for Excel-related queries and always ask excel file name and Sheet name before doing analysis.
-                - If data is insufficient, say 'No relevant information found'—do not speculate.  
-                - Execute queries and actions via plugins when required.  
-                - Keep responses factual, concise, and context-aware.  
+                    - Use the RAGPlugin to fetch relevant information before responding.
+                    - If the user asks a question about a specific video file, use the RAGPlugin to search that video’s transcribed content by filtering with the file name.
+                    - Use ExcelDataAnalyzerPlugin for Excel-related queries and always ask excel file name and Sheet name before doing analysis.
+                    - If data is insufficient, say 'No relevant information found'—do not speculate.  
+                    - Execute queries and actions via plugins when required.  
+                    - Keep responses factual, concise, and context-aware.
                 ";
-
 
                 OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
                 {
@@ -69,21 +68,21 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     ChatSystemPrompt = ChatSystemPrompt
                 };
 
-                var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
-                var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
-                var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
-                var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService);
-                var emailwriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
-                var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _documentsProcessFactory);
-                var excelDataAnalyzerPlugin = new ExcelDataAnalyzerPlugin(_kernel, _blobService);
+                //var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
+                //var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
+                //var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
+                //var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService);
+                //var emailwriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
+                //var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _documentsProcessFactory);
+                //var excelDataAnalyzerPlugin = new ExcelDataAnalyzerPlugin(_kernel, _blobService);
 
-                _kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
-                _kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
-                _kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
-                _kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
-                _kernel.ImportPluginFromObject(emailwriterPlugin, "EmailWriterPlugin");
-                _kernel.ImportPluginFromObject(documentGenerationPlugin, "DocumentGenerationPlugin");
-                _kernel.ImportPluginFromObject(excelDataAnalyzerPlugin, "ExcelDataAnalyzerPlugin");
+                //_kernel.ImportPluginFromObject(ragPlugin, "RAGPlugin");
+                //_kernel.ImportPluginFromObject(weatherPlugin, "WeatherPlugin");
+                //_kernel.ImportPluginFromObject(googleSearchPlugin, "GoogleSearchPlugin");
+                //_kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
+                //_kernel.ImportPluginFromObject(emailwriterPlugin, "EmailWriterPlugin");
+                //_kernel.ImportPluginFromObject(documentGenerationPlugin, "DocumentGenerationPlugin");
+                //_kernel.ImportPluginFromObject(excelDataAnalyzerPlugin, "ExcelDataAnalyzerPlugin");
 
                 var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
 
@@ -138,6 +137,9 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 _logger.LogError(ex, $"{errorId} : ${ex.Message}");
                 try
                 {
+                    var chatPlugin = new BasicChatPlugin(_kernel, _chatService, userQueryDTO.SessionId);
+                    _kernel.ImportPluginFromObject(chatPlugin, "BasicChatPlugin");
+
                     var chatResponse = await _kernel.InvokeAsync("BasicChatPlugin", "chat", new() { ["query"] = userQueryDTO.Query });
 
                     var response = new ChatResponseDTO()

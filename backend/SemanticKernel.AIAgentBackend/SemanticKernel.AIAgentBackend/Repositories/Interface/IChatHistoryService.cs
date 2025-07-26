@@ -1,5 +1,4 @@
 ﻿using SemanticKernel.AIAgentBackend.Models.Domain;
-using System.Runtime.InteropServices;
 
 namespace SemanticKernel.AIAgentBackend.Repositories.Interface
 {
@@ -10,5 +9,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Interface
         public Task AddMessagesAsync(List<ChatHistory> chatHistories);
 
         public Task<IEnumerable<ChatHistory>> GetMessagesAsync(Guid sessionId, int lastChats);
+
+        public Task<string> GetOrUpdateGroundingSummaryAsync(Guid sessionId, List<ChatHistory> chatHistories);
     }
 }

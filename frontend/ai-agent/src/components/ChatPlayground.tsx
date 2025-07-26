@@ -63,7 +63,7 @@ const ChatPlayground: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `${apiUrl}/api/chat`,
+        `${apiUrl}/api/Agent/SingleAgentChat`,
         { sessionId: sessionId.current, query: input },
         {
           headers: {

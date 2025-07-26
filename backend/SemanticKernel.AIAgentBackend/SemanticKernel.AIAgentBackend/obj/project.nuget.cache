@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "YnP3fZeW7xM=",
+  "dgSpecHash": "OVwmO4WG9QM=",
   "success": true,
   "projectFilePath": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj",
   "expectedPackageFiles": [
@@ -53,6 +53,7 @@
     "C:\\Users\\Munendra\\.nuget\\packages\\microsoft.codeanalysis.scripting.common\\4.8.0\\microsoft.codeanalysis.scripting.common.4.8.0.nupkg.sha512",
     "C:\\Users\\Munendra\\.nuget\\packages\\microsoft.codeanalysis.workspaces.common\\4.8.0\\microsoft.codeanalysis.workspaces.common.4.8.0.nupkg.sha512",
     "C:\\Users\\Munendra\\.nuget\\packages\\microsoft.codeanalysis.workspaces.msbuild\\4.8.0\\microsoft.codeanalysis.workspaces.msbuild.4.8.0.nupkg.sha512",
+    "C:\\Users\\Munendra\\.nuget\\packages\\microsoft.cognitiveservices.speech\\1.45.0\\microsoft.cognitiveservices.speech.1.45.0.nupkg.sha512",
     "C:\\Users\\Munendra\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\Munendra\\.nuget\\packages\\microsoft.data.analysis\\0.22.2\\microsoft.data.analysis.0.22.2.nupkg.sha512",
     "C:\\Users\\Munendra\\.nuget\\packages\\microsoft.data.sqlclient\\5.1.6\\microsoft.data.sqlclient.5.1.6.nupkg.sha512",
