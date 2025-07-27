@@ -14,8 +14,6 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
         private readonly IDocumentsProcessFactory _documentsProcessFactory;
         private readonly IConfiguration _configuration;
 
-        private const string FfmpegServiceUrl = "http://ffmpeg-node:5000/extract-audio";
-
         public VideoProcessingService(IBlobService blobService, ILogger<VideoProcessingService> logger, IDocumentsProcessFactory documentsProcessFactory, IConfiguration configuration)
         {
             _blobService = blobService;
@@ -27,6 +25,8 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 
         public async Task<IEnumerable<string>> ProcessVideo(string fileName)
         {
+            string FfmpegServiceUrl = _configuration["VideoToAudioService:EndPoint"]!;
+
             string fileId = Guid.NewGuid().ToString("N");
             string videoFileName = $"{fileId}_{Path.GetFileName(fileName)}";
             string audioFileName = Path.GetFileNameWithoutExtension(videoFileName) + ".wav";

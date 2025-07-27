@@ -46,6 +46,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 You are an AI assistant that answers queries strictly using retrieved knowledge. 
 
                 - Use the RAGPlugin to fetch relevant information before responding.
+                - Always look for latest files and templates if user asks about your documents or knowledge.
                 - If the user asks a question about a specific video file, use the RAGPlugin to search that video’s transcribed content by filtering with the file name.
                 - Use ExcelDataAnalyzerPlugin for Excel-related queries and always ask excel file name and Sheet name before doing analysis.
                 - If data is insufficient, say 'No relevant information found'—do not speculate.  
@@ -55,7 +56,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
                 var chatHistory = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
 
-                var userChatHistory = await _chatService.GetMessagesAsync(userQueryDTO.SessionId, 10);
+                var userChatHistory = await _chatService.GetMessagesAsync(userQueryDTO.SessionId, 15);
 
                 string groundingSummary = await _chatService.GetOrUpdateGroundingSummaryAsync(userQueryDTO.SessionId, userChatHistory.ToList());
 

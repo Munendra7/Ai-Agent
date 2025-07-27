@@ -50,7 +50,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                     Context: {{$searchResults}}
                     Question: {{$query}}
     
-                    Provide a clear and concise response (maximum 40 words) strictly based on the provided Context.  
+                    Provide a clear and concise response (maximum 300 words) strictly based on the provided Context.  
                     Mention the file name where it is located.'
                 ";
 
@@ -116,7 +116,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 Summarize the following text while keeping key details:
                 {{$chunk}}
 
-                Provide a concise summary within 100 words.
+                Provide a concise summary within 300 words.
             """;
 
             var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
