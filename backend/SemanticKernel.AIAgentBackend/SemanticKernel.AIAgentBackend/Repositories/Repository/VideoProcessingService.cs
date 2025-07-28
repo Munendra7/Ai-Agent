@@ -1,7 +1,9 @@
-﻿using Microsoft.CognitiveServices.Speech;
+﻿using Azure.Core;
+using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
+using System.Drawing;
 using System.Text;
 using System.Text.Json;
 
@@ -81,7 +83,9 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 else
                 {
                     audioStream.Position = 0;
-                    transcription = await TranscribeAudioStreamAsync(audioStream);
+                    //transcription = await TranscribeAudioStreamAsync(audioStream);
+
+                    transcription = await TranscribeWithFastApiAsync(audioStream, audioFileName);
                 }
 
                 return _documentsProcessFactory.ChunkText(transcription, 1000);
@@ -164,6 +168,47 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             }
 
             return builder.ToString();
+        }
+
+        private async Task<string> TranscribeWithFastApiAsync(Stream audioStream, string fileName)
+        {
+            string region = _configuration["SpeechToTextService:Region"]!;
+            string subscriptionKey = _configuration["SpeechToTextService:SubscriptionKey"]!;
+            string endpoint = $"https://{region}.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2024-11-15";
+
+            using var content = new MultipartFormDataContent();
+
+            var streamContent = new StreamContent(audioStream);
+            streamContent.Headers.ContentType =
+                new System.Net.Http.Headers.MediaTypeHeaderValue("audio/wav");
+            content.Add(streamContent, "audio", fileName);
+
+            // Example definition JSON
+            var definition = new
+            {
+                locales = new[] { "en-US", "hi-IN" },
+                profanityFilterMode = "Masked",
+                channels = new[] { 0 },
+                // diarizationSettings = new { minSpeakers = 1, maxSpeakers = 4 } // optional
+            };
+            content.Add(new StringContent(JsonSerializer.Serialize(definition), Encoding.UTF8, "application/json"), "definition");
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
+            client.DefaultRequestHeaders.Accept.Add(new
+                System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+            var response = await client.PostAsync(endpoint, content);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Fast API error: {Status} – {Error}", response.StatusCode, error);
+                throw new Exception($"Fast Transcription API error: {error}");
+            }
+
+            var result = await response.Content.ReadAsStringAsync();
+            // Response includes combinedPhrases and phrases per spec
+            return result;
         }
 
         private async Task<string> TranscribeAudioStreamAsync(Stream audioStream)
