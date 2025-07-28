@@ -83,6 +83,52 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             return knowledgeDocuments;
         }
 
+        //[KernelFunction("summarize_document"), Description("Use this function ONLY when the user explicitly asks to summarize a document and provides a document name. Do NOT use this for general document queries.")]
+        //public async Task<string> SummarizeDocumentAsync([Description("Name of the document to summarize")] string documentName)
+        //{
+        //    try
+        //    {
+        //        var documentChunks = await embeddingService.RetrieveDocumentChunksAsync(documentName);
+
+        //        // Step 2: Summarize each chunk
+        //        var chunkSummaries = new List<string>();
+        //        foreach (var chunk in documentChunks)
+        //        {
+        //            string summary = await SummarizeChunkAsync(chunk);
+        //            chunkSummaries.Add(summary);
+        //        }
+
+        //        // Step 3: Generate final summary from chunk summaries
+        //        string combinedSummary = string.Join("\n", chunkSummaries);
+        //        string finalSummary = await SummarizeChunkAsync(combinedSummary);
+
+        //        return finalSummary;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return "Error retrieving and summarizing document.";
+        //    }
+        //}
+
+        //private async Task<string> SummarizeChunkAsync(string chunk)
+        //{
+        //    var promptTemplate = """
+        //        Summarize the following text while keeping key details:
+        //        {{$chunk}}
+
+        //        Provide a concise summary within 300 words.
+        //    """;
+
+        //    var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
+
+        //    var summaryResponse = await _kernel.InvokeAsync(
+        //        semanticFunction,
+        //        new KernelArguments { ["chunk"] = chunk }
+        //    ).ConfigureAwait(false);
+
+        //    return summaryResponse.ToString();
+        //}
+
         [KernelFunction("summarize_document"), Description("Use this function ONLY when the user explicitly asks to summarize a document and provides a document name. Do NOT use this for general document queries.")]
         public async Task<string> SummarizeDocumentAsync([Description("Name of the document to summarize")] string documentName)
         {
@@ -90,33 +136,76 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             {
                 var documentChunks = await embeddingService.RetrieveDocumentChunksAsync(documentName);
 
-                // Step 2: Summarize each chunk
-                var chunkSummaries = new List<string>();
-                foreach (var chunk in documentChunks)
-                {
-                    string summary = await SummarizeChunkAsync(chunk);
-                    chunkSummaries.Add(summary);
-                }
+                const int MaxTokensPerBatch = 4000;
 
-                // Step 3: Generate final summary from chunk summaries
-                string combinedSummary = string.Join("\n", chunkSummaries);
-                string finalSummary = await SummarizeChunkAsync(combinedSummary);
+                var groupedBatches = GroupChunksByTokenLimit(documentChunks, MaxTokensPerBatch);
+
+                // Step 1: Summarize each batch in parallel
+                var summarizationTasks = groupedBatches.Select(batch =>
+                {
+                    string batchText = string.Join("\n", batch);
+                    return SummarizeChunkWithRetryAsync(batchText);
+                });
+
+                var intermediateSummaries = (await Task.WhenAll(summarizationTasks)).ToList();
+
+                // Step 2: Recursively summarize if too large
+                string finalSummary = await SummarizeRecursivelyAsync(intermediateSummaries, MaxTokensPerBatch);
 
                 return finalSummary;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return "Error retrieving and summarizing document.";
+                return $"Error summarizing document: {ex.Message}";
             }
+        }
+
+        private async Task<string> SummarizeRecursivelyAsync(List<string> summaries, int maxTokens)
+        {
+            while (true)
+            {
+                int totalTokens = summaries.Sum(s => EstimateTokenCount(s));
+                if (totalTokens <= maxTokens)
+                    return string.Join("\n", summaries);
+
+                var grouped = GroupChunksByTokenLimit(summaries, maxTokens);
+
+                var summarized = new List<string>();
+                foreach (var group in grouped)
+                {
+                    string batch = string.Join("\n", group);
+                    summarized.Add(await SummarizeChunkWithRetryAsync(batch));
+                }
+
+                summaries = summarized;
+            }
+        }
+
+        private async Task<string> SummarizeChunkWithRetryAsync(string chunk, int maxRetries = 3)
+        {
+            int attempt = 0;
+            while (attempt < maxRetries)
+            {
+                try
+                {
+                    return await SummarizeChunkAsync(chunk);
+                }
+                catch
+                {
+                    attempt++;
+                    await Task.Delay(2000); // Wait for 2 seconds before retry
+                }
+            }
+            return "[Failed to summarize after retries]";
         }
 
         private async Task<string> SummarizeChunkAsync(string chunk)
         {
             var promptTemplate = """
-                Summarize the following text while keeping key details:
+                Summarize the following text while preserving key details:
                 {{$chunk}}
 
-                Provide a concise summary within 300 words.
+                Keep the summary concise, under 500 words.
             """;
 
             var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
@@ -128,5 +217,33 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 
             return summaryResponse.ToString();
         }
+
+        private List<List<string>> GroupChunksByTokenLimit(IEnumerable<string> chunks, int maxTokens)
+        {
+            var batches = new List<List<string>>();
+            var currentBatch = new List<string>();
+            int currentTokenCount = 0;
+
+            foreach (var chunk in chunks)
+            {
+                int chunkTokens = EstimateTokenCount(chunk);
+                if (currentTokenCount + chunkTokens > maxTokens && currentBatch.Any())
+                {
+                    batches.Add(currentBatch);
+                    currentBatch = new List<string>();
+                    currentTokenCount = 0;
+                }
+
+                currentBatch.Add(chunk);
+                currentTokenCount += chunkTokens;
+            }
+
+            if (currentBatch.Any())
+                batches.Add(currentBatch);
+
+            return batches;
+        }
+
+        private int EstimateTokenCount(string text) => text.Length / 4;
     }
 }
