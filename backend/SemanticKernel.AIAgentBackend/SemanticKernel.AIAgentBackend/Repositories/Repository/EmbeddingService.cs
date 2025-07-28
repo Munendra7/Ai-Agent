@@ -103,7 +103,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             var returnedLocations = await _qdrantClient.QueryAsync(
                 collectionName: collectionName,
                 query: promptEmbedding.ToArray(),
-                limit: 10
+                limit: 20
             );
 
             return returnedLocations;
@@ -135,7 +135,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             var returnedLocations = await _qdrantClient.QueryAsync(
                 collectionName: collectionName,
                 query: promptEmbedding.ToArray(),
-                limit: 10,
+                limit: 20,
                 filter: filter
             );
 
