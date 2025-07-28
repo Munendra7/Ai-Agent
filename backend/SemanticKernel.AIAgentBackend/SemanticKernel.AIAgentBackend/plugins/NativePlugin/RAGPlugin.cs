@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Text;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using SemanticKernel.AIAgentBackend.Constants;
+using SemanticKernel.AIAgentBackend.Repositories.Repository;
 
 namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 {
@@ -12,11 +13,33 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         private readonly IEmbeddingService embeddingService;
         private readonly IBlobService blobService;
 
+        private readonly KernelFunction _chunkSummaryFunction;
+        private readonly KernelFunction _finalSummaryFunction;
+
         public RAGPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IEmbeddingService embeddingService, IBlobService blobService)
         {
             _kernel = kernel;
             this.embeddingService = embeddingService;
             this.blobService = blobService;
+
+            _chunkSummaryFunction = _kernel.CreateFunctionFromPrompt("""
+                Summarize the following text into key points. Focus on important facts, names, dates, and overall meaning.
+                Use bullet points where helpful.
+
+                Text:
+                {{$chunk}}
+
+                Keep it under 300 words.
+            """);
+
+            _finalSummaryFunction = _kernel.CreateFunctionFromPrompt("""
+                Combine the following partial summaries into a final cohesive document summary.
+
+                Partial Summaries:
+                {{$chunkSummaries}}
+
+                Write a unified and concise summary under 500 words that flows naturally and highlights key takeaways.
+            """);
         }
 
         [KernelFunction("answerfromKnowledge"), Description("Acts as the AI knowledge base by retrieving relevant information from user-provided information and documents using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query.")]
@@ -83,6 +106,52 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             return knowledgeDocuments;
         }
 
+        //[KernelFunction("summarize_document"), Description("Use this function ONLY when the user explicitly asks to summarize a document and provides a document name. Do NOT use this for general document queries.")]
+        //public async Task<string> SummarizeDocumentAsync([Description("Name of the document to summarize")] string documentName)
+        //{
+        //    try
+        //    {
+        //        var documentChunks = await embeddingService.RetrieveDocumentChunksAsync(documentName);
+
+        //        // Step 2: Summarize each chunk
+        //        var chunkSummaries = new List<string>();
+        //        foreach (var chunk in documentChunks)
+        //        {
+        //            string summary = await SummarizeChunkAsync(chunk);
+        //            chunkSummaries.Add(summary);
+        //        }
+
+        //        // Step 3: Generate final summary from chunk summaries
+        //        string combinedSummary = string.Join("\n", chunkSummaries);
+        //        string finalSummary = await SummarizeChunkAsync(combinedSummary);
+
+        //        return finalSummary;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return "Error retrieving and summarizing document.";
+        //    }
+        //}
+
+        //private async Task<string> SummarizeChunkAsync(string chunk)
+        //{
+        //    var promptTemplate = """
+        //        Summarize the following text while keeping key details:
+        //        {{$chunk}}
+
+        //        Provide a concise summary within 300 words.
+        //    """;
+
+        //    var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
+
+        //    var summaryResponse = await _kernel.InvokeAsync(
+        //        semanticFunction,
+        //        new KernelArguments { ["chunk"] = chunk }
+        //    ).ConfigureAwait(false);
+
+        //    return summaryResponse.ToString();
+        //}
+
         [KernelFunction("summarize_document"), Description("Use this function ONLY when the user explicitly asks to summarize a document and provides a document name. Do NOT use this for general document queries.")]
         public async Task<string> SummarizeDocumentAsync([Description("Name of the document to summarize")] string documentName)
         {
@@ -90,17 +159,17 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             {
                 var documentChunks = await embeddingService.RetrieveDocumentChunksAsync(documentName);
 
-                // Step 2: Summarize each chunk
-                var chunkSummaries = new List<string>();
-                foreach (var chunk in documentChunks)
-                {
-                    string summary = await SummarizeChunkAsync(chunk);
-                    chunkSummaries.Add(summary);
-                }
+                if (documentChunks == null || !documentChunks.Any())
+                    return "No content found to summarize in the document.";
 
-                // Step 3: Generate final summary from chunk summaries
-                string combinedSummary = string.Join("\n", chunkSummaries);
-                string finalSummary = await SummarizeChunkAsync(combinedSummary);
+                // Step 1: Summarize all chunks in parallel
+                var chunkSummaries = await Task.WhenAll(
+                    documentChunks.Select(chunk => SummarizeChunkAsync(chunk))
+                );
+
+                // Step 2: Summarize all summaries into a final one
+                string combinedChunkSummaries = string.Join("\n\n", chunkSummaries);
+                string finalSummary = await SummarizeFinalAsync(combinedChunkSummaries);
 
                 return finalSummary;
             }
@@ -112,21 +181,22 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 
         private async Task<string> SummarizeChunkAsync(string chunk)
         {
-            var promptTemplate = """
-                Summarize the following text while keeping key details:
-                {{$chunk}}
-
-                Provide a concise summary within 300 words.
-            """;
-
-            var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
-
-            var summaryResponse = await _kernel.InvokeAsync(
-                semanticFunction,
+            var response = await _kernel.InvokeAsync(
+                _chunkSummaryFunction,
                 new KernelArguments { ["chunk"] = chunk }
             ).ConfigureAwait(false);
 
-            return summaryResponse.ToString();
+            return response.ToString();
+        }
+
+        private async Task<string> SummarizeFinalAsync(string combinedSummaries)
+        {
+            var response = await _kernel.InvokeAsync(
+                _finalSummaryFunction,
+                new KernelArguments { ["chunkSummaries"] = combinedSummaries }
+            ).ConfigureAwait(false);
+
+            return response.ToString();
         }
     }
 }

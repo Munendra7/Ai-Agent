@@ -2,6 +2,7 @@
 using Azure.Storage.Blobs;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using Microsoft.AspNetCore.StaticFiles;
+using Azure.Storage.Sas;
 
 namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 {
@@ -58,6 +59,30 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             }
 
             return fileNames;
+        }
+
+        public string GenerateSasUri(string blobName, string containerName, int expiryMinutes = 60)
+        {
+            var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+            var blobClient = containerClient.GetBlobClient(blobName);
+
+            if (!blobClient.CanGenerateSasUri)
+            {
+                throw new InvalidOperationException("SAS generation not supported for this blob client. Ensure the client is initialized with StorageSharedKeyCredential.");
+            }
+
+            var sasBuilder = new BlobSasBuilder
+            {
+                BlobContainerName = containerName,
+                BlobName = blobName,
+                Resource = "b",
+                ExpiresOn = DateTimeOffset.UtcNow.AddMinutes(expiryMinutes)
+            };
+
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+            var sasUri = blobClient.GenerateSasUri(sasBuilder);
+            return sasUri.ToString();
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.CognitiveServices.Speech.Audio;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using System.Text;
+using System.Text.Json;
 
 namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 {
@@ -26,6 +27,8 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
         public async Task<IEnumerable<string>> ProcessVideo(string fileName)
         {
             string FfmpegServiceUrl = _configuration["VideoToAudioService:EndPoint"]!;
+
+            bool useBatch = bool.TryParse(_configuration["SpeechToTextService:UseBatchTranscription"], out var flag) && flag;
 
             string fileId = Guid.NewGuid().ToString("N");
             string videoFileName = $"{fileId}_{Path.GetFileName(fileName)}";
@@ -63,8 +66,23 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 _logger.LogInformation("✅ Audio uploaded to blob: {AudioFile}", audioFileName);
 
                 // 4. Transcribe audio stream directly using Azure Speech SDK
-                audioStream.Position = 0; // reset stream before reusing
-                var transcription = await TranscribeAudioStreamAsync(audioStream);
+                //audioStream.Position = 0; // reset stream before reusing
+                //var transcription = await TranscribeAudioStreamAsync(audioStream);
+
+                // 4. Transcribe audio stream directly using Azure Speech SDK or Batch API
+                string transcription;
+                if (useBatch)
+                {
+                    var audioSas = _blobService.GenerateSasUri(audioFileName, Constants.BlobStorageConstants.ExtractedAudioContainerName);
+                    string jobUrl = await SubmitBatchTranscriptionAsync(audioSas, audioFileName);
+                    string resultUrl = await PollTranscriptionResultAsync(jobUrl);
+                    transcription = await DownloadTranscriptTextAsync(resultUrl);
+                }
+                else
+                {
+                    audioStream.Position = 0;
+                    transcription = await TranscribeAudioStreamAsync(audioStream);
+                }
 
                 return _documentsProcessFactory.ChunkText(transcription, 1000);
             }
@@ -73,6 +91,79 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 _logger.LogError(ex, "❌ Video processing failed for: {InputFile}", fileName);
                 throw;
             }
+        }
+
+        private async Task<string> SubmitBatchTranscriptionAsync(string audioSasUrl, string fileName)
+        {
+            string key = _configuration["SpeechToTextService:SubscriptionKey"]!;
+            string region = _configuration["SpeechToTextService:Region"]!;
+            string endpoint = $"https://{region}.api.cognitive.microsoft.com/speechtotext/v3.0/transcriptions";
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", key);
+
+            var requestBody = new
+            {
+                contentUrls = new[] { audioSasUrl },
+                properties = new
+                {
+                    diarizationEnabled = true,
+                    wordLevelTimestampsEnabled = true,
+                    punctuationMode = "DictatedAndAutomatic",
+                    profanityFilterMode = "Masked"
+                },
+                locale = "en-US",
+                displayName = $"Transcription_{fileName}"
+            };
+
+            var response = await client.PostAsJsonAsync(endpoint, requestBody);
+            if (!response.IsSuccessStatusCode)
+                throw new Exception(await response.Content.ReadAsStringAsync());
+
+            // Fix for CS8602: Ensure the Location header is not null before accessing it  
+            if (response.Headers.Location == null)
+                throw new Exception("The response does not contain a Location header.");
+
+            return response.Headers.Location.ToString();
+        }
+
+        private async Task<string> PollTranscriptionResultAsync(string jobUrl)
+        {
+            string key = _configuration["SpeechToTextService:SubscriptionKey"]!;
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", key);
+
+            while (true)
+            {
+                var result = await client.GetStringAsync(jobUrl);
+                var json = JsonDocument.Parse(result).RootElement;
+                string status = json.GetProperty("status").GetString()!;
+
+                if (status == "Succeeded")
+                {
+                    return json.GetProperty("resultsUrls").GetProperty("transcriptionFiles").GetString()!;
+                }
+                if (status == "Failed") throw new Exception("Transcription job failed");
+
+                await Task.Delay(5000);
+            }
+        }
+
+        private async Task<string> DownloadTranscriptTextAsync(string resultsUrl)
+        {
+            using var client = new HttpClient();
+            var json = await client.GetStringAsync(resultsUrl);
+            var builder = new StringBuilder();
+
+            using var doc = JsonDocument.Parse(json);
+            foreach (var phrase in doc.RootElement.GetProperty("combinedRecognizedPhrases").EnumerateArray())
+            {
+                var speaker = phrase.TryGetProperty("speaker", out var spk) ? spk.GetRawText() : "Unknown";
+                var text = phrase.GetProperty("display").GetString();
+                builder.AppendLine($"Speaker {speaker}: {text}");
+            }
+
+            return builder.ToString();
         }
 
         private async Task<string> TranscribeAudioStreamAsync(Stream audioStream)
@@ -121,6 +212,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 
             return fullTranscript.ToString();
         }
+
 
         // Helper class to wrap Stream into pull audio stream for Azure SDK
         private class BinaryAudioStreamReader : PullAudioInputStreamCallback
