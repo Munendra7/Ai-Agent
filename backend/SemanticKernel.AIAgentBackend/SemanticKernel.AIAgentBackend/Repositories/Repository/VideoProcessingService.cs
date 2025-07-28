@@ -88,7 +88,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                     transcription = await TranscribeWithFastApiAsync(audioStream, audioFileName);
                 }
 
-                return _documentsProcessFactory.ChunkText(transcription, 1000);
+                return _documentsProcessFactory.ChunkText(transcription, 2000);
             }
             catch (Exception ex)
             {
@@ -206,9 +206,37 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 throw new Exception($"Fast Transcription API error: {error}");
             }
 
-            var result = await response.Content.ReadAsStringAsync();
-            // Response includes combinedPhrases and phrases per spec
-            return result;
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var builder = new StringBuilder();
+
+            try
+            {
+                using var doc = JsonDocument.Parse(jsonString);
+                if (doc.RootElement.TryGetProperty("combinedPhrases", out var combinedPhrases))
+                {
+                    foreach (var phrase in combinedPhrases.EnumerateArray())
+                    {
+                        string? text = phrase.GetProperty("text").GetString();
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            builder.AppendLine(text.Trim());
+                        }
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("⚠️ Fast API response did not contain combinedPhrases.");
+                    builder.AppendLine("[No transcription found]");
+                }
+            }
+
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Failed to parse transcription from Fast API response.");
+                throw new Exception("Failed to parse Fast API transcription response.", ex);
+            }
+
+            return builder.ToString();
         }
 
         private async Task<string> TranscribeAudioStreamAsync(Stream audioStream)

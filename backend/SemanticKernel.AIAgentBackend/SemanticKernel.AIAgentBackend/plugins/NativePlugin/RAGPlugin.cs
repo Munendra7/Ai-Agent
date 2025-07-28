@@ -16,6 +16,9 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         private readonly KernelFunction _chunkSummaryFunction;
         private readonly KernelFunction _finalSummaryFunction;
 
+        // Limit to 3 concurrent summarizations to avoid 429
+        private static readonly SemaphoreSlim _semaphore = new(5);
+
         public RAGPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IEmbeddingService embeddingService, IBlobService blobService)
         {
             _kernel = kernel;
@@ -162,20 +165,18 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 if (documentChunks == null || !documentChunks.Any())
                     return "No content found to summarize in the document.";
 
-                // Step 1: Summarize all chunks in parallel
                 var chunkSummaries = await Task.WhenAll(
-                    documentChunks.Select(chunk => SummarizeChunkAsync(chunk))
+                    documentChunks.Select(chunk => SummarizeChunkWithThrottlingAndRetryAsync(chunk))
                 );
 
-                // Step 2: Summarize all summaries into a final one
                 string combinedChunkSummaries = string.Join("\n\n", chunkSummaries);
                 string finalSummary = await SummarizeFinalAsync(combinedChunkSummaries);
 
                 return finalSummary;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return "Error retrieving and summarizing document.";
+                return $"Error retrieving and summarizing document: {ex.Message}";
             }
         }
 
@@ -197,6 +198,37 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             ).ConfigureAwait(false);
 
             return response.ToString();
+        }
+
+        private async Task<string> SummarizeChunkWithThrottlingAndRetryAsync(string chunk, int maxRetries = 3)
+        {
+            await _semaphore.WaitAsync();
+            try
+            {
+                int attempt = 0;
+                while (true)
+                {
+                    try
+                    {
+                        return await SummarizeChunkAsync(chunk);
+                    }
+                    catch (Exception ex) when (Is429Error(ex) && attempt < maxRetries)
+                    {
+                        attempt++;
+                        int delay = 2000 * attempt; // exponential backoff
+                        await Task.Delay(delay);
+                    }
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        private bool Is429Error(Exception ex)
+        {
+            return ex.Message.Contains("429") || ex.InnerException?.Message.Contains("429") == true;
         }
     }
 }
