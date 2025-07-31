@@ -431,7 +431,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             templateStream.CopyTo(outputStream);
             outputStream.Position = 0;
 
-            using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(tempFile, true))
+            using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(outputStream, true))
             {
                 var doc = wordDoc.MainDocumentPart.Document;
                 var body = doc.Body;
