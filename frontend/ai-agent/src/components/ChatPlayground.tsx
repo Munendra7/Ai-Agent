@@ -130,8 +130,8 @@ const ChatPlayground: React.FC = () => {
 
       <div className="flex items-center bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
         <textarea
-          rows={2}
-          maxLength={499}
+          rows={4}
+          maxLength={3000}
           className="flex-1 p-3 bg-gray-900 outline-none text-white placeholder-gray-400 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500"
           placeholder="Type a message..."
           value={input}
