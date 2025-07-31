@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Microsoft.SemanticKernel;
+using Newtonsoft.Json;
 using SemanticKernel.AIAgentBackend.Constants;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
@@ -26,22 +27,23 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             return templates;
         }
 
-        [KernelFunction("ExtractTemplateParameters"), Description("Extract all required placeholders (text and tables) from a selected template")]
-        public async Task<HashSet<string>> ExtractTemplateParametersAsync(string templateFileName)
+        [KernelFunction("ExtractTemplatePayload"), Description("Extract required json payload from template which will help for document generation")]
+        public async Task<string> ExtractTemplatePayloadAsync(string templateFileName)
         {
             var templateStream = await blobService.DownloadFileAsync(templateFileName, BlobStorageConstants.TemplateContainerName);
-            if (templateStream.Content == null) return new HashSet<string>();
+            if (templateStream.Content == null) return "";
 
-            return documentsProcessFactory.ExtractPlaceholders(templateStream.Content);
+            var payload = documentsProcessFactory.ExtractRequiredPayload(templateStream.Content);
+            return JsonConvert.SerializeObject(payload, Formatting.Indented);
         }
 
-        [KernelFunction("GenerateDocument"), Description("Generate a document from a template with user input, it returns the URL of the file")]
-        public async Task<string> GenerateDocumentAsync([Description("Will take template name and placeholders to replace template placeholders. Normal Text fields should be in the format {key:value} and Tabular Data should be in the format [{ColName1:'value1', ColName2:'value2'}, {ColName1:'value3', ColName2:'value4'}]. Both are part of my dynamicInputs variable")] string templateFileName, Dictionary<string, object> dynamicInputs)
+        [KernelFunction("GenerateDocument"), Description("Generate a document from a template with user input payload, it returns the URL of the file")]
+        public async Task<string> GenerateDocumentAsync([Description("Will take template name and placeholders to replace template placeholders.")] string templateFileName, [Description("send the template json payload in format returned by KernelFunction ExtractTemplatePayload for this template")] string templatePayload)
         {
             var templateStream = await blobService.DownloadFileAsync(templateFileName, BlobStorageConstants.TemplateContainerName);
             if (templateStream.Content == null) return "Template not found.";
 
-            var generatedDocStream = documentsProcessFactory.ReplacePlaceholdersInDocx(templateStream.Content, dynamicInputs);
+            var generatedDocStream = documentsProcessFactory.PopulateContentControlsFromJson(templateStream.Content, templatePayload);
 
             string newFileName = $"Generated_{Guid.NewGuid()}.docx";
             string documentUrl = await blobService.UploadFileAsync(generatedDocStream, newFileName, BlobStorageConstants.GeneratedDocsContainerName);
