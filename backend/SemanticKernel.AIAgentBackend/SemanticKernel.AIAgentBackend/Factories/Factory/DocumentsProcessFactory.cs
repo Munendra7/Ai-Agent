@@ -431,7 +431,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             templateStream.CopyTo(outputStream);
             outputStream.Position = 0;
 
-            using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(outputStream, true))
+            using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(tempFile, true))
             {
                 var doc = wordDoc.MainDocumentPart.Document;
                 var body = doc.Body;
@@ -446,21 +446,18 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
 
                     if (token.Type == JTokenType.String || token.Type == JTokenType.Integer)
                     {
-                        foreach (var text in sdt.Descendants<Text>())
-                            text.Text = token.ToString();
+                        SetSingleText(sdt, token.ToString());
                     }
                     else if (token.Type == JTokenType.Boolean && sdt.SdtProperties.GetFirstChild<CheckBox>() != null)
                     {
                         var isChecked = token.Value<bool>();
                         var val = isChecked ? "☒" : "☐";
 
-                        foreach (var text in sdt.Descendants<Text>())
-                            text.Text = val;
+                        SetSingleText(sdt, val);
                     }
                     else if (token.Type == JTokenType.String && sdt.SdtProperties?.GetFirstChild<SdtContentDropDownList>() != null)
                     {
-                        foreach (var text in sdt.Descendants<Text>())
-                            text.Text = token.ToString();
+                        SetSingleText(sdt, token.ToString());
                     }
                     else if (token.Type == JTokenType.Array)
                     {
@@ -478,8 +475,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
                                 var innerTag = innerSdt.SdtProperties?.GetFirstChild<Tag>()?.Val?.Value;
                                 if (!string.IsNullOrWhiteSpace(innerTag) && objFields.ContainsKey(innerTag))
                                 {
-                                    foreach (var text in innerSdt.Descendants<Text>())
-                                        text.Text = objFields[innerTag]?.ToString();
+                                    SetSingleText(innerSdt, objFields[innerTag]?.ToString());
                                 }
                             }
 
@@ -493,6 +489,18 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
 
             outputStream.Position = 0;
             return outputStream;
+        }
+
+        // Helper method to set only the first <Text> and clear the rest
+        private static void SetSingleText(SdtElement sdt, string value)
+        {
+            var textElements = sdt.Descendants<Text>().ToList();
+            if (textElements.Count > 0)
+            {
+                textElements[0].Text = value;
+                for (int i = 1; i < textElements.Count; i++)
+                    textElements[i].Text = string.Empty;
+            }
         }
     }
 }
