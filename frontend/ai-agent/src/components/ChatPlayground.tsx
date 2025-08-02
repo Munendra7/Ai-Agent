@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Loader2, Bot } from "lucide-react";
-import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { useMsal } from "@azure/msal-react";
 import { backendAPILoginRequest } from "../authConfig";
@@ -8,13 +7,14 @@ import { backendAPILoginRequest } from "../authConfig";
 const apiUrl = (import.meta as any).env.VITE_AIAgent_URL;
 
 const ChatPlayground: React.FC = () => {
-  const { instance} = useMsal();
+  const { instance } = useMsal();
   const activeAccount = instance.getActiveAccount();
   const sessionId = useRef<string>(crypto.randomUUID());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [messages, setMessages] = useState<{ text: string; type: "user" | "bot"; persona: string; isLoading?: boolean }[]>
-  ([
+  const [messages, setMessages] = useState<
+    { text: string; type: "user" | "bot"; persona: string; isLoading?: boolean }[]
+  >([
     {
       text: `Hi ${activeAccount?.name}, how can I assist you?`,
       type: "bot",
@@ -24,12 +24,10 @@ const ChatPlayground: React.FC = () => {
   const [input, setInput] = useState("");
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
-  // Scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Fetch Access Token Once
   useEffect(() => {
     const fetchToken = async () => {
       try {
@@ -46,54 +44,99 @@ const ChatPlayground: React.FC = () => {
     if (activeAccount) {
       fetchToken();
     }
-  }, []);
+  }, [activeAccount, instance]);
 
-  function formatChatResponse(text: string): string {
+  const formatChatResponse = (text: string): string => {
     return text.replace(/- \*\*(.*?)\*\*/g, "\n- **`$1`**").replace(/ - /g, "\n- ").trim();
-  }
+  };
 
-  const fetchAgentResponse = async () => {
+  const fetchAgentStreamResponse = async (query: string) => {
     if (!accessToken) {
       console.error("Access token not available");
       return;
     }
 
-    setIsWaitingForResponse(true);
-    setMessages((prev) => [...prev, { text: "", type: "bot", persona: "AI Agent", isLoading: true }]);
+    // Add initial bot message with thinking animation
+    setMessages((prev) => [
+      ...prev,
+      { text: "", type: "bot", persona: "AI Agent", isLoading: true },
+    ]);
 
     try {
-      const response = await axios.post(
-        `${apiUrl}/api/Agent/SingleAgentChat`,
-        { sessionId: sessionId.current, query: input },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/Agent/StreamAgentChat`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sessionId: sessionId.current, query }),
+      });
 
+      if (!response.body) throw new Error("No response body");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+      let isFirstChunk = true;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+
+        for (const char of chunk) {
+          fullText += char;
+
+          setMessages((prev) => {
+            const updated = [...prev];
+            const lastIndex = updated.length - 1;
+
+            if (isFirstChunk && updated[lastIndex].isLoading) {
+              updated[lastIndex].isLoading = false;
+              isFirstChunk = false;
+            }
+
+            updated[lastIndex] = {
+              ...updated[lastIndex],
+              text: formatChatResponse(fullText),
+            };
+
+            return updated;
+          });
+
+          await new Promise((r) => setTimeout(r, 5)); // Typing animation speed
+        }
+      }
+    } catch (error: any) {
+      console.error("Error streaming agent response", error);
       setMessages((prev) => [
         ...prev.slice(0, -1),
-        { text: formatChatResponse(response.data.response), type: "bot", persona: "AI Agent" },
+        { text: error.message, type: "bot", persona: "AI Agent" },
       ]);
-    } catch (error: any) {
-      console.error("Error fetching agent response", error);
-      setMessages((prev) => [...prev.slice(0, -1), { text: error.message, type: "bot", persona: "AI Agent" }]);
     } finally {
-      setInput("");
       setIsWaitingForResponse(false);
     }
   };
 
   const handleSendMessage = () => {
     if (input.trim() === "") return;
-    setMessages([...messages, { text: input, type: "user", persona: "You" }]);
-    fetchAgentResponse();
+
+    const currentInput = input;
+    setInput(""); // Clear immediately
+    setIsWaitingForResponse(true); // Disable textarea immediately
+
+    setMessages((prev) => [
+      ...prev,
+      { text: currentInput, type: "user", persona: "You" },
+    ]);
+
+    fetchAgentStreamResponse(currentInput);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && !isWaitingForResponse) {
+      e.preventDefault();
       handleSendMessage();
     }
   };
@@ -120,11 +163,20 @@ const ChatPlayground: React.FC = () => {
                   <span>Thinking...</span>
                 </div>
               ) : (
-                <ReactMarkdown components={{
-                  a: (props) => (
-                    <a {...props} target="_blank" rel="noopener noreferrer" className="underline text-blue-400 hover:text-blue-300" />
-                  ),
-                }}>{msg.text.replace(/\n/g, "  \n")}</ReactMarkdown>
+                <ReactMarkdown
+                  components={{
+                    a: (props) => (
+                      <a
+                        {...props}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline text-blue-400 hover:text-blue-300"
+                      />
+                    ),
+                  }}
+                >
+                  {msg.text.replace(/\n/g, "  \n")}
+                </ReactMarkdown>
               )}
             </div>
           </div>
