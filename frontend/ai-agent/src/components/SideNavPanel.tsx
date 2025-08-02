@@ -35,12 +35,12 @@ const SideNavPanel: React.FC = () => {
 
     const handleUpload = async () => {
         if (!accessToken) {
-            toast.error("❌ Access token not available");
+            toast.error("Access token not available");
             return;
         }
 
         if (!file || (UploadType === UploadTypeEnum.Knowledge && !description.trim())) {
-            toast.error("⚠️ File and description are mandatory!");
+            toast.error("File and description are mandatory!");
             return;
         }
 
@@ -64,13 +64,13 @@ const SideNavPanel: React.FC = () => {
                 },
             });
 
-            toast.success(`✅ ${UploadType} uploaded successfully!`);
+            toast.success(`${UploadType} uploaded successfully!`);
             setIsUploadModalOpen(false);
             setFile(null);
             setDescription('');
             setIsOpen(false);
         } catch (error: any) {
-            toast.error(`❌ Upload failed: ${error.message || error}`);
+            toast.error(`Upload failed: ${error.message || error}`);
         } finally {
             setIsUploading(false);
         }

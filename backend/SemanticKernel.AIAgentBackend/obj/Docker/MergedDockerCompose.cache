@@ -41,6 +41,27 @@ services:
         source: blobstorage_data
         target: /data
         volume: {}
+  docx-pdf-service:
+    build:
+      context: D:\Code Files\Learning\Semantic kernel\AI-Agent\docx-to-pdf-node-service
+      dockerfile: Dockerfile
+    container_name: docx-pdf-service
+    networks:
+      app_network: null
+    ports:
+      - mode: ingress
+        target: 3000
+        published: "3000"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: docx_uploads
+        target: /app/uploads
+        volume: {}
+      - type: volume
+        source: docx_outputs
+        target: /app/outputs
+        volume: {}
   ffmpeg-node:
     build:
       context: D:\Code Files\Learning\Semantic kernel\AI-Agent\ffmpeg-node-service
@@ -89,6 +110,12 @@ services:
       blobstorage:
         condition: service_started
         required: true
+      docx-pdf-service:
+        condition: service_started
+        required: true
+      ffmpeg-node:
+        condition: service_started
+        required: true
       qdrant:
         condition: service_started
         required: true
@@ -96,6 +123,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
       ASPNETCORE_HTTPS_PORTS: "8081"
+      ConnectionStrings__AppDBConnectionString: Server=agenticaisqlserver,1433;Database=AgenticAIDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
     image: semantickernelaiagentbackend
     networks:
       app_network: null
@@ -126,6 +154,12 @@ networks:
 volumes:
   blobstorage_data:
     name: dockercompose16813498347866987284_blobstorage_data
+    driver: local
+  docx_outputs:
+    name: dockercompose16813498347866987284_docx_outputs
+    driver: local
+  docx_uploads:
+    name: dockercompose16813498347866987284_docx_uploads
     driver: local
   ffmpeg_data:
     name: dockercompose16813498347866987284_ffmpeg_data

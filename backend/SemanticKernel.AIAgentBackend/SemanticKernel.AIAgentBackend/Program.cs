@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using DocxProcessorLibrary.TemplateBasedDocGenerator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,9 @@ builder.Services.AddScoped<BlobServiceClient>(provider =>
     var connectionString = builder.Configuration.GetConnectionString("AzureBlobStorage");
     return new BlobServiceClient(connectionString);
 });
+
+
+builder.Services.AddScoped<ITemplateBasedDocGenerator, TemplateBasedDocGenerator>();
 
 builder.Services.AddSemanticKernelServices(builder.Configuration);
 

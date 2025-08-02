@@ -178,6 +178,7 @@ DocProject/Help/html
 
 #appsettings
 appsettings.Development.json
+appsettings.Production.json
 
 # Click-Once directory
 publish/

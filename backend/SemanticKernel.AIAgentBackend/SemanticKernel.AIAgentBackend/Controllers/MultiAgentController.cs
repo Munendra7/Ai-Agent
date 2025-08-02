@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DocxProcessorLibrary.TemplateBasedDocGenerator;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.Chat;
@@ -22,10 +23,10 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         private readonly IEmbeddingService _embeddingService;
         private readonly IBlobService _blobService;
         private readonly ILogger _logger;
-        private readonly IDocumentsProcessFactory _documentsProcessFactory;
         private readonly IAgentFactory _agentFactory;
+        private readonly ITemplateBasedDocGenerator _templateBasedDocGenerator;
 
-        public MultiAgentController([FromKeyedServices("LLMKernel")] Kernel kernel, HttpClient httpClient, IConfiguration configuration, IChatHistoryService chatService, IEmbeddingService embeddingService, IBlobService blobService, IDocumentsProcessFactory documentsProcessFactory, IAgentFactory agentFactory, ILogger<ChatController> logger)
+        public MultiAgentController([FromKeyedServices("LLMKernel")] Kernel kernel, HttpClient httpClient, IConfiguration configuration, IChatHistoryService chatService, IEmbeddingService embeddingService, IBlobService blobService, IAgentFactory agentFactory, ILogger<ChatController> logger, ITemplateBasedDocGenerator templateBasedDocGenerator)
         {
             _kernel = kernel;
             _httpClient = httpClient;
@@ -33,9 +34,9 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             _chatService = chatService;
             _embeddingService = embeddingService;
             _blobService = blobService;
-            _documentsProcessFactory = documentsProcessFactory;
             _agentFactory = agentFactory;
             _logger = logger;
+            _templateBasedDocGenerator = templateBasedDocGenerator;
         }
 
         [HttpPost]
@@ -49,12 +50,12 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
             try
             {
-#pragma warning disable SKEXP0110
+                #pragma warning disable SKEXP0110
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
                 var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService);
                 var emailWriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
-                var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _documentsProcessFactory);
+                var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _templateBasedDocGenerator, _configuration);
 
                 Microsoft.SemanticKernel.ChatCompletion.ChatHistory chatHistory = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
 

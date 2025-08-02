@@ -4922,6 +4922,20 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XPath.dll": {}
         }
+      },
+      "DocxProcessorLibrary/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "DocumentFormat.OpenXml": "3.3.0",
+          "Newtonsoft.Json": "13.0.3"
+        },
+        "compile": {
+          "bin/placeholder/DocxProcessorLibrary.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DocxProcessorLibrary.dll": {}
+        }
       }
     }
   },
@@ -13695,6 +13709,11 @@
         "system.xml.xpath.4.0.1.nupkg.sha512",
         "system.xml.xpath.nuspec"
       ]
+    },
+    "DocxProcessorLibrary/1.0.0": {
+      "type": "project",
+      "path": "../DocxProcessorLibrary/DocxProcessorLibrary.csproj",
+      "msbuildProject": "../DocxProcessorLibrary/DocxProcessorLibrary.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -13702,6 +13721,7 @@
       "Azure.Storage.Blobs >= 12.24.0",
       "CsvHelper >= 33.0.1",
       "DocumentFormat.OpenXml >= 3.3.0",
+      "DocxProcessorLibrary >= 1.0.0",
       "EPPlus >= 7.7.0",
       "ExcelDataReader >= 3.7.0",
       "ExcelDataReader.DataSet >= 3.7.0",
@@ -13764,7 +13784,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\DocxProcessorLibrary\\DocxProcessorLibrary.csproj": {
+              "projectPath": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\DocxProcessorLibrary\\DocxProcessorLibrary.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

@@ -67,4 +67,8 @@
     <Folder Include="Logs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DocxProcessorLibrary\DocxProcessorLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

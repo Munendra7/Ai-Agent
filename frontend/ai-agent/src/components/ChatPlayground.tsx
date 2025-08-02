@@ -120,7 +120,11 @@ const ChatPlayground: React.FC = () => {
                   <span>Thinking...</span>
                 </div>
               ) : (
-                <ReactMarkdown>{msg.text.replace(/\n/g, "  \n")}</ReactMarkdown>
+                <ReactMarkdown components={{
+                  a: (props) => (
+                    <a {...props} target="_blank" rel="noopener noreferrer" className="underline text-blue-400 hover:text-blue-300" />
+                  ),
+                }}>{msg.text.replace(/\n/g, "  \n")}</ReactMarkdown>
               )}
             </div>
           </div>

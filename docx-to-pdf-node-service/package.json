@@ -1,0 +1,14 @@
+{
+  "name": "docx-to-pdf-api",
+  "version": "1.0.0",
+  "description": "DOCX to PDF conversion service",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "multer": "^1.4.4-lts.1",
+    "cors": "^2.8.5"
+  }
+}

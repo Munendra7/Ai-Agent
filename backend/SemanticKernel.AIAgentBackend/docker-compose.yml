@@ -6,11 +6,14 @@ services:
     build:
       context: .
       dockerfile: SemanticKernel.AIAgentBackend/Dockerfile
+    environment:
+      - ConnectionStrings__AppDBConnectionString=Server=agenticaisqlserver,1433;Database=AgenticAIDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
     depends_on:
       - qdrant
       - blobstorage
       - agenticaisqlserver
       - ffmpeg-node
+      - docx-pdf-service
     networks:
       - app_network
 
@@ -63,6 +66,18 @@ services:
     networks:
       - app_network
 
+  docx-pdf-service:
+    build:
+     context:  ../../docx-to-pdf-node-service
+    container_name: docx-pdf-service
+    ports:
+      - "3000:3000"
+    networks:
+      - app_network
+    volumes:
+     - docx_uploads:/app/uploads
+     - docx_outputs:/app/outputs
+
 
 volumes:
   sqlserverdata:
@@ -72,6 +87,10 @@ volumes:
   blobstorage_data:
     driver: local
   ffmpeg_data:
+    driver: local
+  docx_uploads:
+   driver: local
+  docx_outputs:
     driver: local
 
 networks:
