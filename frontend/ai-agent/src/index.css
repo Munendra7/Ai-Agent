@@ -4,3 +4,26 @@ a{
     color: #8d8de2;
     text-decoration: underline;
 }
+
+html {
+  scroll-behavior: smooth;
+  overflow-y: scroll; /* Always show vertical scrollbar */
+  background-color: black;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s ease-out both;
+}
+
+

@@ -3,6 +3,7 @@ import { Send, Loader2, Bot } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useMsal } from "@azure/msal-react";
 import { backendAPILoginRequest } from "../authConfig";
+import "./ChatPlayground.css"; // 👈 import CSS styles
 
 const apiUrl = (import.meta as any).env.VITE_AIAgent_URL;
 
@@ -56,7 +57,6 @@ const ChatPlayground: React.FC = () => {
       return;
     }
 
-    // Add initial bot message with thinking animation
     setMessages((prev) => [
       ...prev,
       { text: "", type: "bot", persona: "AI Agent", isLoading: true },
@@ -104,8 +104,6 @@ const ChatPlayground: React.FC = () => {
 
             return updated;
           });
-
-          await new Promise((r) => setTimeout(r, 5)); // Typing animation speed
         }
       }
     } catch (error: any) {
@@ -123,8 +121,8 @@ const ChatPlayground: React.FC = () => {
     if (input.trim() === "") return;
 
     const currentInput = input;
-    setInput(""); // Clear immediately
-    setIsWaitingForResponse(true); // Disable textarea immediately
+    setInput("");
+    setIsWaitingForResponse(true);
 
     setMessages((prev) => [
       ...prev,
@@ -142,20 +140,19 @@ const ChatPlayground: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen pt-16 ml-16 bg-gray-900 text-white p-4">
-      <div className="flex-1 overflow-y-auto space-y-4 p-4 custom-scrollbar">
+    <div className="chat-container flex flex-col h-screen pt-16 ml-16 p-4">
+      <div className="flex-1 overflow-y-auto space-y-4 p-4">
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`flex items-start overflow-x-auto custom-scrollbar p-4 rounded-xl shadow-md transition-all duration-300 
-              ${msg.type === "bot" ? "bg-gray-800 text-white self-start text-left max-w-max" : "bg-blue-600 text-white self-end ml-auto max-w-lg"}`}
+            className={`glass-bubble ${msg.type === "bot" ? "bubble-bot" : "bubble-user"}`}
           >
             {msg.type === "bot" && (
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-opacity-20 mr-2">
-                <Bot size={24} className="text-white" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 mr-3">
+                <Bot size={20} className="text-white" />
               </div>
             )}
-            <div>
+            <div className="break-words w-full">
               <span className="block font-semibold mb-1">{msg.persona}</span>
               {msg.isLoading ? (
                 <div className="flex items-center space-x-2">
@@ -184,11 +181,11 @@ const ChatPlayground: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="flex items-center bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
+      <div className="glass-input flex items-center mt-4 gap-4">
         <textarea
-          rows={4}
+          rows={3}
           maxLength={3000}
-          className="flex-1 p-3 bg-gray-900 outline-none text-white placeholder-gray-400 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500"
+          className="chat-textarea"
           placeholder="Type a message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -196,8 +193,8 @@ const ChatPlayground: React.FC = () => {
           disabled={isWaitingForResponse}
         />
         <button
-          className={`ml-4 p-3 rounded-full transition-all shadow-md flex items-center justify-center w-12 h-12 
-            ${isWaitingForResponse ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"}`}
+          className={`p-3 rounded-full flex items-center justify-center w-12 h-12 transition-all duration-200 
+            ${isWaitingForResponse ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
           onClick={handleSendMessage}
           disabled={isWaitingForResponse}
         >
