@@ -9,6 +9,7 @@ html {
   scroll-behavior: smooth;
   overflow-y: scroll; /* Always show vertical scrollbar */
   background-color: black;
+  font-size: 14px;
 }
 
 @keyframes fadeInUp {
