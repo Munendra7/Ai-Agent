@@ -1,68 +1,131 @@
-import React from 'react';
-import { SignInButton } from '../src/components/MSAuthentication/SignInButton';
-import Copilot from "../src/assets/AIAgent.svg";
+import React from "react";
+import { SignInButton } from "../src/components/MSAuthentication/SignInButton";
+import Typewriter from "typewriter-effect";
 import Background from "../src/assets/HomeBackground.jpg";
 
 const HomePage: React.FC = () => {
-    const capabilities = [
-        ['📄', 'Understand & answer queries based on shared documents.'],
-        ['📊', 'Analyze Excel spreadsheets & extract insights.'],
-        ['📧', 'Compose and send intelligent emails.'],
-        ['🌤️', 'Fetch real-time weather updates.'],
-        ['📝', 'Generate structured documents from templates.'],
-        ['🧠', 'Summarize complex documents and video files.']
-    ];
+  const capabilities = [
+    ["📄", "Document Q&A", "Understand & answer queries based on shared documents."],
+    ["🧠", "Smart Summaries", "Summarize complex documents and video files into key points."],
+    ["🌐", "Web Search", "Search the web in real-time to answer your queries."],
+    ["📝", "Template Docs", "Generate structured documents from templates effortlessly."],
+    ["📊", "Excel Insights", "Analyze spreadsheets and extract actionable insights."],
+    ["📧", "Send Emails", "Compose and send intelligent, context-aware emails."],
+    ["🌤️", "Weather Updates", "Fetch up-to-the-minute weather forecasts."]
+  ];
 
-    return (
-        <div
-            className="min-h-screen overflow-y-auto text-white bg-black bg-opacity-80 relative"
-            style={{
-                backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.8)), url(${Background})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            }}
-        >
-            {/* Animated Agent Image */}
-            <img
-                src={Copilot}
-                alt="AI Agent"
-                className="absolute bottom-4 right-4 w-20 md:w-28 animate-bounce opacity-70 z-10"
+  return (
+    <div className="overflow-x-hidden text-white">
+      {/* HERO SECTION */}
+      <section
+        className="relative min-h-screen flex items-center justify-center text-center px-6 bg-cover bg-center"
+        style={{
+          backgroundImage: `linear-gradient(to bottom right, rgba(0,0,0,0.7), rgba(10,10,20,0.9)), url(${Background})`,
+        }}
+      >
+        <div className="max-w-4xl mx-auto z-10">
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight animate-fade-up">
+            Your <span className="text-indigo-400">Intelligent CoPilot</span> for Every Task
+          </h1>
+
+          {/* Colorful Animated Typing Effect */}
+          <div className="mt-4 text-2xl md:text-3xl font-bold animate-fade-up delay-150">
+            <Typewriter
+              options={{
+                strings: [
+                  'Document Q&A',
+                  'Smart Summaries',
+                  'Web Search',
+                  'Template Docs',
+                  'Send Emails',
+                  'Weather Updates',
+                  'Excel Insights',
+                ],
+                autoStart: true,
+                loop: true,
+                delay: 60,
+                deleteSpeed: 40,
+                cursor: '<span class="gradient-text">|</span>',
+                wrapperClassName: "gradient-text"
+              }}
             />
+          </div>
 
-            {/* Main Content */}
-            <div className="flex items-center justify-center px-4 py-16 md:py-24 relative z-20">
-                <div className="text-center p-6 md:p-10 rounded-3xl bg-black/40 backdrop-blur-lg shadow-2xl border border-gray-700 max-w-6xl w-full animate-fade-in">
-                    <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-white drop-shadow-lg animate-fade-up">
-                        Welcome to <span className="text-indigo-400">CoThink</span>
-                    </h1>
-                    <p className="text-lg md:text-xl mb-8 text-gray-300 font-medium animate-fade-up delay-100">
-                        Your cognitive partner in every task.
-                    </p>
+          <p className="mt-6 text-lg md:text-xl text-gray-400 animate-fade-up delay-300">
+            AI Agent that works alongside you — smart, fast, and always ready.
+          </p>
 
-
-                    {/* Capabilities Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8 animate-fade-up delay-200">
-                        {capabilities.map(([icon, desc], idx) => (
-                            <div
-                                key={idx}
-                                className="flex flex-col items-center text-center p-6 rounded-2xl bg-gray-900/70 text-white shadow-md hover:shadow-xl transform hover:scale-[1.03] transition-all duration-300 ease-in-out border border-gray-700 backdrop-blur-md animate-fade-in-up"
-                                style={{ animationDelay: `${idx * 100}ms` }}
-                            >
-                                <div className="w-14 h-14 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-3xl mb-4 shadow-inner">
-                                    {icon}
-                                </div>
-                                <p className="text-base font-semibold text-gray-200">{desc}</p>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="animate-fade-up delay-300">
-                        <SignInButton />
-                    </div>
-                </div>
-            </div>
+          <div className="mt-8 animate-fade-up delay-500">
+            <SignInButton />
+          </div>
         </div>
-    );
+
+        {/* Decorative wave divider */}
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] rotate-180">
+          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-20">
+            <path
+              d="M321.39 56.44c58.43 0 117.16-15.36 175.6-15.36s117.16 15.36 175.6 15.36 117.16-15.36 175.6-15.36 117.16 15.36 175.6 15.36 117.16-15.36 175.6-15.36v79.11H0V41.08c58.43 0 117.16 15.36 175.6 15.36s117.16-15.36 175.6-15.36z"
+              className="fill-gray-900"
+            ></path>
+          </svg>
+        </div>
+      </section>
+
+      {/* FEATURES SECTION */}
+      <section className="bg-gray-900 py-20 px-6">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-12 animate-fade-up">What Can My AI Agent Do?</h2>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {capabilities.map(([icon, title, desc], idx) => (
+              <div
+                key={idx}
+                className="bg-gradient-to-br from-gray-800 to-gray-700 p-8 rounded-3xl shadow-lg transform hover:-translate-y-3 hover:shadow-indigo-500/30 transition-all duration-500 ease-out opacity-0 animate-fade-up"
+                style={{ animationDelay: `${idx * 150 + 200}ms` }}
+              >
+                <div className="w-16 h-16 mx-auto rounded-full bg-indigo-500/20 flex items-center justify-center text-3xl mb-4">
+                  {icon}
+                </div>
+                <h3 className="text-xl font-semibold text-indigo-300 mb-2">{title}</h3>
+                <p className="text-gray-400">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-black py-6 text-center text-gray-500 text-sm">
+        © {new Date().getFullYear()} AI Agent — All Rights Reserved
+      </footer>
+
+      {/* Animations & Gradient Text */}
+      <style>{`
+        .gradient-text {
+          background: linear-gradient(90deg, #ff7eb3, #ff758c, #42a5f5, #7e57c2, #ff7eb3);
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: gradientShift 5s ease infinite;
+          text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes fade-up {
+          0% { opacity: 0; transform: translateY(30px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+          animation: fade-up 0.8s ease forwards;
+        }
+        .delay-150 { animation-delay: 0.15s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-500 { animation-delay: 0.5s; }
+      `}</style>
+    </div>
+  );
 };
 
 export default HomePage;
