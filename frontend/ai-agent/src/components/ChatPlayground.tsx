@@ -3,9 +3,19 @@ import { Send, Loader2, Bot } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useMsal } from "@azure/msal-react";
 import { backendAPILoginRequest } from "../authConfig";
-import "./ChatPlayground.css"; // 👈 import CSS styles
+import "./ChatPlayground.css";
 
-const apiUrl = (import.meta as any).env.VITE_AIAgent_URL;
+const apiUrl = (import.meta).env.VITE_AIAgent_URL;
+
+const starterPrompts = [
+  "List all documents in your knowledge base",
+  "Use your knowledge base to answer my query",
+  "Summarize the document",
+  "Search the Internet to answer my query",
+  "How is the weather?",
+  "List all templates you have and create a doc for me",
+  "Draft and send an email",
+];
 
 const ChatPlayground: React.FC = () => {
   const { instance } = useMsal();
@@ -17,7 +27,7 @@ const ChatPlayground: React.FC = () => {
     { text: string; type: "user" | "bot"; persona: string; isLoading?: boolean }[]
   >([
     {
-      text: `Hi ${activeAccount?.name}, how can I assist you?`,
+      text: `Hi ${activeAccount?.name || "there"}, how can I assist you?`,
       type: "bot",
       persona: "AI Agent",
     },
@@ -117,11 +127,11 @@ const ChatPlayground: React.FC = () => {
     }
   };
 
-  const handleSendMessage = () => {
-    if (input.trim() === "") return;
+  const handleSendMessage = (customInput?: string) => {
+    const currentInput = customInput || input;
+    if (currentInput.trim() === "") return;
 
-    const currentInput = input;
-    setInput("");
+    if (!customInput) setInput(""); // clear only if typed manually
     setIsWaitingForResponse(true);
 
     setMessages((prev) => [
@@ -138,6 +148,8 @@ const ChatPlayground: React.FC = () => {
       handleSendMessage();
     }
   };
+
+  const hasUserMessage = messages.some((m) => m.type === "user");
 
   return (
     <div className="chat-container flex flex-col h-screen pt-16 ml-16 p-4">
@@ -178,9 +190,31 @@ const ChatPlayground: React.FC = () => {
             </div>
           </div>
         ))}
+
+        {/* Starter Prompts UI */}
+        {!hasUserMessage && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-3 text-white">
+              Try asking me:
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {starterPrompts.map((prompt, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSendMessage(prompt)}
+                  className="p-4 rounded-2xl bg-white/10 text-white hover:bg-white/20 transition shadow-sm text-left"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Input Box */}
       <div className="glass-input flex items-center mt-4 gap-4">
         <textarea
           rows={3}
@@ -195,7 +229,7 @@ const ChatPlayground: React.FC = () => {
         <button
           className={`p-3 rounded-full flex items-center justify-center w-12 h-12 transition-all duration-200 
             ${isWaitingForResponse ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
-          onClick={handleSendMessage}
+          onClick={() => handleSendMessage()}
           disabled={isWaitingForResponse}
         >
           <Send size={20} />

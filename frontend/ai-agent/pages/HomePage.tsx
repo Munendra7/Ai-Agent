@@ -25,7 +25,7 @@ const HomePage: React.FC = () => {
       >
         <div className="max-w-4xl mx-auto z-10">
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight animate-fade-up">
-            Your <span className="text-indigo-400">Intelligent CoPilot</span> for Every Task
+            Your <span className="text-indigo-400">Intelligent AI Agent</span> for Every Task
           </h1>
 
           {/* Colorful Animated Typing Effect */}
@@ -33,17 +33,20 @@ const HomePage: React.FC = () => {
             <Typewriter
               options={{
                 strings: [
-                  'Document Q&A',
+                  'Bring your own documents',
+                  'Ask questions about your files',
+                  'Intelligent RAG',
+                  'Video Summaries',
                   'Smart Summaries',
                   'Web Search',
-                  'Template Docs',
-                  'Send Emails',
+                  'Create Documents from Word Templates',
+                  'Draft & Send Emails',
                   'Weather Updates',
                   'Excel Insights',
                 ],
                 autoStart: true,
                 loop: true,
-                delay: 60,
+                delay: 50,
                 deleteSpeed: 40,
                 cursor: '<span class="gradient-text">|</span>',
                 wrapperClassName: "gradient-text"
@@ -52,7 +55,7 @@ const HomePage: React.FC = () => {
           </div>
 
           <p className="mt-6 text-lg md:text-xl text-gray-400 animate-fade-up delay-300">
-            AI Agent that works alongside you — smart, fast, and always ready.
+            AI Agent that works alongside you - smart, fast, and always ready.
           </p>
 
           <div className="mt-8 animate-fade-up delay-500">
