@@ -44,7 +44,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             return JsonConvert.SerializeObject(payload, Formatting.Indented);
         }
 
-        [KernelFunction("GenerateDocument"), Description("Generate a document from a template with user input payload, it returns the URL of the file")]
+        [KernelFunction("GenerateDocument"), Description("Generate a document from a template with user input payload, it returns the URL of the file. Make sure proper payload is given.")]
         public async Task<string> GenerateDocumentAsync([Description("Will take template name and placeholders to replace template placeholders.")] string templateFileName, [Description("send the template json payload in format returned by KernelFunction ExtractTemplatePayload for this template")] string templatePayload)
         {
             string docxtopdfserviceURl = configuration["DocToPDFService:EndPoint"]!;

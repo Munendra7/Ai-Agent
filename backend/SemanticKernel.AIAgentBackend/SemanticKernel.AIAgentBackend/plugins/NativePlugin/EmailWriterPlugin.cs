@@ -17,7 +17,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             this.configuration = configuration;
         }
 
-        [KernelFunction("SendEmail"), Description("Always take user consent before sending email, Prepares an email for sending.")]
+        [KernelFunction("SendEmail"), Description("Always take user consent before sending email, Prepares an email for sending. Make sure HTML is passed instead of markdown")]
         public async Task<string> SendEmailAsync(string to, string subject, string body)
         {
             var emailRequest = new { to,subject, emailBody = body };
