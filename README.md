@@ -1,47 +1,57 @@
 # AI-Agent
 
-**AI-Agent** is a full-stack project that leverages React for the frontend and .NET for the backend to deliver an intelligent, context-aware AI assistant.
+**AI-Agent** is a full-stack project that leverages **React** for the frontend and **.NET** for the backend to deliver an intelligent, context-aware AI assistant. It supports bringing your own documents and videos for instant contextual knowledge, intelligent RAG, document generation, email workflows, and more.
+
+---
 
 ### 📽️ Demo  
 Click on the image below to watch the demo:
 
-[![Watch the demo]![AIAgentDEMOGIF](https://github.com/user-attachments/assets/9dd90e2f-a6e8-4baf-b1d3-5b1d9fedbf7e)
-](https://drive.google.com/file/d/1BNx342cQbMi0Pnw9BZ0yc1Fk5wX7b6T1/view?usp=sharing)
+[![Watch the demo]![AIAgentDEMOGIF](https://github.com/user-attachments/assets/9dd90e2f-a6e8-4baf-b1d3-5b1d9fedbf7e)](https://drive.google.com/file/d/1BNx342cQbMi0Pnw9BZ0yc1Fk5wX7b6T1/view?usp=sharing)
 
-
+---
 
 ## ✨ Features
 
-- 🔗 **Web API Integration**: Interacts with external web APIs to fetch or send data.
-- 🌐 **Web Search**: Retrieves up-to-date information from the internet.
-- 📄 **Document Intelligence**: Understands and extracts knowledge from the documents you provide.
-- 🧾 **Template-Based Document Generation**: Creates new documents using provided templates and dynamic content.
-- 💬 **Chat History Maintenance**: Remembers previous conversations for better context and continuity.
-- 🧠 **Vector Database for Memory**: Uses a vector store to recall information and maintain long-term memory.
-- 📧 **Email Drafting and Sending**: Can generate and send emails based on the context.
-- 🔌 **Plugin-Based Architecture**: Easily customizable plugin system where you can add or update capabilities.
-- 🤖 **Semantic Kernel Integration**: Uses Microsoft Semantic Kernel in the backend for orchestration, memory, planning, and agent-like behavior.
-- 🔐 **Authentication & Authorization**: Integrated with Microsoft Identity Platform using MSAL in the frontend and ASP.NET Identity in the backend.
+- 📄 **Bring Your Own Documents**: Instantly provide context to the AI agent from your files.  
+- 🧠 **Intelligent RAG**: Retrieve accurate answers from your knowledge base using Qdrant vector DB.  
+- 🎥 **Video-to-Context**: Extract audio from video files using **FFmpeg** and transcribe with **Azure Speech-to-Text API** for contextual Q&A.  
+- 🧾 **Template-Based PDF Generation**: Create PDF documents using pre-defined Word templates and dynamic content.  
+- 📧 **Draft & Send Emails**: Automatically draft and send emails using contextual data.  
+- 💬 **Conversation History**: Maintains a memory of past chats for contextual continuity.  
+- ☁️ **Weather API Integration**: Fetch real-time weather updates via a dedicated plugin.  
+- 🌐 **Internet Search**: Uses Google Search API to retrieve up-to-date information.  
+- 🔌 **Plugin-Based Architecture**: Add or update capabilities without disrupting the core.  
+- 🤖 **Semantic Kernel Orchestration**: Leverages Microsoft Semantic Kernel for planning, memory, and agent behavior.  
+- 🔐 **Authentication & Authorization**: Secure access with MSAL (frontend) and ASP.NET Identity (backend).  
+
+---
 
 ## 🛠 Tech Stack
 
-- **Frontend**: React + MSAL (for authentication)
-- **Backend**: ASP.NET Core + Semantic Kernel
-- **AI/LLM**: You can use any LLM model. Use GPT-4o for better performance.
-- **Vector Store**: Qdrant
-- **Database**: SQL Server
-- **File Storage**: Azure Blob Storage
-- **Containerization**: Docker & Docker Compose
+- **Frontend**: React + TailwindCSS + MSAL  
+- **Backend**: ASP.NET Core + Semantic Kernel  
+- **AI/LLM**: Any LLM (supporting auto function calling)  
+- **Vector Store**: Qdrant  
+- **Database**: SQL Server  
+- **File Storage**: Azure Blob Storage  
+- **Video/Audio Processing**: FFmpeg (Node.js service)
+- **Containerization**: Docker & Docker Compose  
 
-## 📦 Containerized Architecture
+---
 
-This project is fully containerized using Docker. Services include:
+## 📦 Modules & Architecture
 
-- 🧠 **Qdrant**: Vector database for memory storage and retrieval
-- 🗃️ **SQL Server**: Relational database for storing structured data and user information
-- ☁️ **Azure Blob Storage (emulated/local)**: For document and file handling
-- ⚙️ **.NET Backend API**: Semantic Kernel-powered orchestrator and business logic layer
-- 🖥️ **React Frontend**: User interface with MSAL-based authentication
+- 🎞️ **FFmpeg Node Server**: Extracts audio streams from video files for transcription.
+- 📄 **Docx to pdf Node Server**: Converts DOCX to PDF.  
+- 🗣️ **Azure Speech-to-Text**: Converts extracted audio into text for knowledge ingestion.  
+- 🧠 **Qdrant Vector DB**: Stores embeddings for semantic search and RAG.  
+- 🗃️ **SQL Server**: Manages structured relational data and user info.  
+- ☁️ **Azure Blob Storage**: Stores uploaded files and processed content.  
+- ⚙️ **ASP.NET Backend**: Semantic Kernel-powered orchestrator for AI workflows.  
+- 🖥️ **React Frontend**: Clean, responsive UI with TailwindCSS and MSAL auth.  
+
+---
 
 ## 🚀 Getting Started
 
@@ -70,4 +80,3 @@ docker-compose up --build
 >   Update-Database
 >   ```
 >   _Run these commands from the ASP.NET Core Web API project directory._
-
