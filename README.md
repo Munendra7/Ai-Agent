@@ -11,6 +11,19 @@ Click on the image below to watch the demo:
 
 ---
 
+---
+
+## 🏗️ Architecture Diagram  
+
+Below is the high-level architecture of the **AI-Agent** project:  
+
+<img width="1490" height="960" alt="diagram-export-8-17-2025-3_07_24-PM" src="https://github.com/user-attachments/assets/a2feea2c-664b-434b-a34f-ffbf0d856daa" />
+
+
+> The diagram shows how the **React frontend**, **ASP.NET Core backend**, **Semantic Kernel**, **Node.js services**, **Qdrant**, **Azure SQL**, and **Azure Blob Storage** interact together to deliver an intelligent, extensible AI agent.
+
+---
+
 ## ✨ Features
 
 - 📄 **Bring Your Own Documents**: Instantly provide context to the AI agent from your files.  
