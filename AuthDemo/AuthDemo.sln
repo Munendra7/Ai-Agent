@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1BA58319-778D-45C4-84F0-1E97C40826C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthDemo.Api", "src\AuthDemo.Api\AuthDemo.Api.csproj", "{CC9006E2-7E0E-463B-B523-ACDFD9DEBB77}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC9006E2-7E0E-463B-B523-ACDFD9DEBB77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC9006E2-7E0E-463B-B523-ACDFD9DEBB77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC9006E2-7E0E-463B-B523-ACDFD9DEBB77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC9006E2-7E0E-463B-B523-ACDFD9DEBB77}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CC9006E2-7E0E-463B-B523-ACDFD9DEBB77} = {1BA58319-778D-45C4-84F0-1E97C40826C1}
+	EndGlobalSection
+EndGlobal
