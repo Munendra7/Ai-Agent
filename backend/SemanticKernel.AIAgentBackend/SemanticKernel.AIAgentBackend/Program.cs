@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
 using Qdrant.Client;
@@ -11,7 +12,9 @@ using SemanticKernel.AIAgentBackend.Data;
 using SemanticKernel.AIAgentBackend.Extentions.cs;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Middlewares;
+using SemanticKernel.AIAgentBackend.Services;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,8 +35,35 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+// Configure JWT Authentication
+var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "your-super-secret-key-with-at-least-32-characters";
+var key = Encoding.ASCII.GetBytes(jwtSecret);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "your-app",
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "your-app",
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+// Register authentication services
+builder.Services.AddScoped<IExternalAuthService, ExternalAuthService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

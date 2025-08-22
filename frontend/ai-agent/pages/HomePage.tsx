@@ -1,9 +1,13 @@
 import React from "react";
-import { SignInButton } from "../src/components/MSAuthentication/SignInButton";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../src/contexts/AuthContext";
 import Typewriter from "typewriter-effect";
 import Background from "../src/assets/HomeBackground.jpg";
 
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  
   const capabilities = [
     ["📄", "Document Q&A", "Understand & answer queries based on shared documents."],
     ["🧠", "Smart Summaries", "Summarize complex documents and video files into key points."],
@@ -59,7 +63,21 @@ const HomePage: React.FC = () => {
           </p>
 
           <div className="mt-8 animate-fade-up delay-500">
-            <SignInButton />
+            {isAuthenticated ? (
+              <button
+                onClick={() => navigate('/chat')}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+              >
+                Go to Chat
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+              >
+                Get Started
+              </button>
+            )}
           </div>
         </div>
 

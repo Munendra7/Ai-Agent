@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -45,6 +45,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Identity.Web" Version="3.8.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.GitHub" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
     <PackageReference Include="Microsoft.KernelMemory.Abstractions" Version="0.97.250211.1" />
     <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.47.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureOpenAI" Version="1.40.0" />

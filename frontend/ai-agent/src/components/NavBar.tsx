@@ -1,15 +1,12 @@
 import React, { useState } from "react";
-import { SignOutButton } from "./MSAuthentication/SignOutButton";
 import Copilot from "../assets/AIAgent.svg";
 import { Menu, X } from "lucide-react";
-import { useIsAuthenticated, useMsal } from "@azure/msal-react";
-import { SignInButton } from "./MSAuthentication/SignInButton";
+import { useAuth } from "../contexts/AuthContext";
+import UserProfile from "./UserProfile";
 
 const NavBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const isAuthenticated = useIsAuthenticated();
-  const { instance } = useMsal();
-  const activeAccount = instance.getActiveAccount();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-black/80 backdrop-blur-lg text-white z-50 border-b border-gray-700 shadow-md">
@@ -33,14 +30,11 @@ const NavBar: React.FC = () => {
         {/* Desktop Nav */}
         <div className="hidden sm:flex items-center gap-4">
           {isAuthenticated ? (
-            <>
-              <span className="text-sm text-gray-300">
-                Welcome, {activeAccount?.name}
-              </span>
-              <SignOutButton />
-            </>
+            <UserProfile />
           ) : (
-            <SignInButton />
+            <span className="text-sm text-gray-300">
+              Please sign in to continue
+            </span>
           )}
         </div>
       </div>
@@ -49,14 +43,13 @@ const NavBar: React.FC = () => {
       {isOpen && (
         <div className="sm:hidden flex flex-col items-center bg-gray-900 text-white py-4 border-t border-gray-700">
           {isAuthenticated ? (
-            <>
-              <span className="text-sm mb-2 text-gray-300">
-                Welcome, {activeAccount?.name}
-              </span>
-              <SignOutButton />
-            </>
+            <div className="w-full px-4">
+              <UserProfile />
+            </div>
           ) : (
-            <SignInButton />
+            <span className="text-sm text-gray-300">
+              Please sign in to continue
+            </span>
           )}
         </div>
       )}
