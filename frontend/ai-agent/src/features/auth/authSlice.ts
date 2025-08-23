@@ -39,6 +39,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async () => {
     await authService.logout();
+    await authService.msalLogout(); // Also logout from MSAL if logged in
     localStorage.removeItem('accessToken');
   }
 );
@@ -52,10 +53,17 @@ export const googleLogin = createAsyncThunk(
   }
 );
 
-export const microsoftLogin = createAsyncThunk(
-  'auth/microsoftLogin',
-  async ({ code, redirectUri }: { code: string; redirectUri: string }) => {
-    const response = await authService.microsoftLogin(code, redirectUri);
+// NEW: Microsoft login with MSAL
+export const microsoftLoginMSAL = createAsyncThunk(
+  'auth/microsoftLoginMSAL',
+  async () => {
+    const msalResponse = await authService.microsoftLoginWithMSAL();
+    if (!msalResponse) {
+      throw new Error('MSAL login failed');
+    }
+    
+    // Exchange MSAL token for your backend JWT
+    const response = await authService.exchangeMicrosoftToken(msalResponse.idToken);
     localStorage.setItem('accessToken', response.accessToken);
     return response;
   }
@@ -126,12 +134,20 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
       })
-      // Microsoft Login
-      .addCase(microsoftLogin.fulfilled, (state, action) => {
+      // Microsoft Login with MSAL
+      .addCase(microsoftLoginMSAL.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(microsoftLoginMSAL.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
+      })
+      .addCase(microsoftLoginMSAL.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Microsoft login failed';
       });
   },
 });

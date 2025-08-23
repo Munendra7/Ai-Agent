@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAppDispatch } from '../app/hooks';
-import { googleLogin, microsoftLogin } from '../features/auth/authSlice';
+import { googleLogin, microsoftLoginMSAL } from '../features/auth/authSlice';
 
 const OAuthCallback: React.FC = () => {
   const { provider } = useParams<{ provider: string }>();
@@ -21,7 +21,7 @@ const OAuthCallback: React.FC = () => {
           .then(() => navigate('/dashboard'))
           .catch(() => navigate('/login'));
       } else if (provider === 'microsoft') {
-        dispatch(microsoftLogin({ code, redirectUri }))
+        dispatch(microsoftLoginMSAL())
           .unwrap()
           .then(() => navigate('/dashboard'))
           .catch(() => navigate('/login'));

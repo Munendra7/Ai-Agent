@@ -1,8 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import {App} from './App.tsx'
-import { MsalProvider } from '@azure/msal-react'
-import { msalInstance } from "./authConfig";
+import {App} from './App.tsx';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
 import NotFoundPage from '../pages/NotFoundPage.tsx';
 import HomePage from '../pages/HomePage.tsx';
@@ -34,9 +32,7 @@ const router  = createBrowserRouter(
 
 createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
-      <MsalProvider instance={msalInstance}>
-        <ToastContainer position="top-right" autoClose={3000} />
-        <RouterProvider router={router} />
-      </MsalProvider>
+    <ToastContainer position="top-right" autoClose={3000} />
+    <RouterProvider router={router} />
   </Provider>,
 )

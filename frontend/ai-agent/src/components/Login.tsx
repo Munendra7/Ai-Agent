@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { login, clearError } from '../features/auth/authSlice';
+import { login, clearError, microsoftLoginMSAL } from '../features/auth/authSlice';
 import authService from '../services/authService';
 
 const Login: React.FC = () => {
@@ -33,8 +33,14 @@ const Login: React.FC = () => {
     window.location.href = authService.getGoogleAuthUrl();
   };
 
-  const handleMicrosoftLogin = () => {
-    window.location.href = authService.getMicrosoftAuthUrl();
+  // UPDATED: Microsoft login handler using MSAL
+  const handleMicrosoftLogin = async () => {
+    try {
+      await dispatch(microsoftLoginMSAL()).unwrap();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Microsoft login failed:', error);
+    }
   };
 
   return (
@@ -105,7 +111,8 @@ const Login: React.FC = () => {
               <button
                 type="button"
                 onClick={handleMicrosoftLogin}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                disabled={isLoading}
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
               >
                 Microsoft
               </button>

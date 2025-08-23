@@ -1,4 +1,7 @@
 import api from './api';
+import { msalInstance } from './msalService';
+import { loginRequest } from '../config/msalConfig';
+import { AuthenticationResult } from '@azure/msal-browser';
 
 export interface RegisterData {
   email: string;
@@ -54,14 +57,29 @@ class AuthService {
     return response.data;
   }
 
-  async microsoftLogin(code: string, redirectUri: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/microsoft', {
-      code,
-      redirectUri,
+  // UPDATED: Microsoft login using MSAL
+  async microsoftLoginWithMSAL(): Promise<AuthenticationResult | null> {
+    try {
+      // Try popup first
+      const response = await msalInstance.loginPopup(loginRequest);
+      return response;
+    } catch (popupError) {
+      console.error("Popup failed, trying redirect:", popupError);
+      // Fallback to redirect
+      await msalInstance.loginRedirect(loginRequest);
+      return null;
+    }
+  }
+
+  // UPDATED: Exchange MSAL token for your backend JWT
+  async exchangeMicrosoftToken(msalToken: string): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>('/auth/microsoft/token', {
+      idToken: msalToken,
     });
     return response.data;
   }
 
+  // Keep Google OAuth URL generation as is
   getGoogleAuthUrl(): string {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const redirectUri = `${window.location.origin}/auth/google/callback`;
@@ -76,16 +94,19 @@ class AuthService {
       `prompt=consent`;
   }
 
-  getMicrosoftAuthUrl(): string {
-    const clientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
-    const redirectUri = `${window.location.origin}/auth/microsoft/callback`;
-    const scope = 'openid email profile';
-    
-    return `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?` +
-      `client_id=${clientId}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `response_type=code&` +
-      `scope=${encodeURIComponent(scope)}`;
+  // Get current MSAL account
+  getCurrentMsalAccount() {
+    return msalInstance.getActiveAccount();
+  }
+
+  // Sign out from MSAL
+  async msalLogout() {
+    const account = msalInstance.getActiveAccount();
+    if (account) {
+      await msalInstance.logoutPopup({
+        account: account,
+      });
+    }
   }
 }
 
