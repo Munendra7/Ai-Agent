@@ -4,12 +4,13 @@ using SemanticKernel.AIAgentBackend.CustomActionFilters;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using SemanticKernel.AIAgentBackend.Constants;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class KnowledgeController : ControllerBase
     {
         private readonly IEmbeddingService embeddingService;

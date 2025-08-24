@@ -1,12 +1,12 @@
-﻿using Google;
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using SemanticKernel.AIAgentBackend.Models.Domain;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Data;
 using Microsoft.EntityFrameworkCore;
+using SemanticKernel.AIAgentBackend.Services.Interface;
+using SemanticKernel.AIAgentBackend.Services.Model;
 
-namespace SemanticKernel.AIAgentBackend.Services
+namespace SemanticKernel.AIAgentBackend.Services.Service
 {
     public class AuthService : IAuthService
     {
@@ -40,7 +40,6 @@ namespace SemanticKernel.AIAgentBackend.Services
 
             user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
 
-            // Add default role
             var userRole = await _context.Roles.FirstAsync(r => r.Name == "User");
             user.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = userRole.Id });
 

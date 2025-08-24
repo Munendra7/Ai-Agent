@@ -10,5 +10,7 @@ namespace SemanticKernel.AIAgentBackend.Models.Domain
         public string Content { get; set; } = string.Empty;
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        public ICollection<ChatHistory> ChatHistories { get; set; } = new List<ChatHistory>();
     }
 }

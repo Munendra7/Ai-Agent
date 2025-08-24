@@ -1,19 +1,7 @@
-﻿using Google;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Tokens;
-using SemanticKernel.AIAgentBackend.Data;
-using SemanticKernel.AIAgentBackend.Models.Domain;
 using SemanticKernel.AIAgentBackend.Models.DTO;
-using SemanticKernel.AIAgentBackend.Services;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using SemanticKernel.AIAgentBackend.Services.Interface;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {

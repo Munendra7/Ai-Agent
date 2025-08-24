@@ -2,12 +2,13 @@
 using Microsoft.IdentityModel.Tokens;
 using SemanticKernel.AIAgentBackend.Models.Configuration;
 using SemanticKernel.AIAgentBackend.Models.Domain;
+using SemanticKernel.AIAgentBackend.Services.Interface;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SemanticKernel.AIAgentBackend.Services
+namespace SemanticKernel.AIAgentBackend.Services.Service
 {
     public class TokenService : ITokenService
     {

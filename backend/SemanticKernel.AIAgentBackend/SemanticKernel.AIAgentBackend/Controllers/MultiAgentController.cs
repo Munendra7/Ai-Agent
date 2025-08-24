@@ -1,4 +1,5 @@
 ﻿using DocxProcessorLibrary.TemplateBasedDocGenerator;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
@@ -14,6 +15,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MultiAgentController : ControllerBase
     {
         private readonly Kernel _kernel;

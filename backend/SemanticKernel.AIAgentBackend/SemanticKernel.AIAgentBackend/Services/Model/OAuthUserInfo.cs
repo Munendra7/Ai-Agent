@@ -1,4 +1,4 @@
-﻿namespace SemanticKernel.AIAgentBackend.Services
+﻿namespace SemanticKernel.AIAgentBackend.Services.Model
 {
     public class OAuthUserInfo
     {

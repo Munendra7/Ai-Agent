@@ -18,5 +18,6 @@ namespace SemanticKernel.AIAgentBackend.Models.Domain
 
         public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+        public ICollection<ChatHistory> ChatHistories { get; set; } = new List<ChatHistory>();
     }
 }

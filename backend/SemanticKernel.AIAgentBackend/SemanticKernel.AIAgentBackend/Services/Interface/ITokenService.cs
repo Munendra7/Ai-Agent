@@ -1,7 +1,7 @@
 ﻿using SemanticKernel.AIAgentBackend.Models.Domain;
 using System.Security.Claims;
 
-namespace SemanticKernel.AIAgentBackend.Services
+namespace SemanticKernel.AIAgentBackend.Services.Interface
 {
     public interface ITokenService
     {

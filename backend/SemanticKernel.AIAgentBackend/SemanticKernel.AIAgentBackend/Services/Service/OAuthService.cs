@@ -7,9 +7,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
-using Azure.Core;
+using SemanticKernel.AIAgentBackend.Services.Interface;
+using SemanticKernel.AIAgentBackend.Services.Model;
 
-namespace SemanticKernel.AIAgentBackend.Services
+namespace SemanticKernel.AIAgentBackend.Services.Service
 {
     public class OAuthService : IOAuthService
     {
@@ -60,9 +61,9 @@ namespace SemanticKernel.AIAgentBackend.Services
             return new OAuthUserInfo
             {
                 Id = userInfo.RootElement.TryGetProperty("id", out var idProp) ? idProp.GetString() ?? "" : "",
-                Email = userInfo.RootElement.TryGetProperty("email", out var emailProp) ? emailProp.GetString() ?? "": "",
-                FirstName = userInfo.RootElement.TryGetProperty("given_name", out var firstNameProp)? firstNameProp.GetString() ?? "": "",
-                LastName = userInfo.RootElement.TryGetProperty("family_name", out var lastNameProp)? lastNameProp.GetString() ?? "": ""
+                Email = userInfo.RootElement.TryGetProperty("email", out var emailProp) ? emailProp.GetString() ?? "" : "",
+                FirstName = userInfo.RootElement.TryGetProperty("given_name", out var firstNameProp) ? firstNameProp.GetString() ?? "" : "",
+                LastName = userInfo.RootElement.TryGetProperty("family_name", out var lastNameProp) ? lastNameProp.GetString() ?? "" : ""
             };
         }
 

@@ -7,11 +7,13 @@ using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 using Microsoft.SemanticKernel.Agents;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AgentController : ControllerBase
     {
         private readonly Kernel _kernel;

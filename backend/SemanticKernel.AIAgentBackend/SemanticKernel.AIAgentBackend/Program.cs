@@ -14,7 +14,8 @@ using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Middlewares;
 using SemanticKernel.AIAgentBackend.Models.Configuration;
 using SemanticKernel.AIAgentBackend.Models.Domain;
-using SemanticKernel.AIAgentBackend.Services;
+using SemanticKernel.AIAgentBackend.Services.Interface;
+using SemanticKernel.AIAgentBackend.Services.Service;
 using Serilog;
 using System.Text;
 

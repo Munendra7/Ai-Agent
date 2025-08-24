@@ -1,4 +1,6 @@
-﻿namespace SemanticKernel.AIAgentBackend.Services
+﻿using SemanticKernel.AIAgentBackend.Services.Model;
+
+namespace SemanticKernel.AIAgentBackend.Services.Interface
 {
     public interface IOAuthService
     {

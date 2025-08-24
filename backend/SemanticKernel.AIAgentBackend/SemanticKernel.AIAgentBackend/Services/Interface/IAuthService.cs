@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.Data;
 using SemanticKernel.AIAgentBackend.Models.DTO;
+using SemanticKernel.AIAgentBackend.Services.Model;
 
-namespace SemanticKernel.AIAgentBackend.Services
+namespace SemanticKernel.AIAgentBackend.Services.Interface
 {
     public interface IAuthService
     {

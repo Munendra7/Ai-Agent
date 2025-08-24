@@ -19,16 +19,29 @@ namespace SemanticKernel.AIAgentBackend.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ChatHistory>().HasIndex(x => x.SessionId);
-            modelBuilder.Entity<ChatHistory>().HasKey(x => x.Id);
-            modelBuilder.Entity<ChatHistory>()
-            .Property(u => u.Id)
-            .HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<ChatHistory>(entity =>
+            {
+                entity.HasIndex(x => x.SessionId);
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Id)
+                    .HasDefaultValueSql("NEWID()");
 
-            modelBuilder.Entity<SessionSummary>().HasIndex(x => x.SessionId);
-            modelBuilder.Entity<SessionSummary>().HasKey(x => x.SessionId);
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.ChatHistories)
+                    .HasForeignKey(e => e.UserId);
 
-            // User configuration
+                entity.HasOne(e => e.SessionSummary)
+                    .WithMany(s => s.ChatHistories)
+                    .HasForeignKey(e => e.SessionId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<SessionSummary>(entity =>
+            {
+                entity.HasKey(e => e.SessionId);
+                entity.HasKey(x => x.SessionId);
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -38,7 +51,6 @@ namespace SemanticKernel.AIAgentBackend.Data
                 entity.Property(e => e.LastName).HasMaxLength(100);
             });
 
-            // Role configuration
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -47,7 +59,6 @@ namespace SemanticKernel.AIAgentBackend.Data
                 entity.Property(e => e.Description).HasMaxLength(256);
             });
 
-            // UserRole configuration
             modelBuilder.Entity<UserRole>(entity =>
             {
                 entity.HasKey(e => new { e.UserId, e.RoleId });
@@ -61,7 +72,7 @@ namespace SemanticKernel.AIAgentBackend.Data
                     .HasForeignKey(e => e.RoleId);
             });
 
-            // RefreshToken configuration
+
             modelBuilder.Entity<RefreshToken>(entity =>
             {
                 entity.HasKey(e => e.Id);
