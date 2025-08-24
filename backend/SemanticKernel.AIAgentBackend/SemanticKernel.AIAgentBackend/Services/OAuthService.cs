@@ -1,7 +1,13 @@
 ﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Tokens;
 using SemanticKernel.AIAgentBackend.Models.Configuration;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text.Json;
+using Azure.Core;
 
 namespace SemanticKernel.AIAgentBackend.Services
 {
@@ -60,47 +66,55 @@ namespace SemanticKernel.AIAgentBackend.Services
             };
         }
 
-        public async Task<OAuthUserInfo?> GetMicrosoftUserInfoAsync(string code, string redirectUri)
+        public async Task<OAuthUserInfo?> GetMicrosoftUserInfoAsync(string idToken)
         {
-            // Exchange code for token
-            var tokenRequest = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("code", code),
-                new KeyValuePair<string, string>("client_id", _oauthSettings.Microsoft.ClientId),
-                new KeyValuePair<string, string>("client_secret", _oauthSettings.Microsoft.ClientSecret),
-                new KeyValuePair<string, string>("redirect_uri", redirectUri),
-                new KeyValuePair<string, string>("grant_type", "authorization_code")
-            });
+            // Validate the Microsoft ID token
+            var validatedToken = await ValidateMicrosoftToken(idToken);
 
-            var tokenUrl = $"https://login.microsoftonline.com/{_oauthSettings.Microsoft.TenantId}/oauth2/v2.0/token";
-            var tokenResponse = await _httpClient.PostAsync(tokenUrl, tokenRequest);
-
-            if (!tokenResponse.IsSuccessStatusCode)
+            if (validatedToken == null)
                 return null;
 
-            var tokenContent = await tokenResponse.Content.ReadAsStringAsync();
-            var tokenData = JsonDocument.Parse(tokenContent);
-            var accessToken = tokenData.RootElement.GetProperty("access_token").GetString();
-
-            // Get user info
-            var userInfoRequest = new HttpRequestMessage(HttpMethod.Get,
-                "https://graph.microsoft.com/v1.0/me");
-            userInfoRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-            var userInfoResponse = await _httpClient.SendAsync(userInfoRequest);
-            if (!userInfoResponse.IsSuccessStatusCode)
-                return null;
-
-            var userInfoContent = await userInfoResponse.Content.ReadAsStringAsync();
-            var userInfo = JsonDocument.Parse(userInfoContent);
+            // Extract user info from the validated token
+            var claims = validatedToken.Claims.ToDictionary(c => c.Type, c => c.Value);
 
             return new OAuthUserInfo
             {
-                Id = userInfo.RootElement.TryGetProperty("id", out var idProp) ? idProp.GetString() ?? "" : "",
-                Email = userInfo.RootElement.TryGetProperty("mail", out var mailProp) && !string.IsNullOrEmpty(mailProp.GetString()) ? mailProp.GetString()! : userInfo.RootElement.TryGetProperty("userPrincipalName", out var upnProp) ? upnProp.GetString() ?? "" : "",
-                FirstName = userInfo.RootElement.TryGetProperty("givenName", out var firstProp) ? firstProp.GetString() ?? "" : "",
-                LastName = userInfo.RootElement.TryGetProperty("surname", out var lastProp) ? lastProp.GetString() ?? "": ""
+                Id = claims.ContainsKey("http://schemas.microsoft.com/identity/claims/objectidentifier") ? claims["http://schemas.microsoft.com/identity/claims/objectidentifier"] : "",
+                Email = claims.ContainsKey("preferred_username") ? claims["preferred_username"] : "",
+                FirstName = claims.ContainsKey("given_name") ? claims["given_name"] : "",
+                LastName = claims.ContainsKey("family_name") ? claims["family_name"] : ""
             };
+        }
+
+        private async Task<ClaimsPrincipal?> ValidateMicrosoftToken(string idToken)
+        {
+            try
+            {
+                var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                    "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration",
+                    new OpenIdConnectConfigurationRetriever(),
+                    new HttpDocumentRetriever());
+
+                var openIdConfig = await configurationManager.GetConfigurationAsync();
+
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = true,
+                    ValidAudience = _oauthSettings.Microsoft.ClientId,
+                    ValidateLifetime = true,
+                    IssuerSigningKeys = openIdConfig.SigningKeys,
+                    ValidateIssuerSigningKey = true
+                };
+
+                var handler = new JwtSecurityTokenHandler();
+                var principal = handler.ValidateToken(idToken, validationParameters, out _);
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

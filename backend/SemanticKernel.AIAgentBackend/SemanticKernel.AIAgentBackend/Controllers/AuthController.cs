@@ -5,10 +5,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Tokens;
 using SemanticKernel.AIAgentBackend.Data;
 using SemanticKernel.AIAgentBackend.Models.Domain;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Services;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
@@ -103,22 +107,29 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             return Ok(result);
         }
 
-        [HttpPost("microsoft")]
-        public async Task<IActionResult> MicrosoftLogin([FromBody] ExternalAuthRequestDTO request)
+        [HttpPost("microsoft/token")]
+        public async Task<IActionResult> MicrosoftTokenExchange([FromBody] MicrosoftTokenRequestDTO request)
         {
-            var userInfo = await _oauthService.GetMicrosoftUserInfoAsync(request.Code, request.RedirectUri);
+            try
+            {
+                var userInfo = await _oauthService.GetMicrosoftUserInfoAsync(request.IdToken);
 
-            if (userInfo == null)
-                return BadRequest(new { message = "Invalid authorization code" });
+                if (userInfo == null)
+                    return BadRequest(new { message = "Invalid authorization code" });
 
-            var ipAddress = GetIpAddress();
-            var result = await _authService.ExternalLoginAsync("microsoft", userInfo, ipAddress);
+                var ipAddress = GetIpAddress();
+                var result = await _authService.ExternalLoginAsync("microsoft", userInfo, ipAddress);
 
-            if (result == null)
-                return BadRequest(new { message = "Login failed" });
+                if (result == null)
+                    return BadRequest(new { message = "Login failed" });
 
-            SetTokenCookie(result.RefreshToken);
-            return Ok(result);
+                SetTokenCookie(result.RefreshToken);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Token validation failed", error = ex.Message });
+            }
         }
 
         [HttpPost("logout")]
