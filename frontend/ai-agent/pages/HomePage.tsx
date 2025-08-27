@@ -1,5 +1,4 @@
 import React from "react";
-import { SignInButton } from "../src/components/MSAuthentication/SignInButton";
 import Typewriter from "typewriter-effect";
 import Background from "../src/assets/HomeBackground.jpg";
 
@@ -59,7 +58,7 @@ const HomePage: React.FC = () => {
           </p>
 
           <div className="mt-8 animate-fade-up delay-500">
-            <SignInButton />
+            {/* <SignInButton /> */}
           </div>
         </div>
 

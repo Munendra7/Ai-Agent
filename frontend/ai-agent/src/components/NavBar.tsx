@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { SignOutButton } from "./MSAuthentication/SignOutButton";
 import Copilot from "../assets/AIAgent.svg";
 import { Menu, X } from "lucide-react";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
-import { SignInButton } from "./MSAuthentication/SignInButton";
 
 const NavBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,10 +35,11 @@ const NavBar: React.FC = () => {
               <span className="text-sm text-gray-300">
                 Welcome, {activeAccount?.name}
               </span>
-              <SignOutButton />
+              {/* <SignOutButton /> */}
             </>
           ) : (
-            <SignInButton />
+            // <SignInButton />
+            <></>
           )}
         </div>
       </div>
@@ -53,10 +52,11 @@ const NavBar: React.FC = () => {
               <span className="text-sm mb-2 text-gray-300">
                 Welcome, {activeAccount?.name}
               </span>
-              <SignOutButton />
+              {/* <SignOutButton /> */}
             </>
           ) : (
-            <SignInButton />
+            // <SignInButton />
+            <></>
           )}
         </div>
       )}

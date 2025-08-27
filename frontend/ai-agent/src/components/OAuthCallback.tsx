@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useAppDispatch } from '../app/hooks';
 import { googleLogin, microsoftLoginMSAL } from '../features/auth/authSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../app/store';
 
 const OAuthCallback: React.FC = () => {
   const { provider } = useParams<{ provider: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -18,12 +19,12 @@ const OAuthCallback: React.FC = () => {
       if (provider === 'google') {
         dispatch(googleLogin({ code, redirectUri }))
           .unwrap()
-          .then(() => navigate('/dashboard'))
+          .then(() => navigate('/chat'))
           .catch(() => navigate('/login'));
       } else if (provider === 'microsoft') {
         dispatch(microsoftLoginMSAL())
           .unwrap()
-          .then(() => navigate('/dashboard'))
+          .then(() => navigate('/chat'))
           .catch(() => navigate('/login'));
       }
     } else {

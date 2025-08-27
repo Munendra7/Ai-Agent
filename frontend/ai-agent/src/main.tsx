@@ -6,13 +6,13 @@ import NotFoundPage from '../pages/NotFoundPage.tsx';
 import HomePage from '../pages/HomePage.tsx';
 import PublicRoutes from '../utils/PublicRoutes.tsx';
 import ProtectedRoute from '../utils/ProtectedRoute.tsx';
-import AgentPage from '../pages/AgentPage.tsx'
 import { ToastContainer } from 'react-toastify'
 import ErrorPage from '../pages/ErrorPage.tsx'
 import { store } from './app/store.ts';
 import { Provider } from 'react-redux';
 import Login from './components/Login.tsx';
 import OAuthCallback from './components/OAuthCallback.tsx';
+import ChatPlayground from './components/ChatPlayground.tsx';
 
 const router  = createBrowserRouter(
   createRoutesFromElements(
@@ -23,7 +23,7 @@ const router  = createBrowserRouter(
         <Route path="/auth/:provider/callback" element={<OAuthCallback />} />
       </Route>
       <Route path="/chat" element={<ProtectedRoute />}>
-        <Route path="/chat" element={<AgentPage />} />
+        <Route path="/chat" element={<ChatPlayground />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Route>

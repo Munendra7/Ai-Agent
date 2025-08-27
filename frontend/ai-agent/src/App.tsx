@@ -12,6 +12,8 @@ export const App: React.FC = () => {
       setMsalInitialized(true);
     };
     init();
+
+    
   }, []);
 
   if (!msalInitialized) {

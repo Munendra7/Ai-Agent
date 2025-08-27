@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { Send, Loader2, Bot } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useMsal } from "@azure/msal-react";
-import { backendAPILoginRequest } from "../authConfig";
 import "./ChatPlayground.css";
 
 const apiUrl = (import.meta).env.VITE_AIAgent_URL;
@@ -22,7 +21,6 @@ const ChatPlayground: React.FC = () => {
   const activeAccount = instance.getActiveAccount();
   const sessionId = useRef<string>(crypto.randomUUID());
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [messages, setMessages] = useState<
     { text: string; type: "user" | "bot"; persona: string; isLoading?: boolean }[]
   >([
@@ -39,40 +37,20 @@ const ChatPlayground: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const response = await instance.acquireTokenSilent({
-          ...backendAPILoginRequest,
-          account: activeAccount!,
-        });
-        setAccessToken(response.accessToken);
-      } catch (error) {
-        console.error("Token acquisition failed", error);
-      }
-    };
-
-    if (activeAccount) {
-      fetchToken();
-    }
-  }, [activeAccount, instance]);
-
   const formatChatResponse = (text: string): string => {
     return text.replace(/- \*\*(.*?)\*\*/g, "\n- **`$1`**").replace(/ - /g, "\n- ").trim();
   };
 
   const fetchAgentStreamResponse = async (query: string) => {
-    if (!accessToken) {
-      console.error("Access token not available");
-      return;
-    }
-
     setMessages((prev) => [
       ...prev,
       { text: "", type: "bot", persona: "AI Agent", isLoading: true },
     ]);
 
     try {
+
+      //const response = await api.post('/Agent/Chat', { sessionId: sessionId.current, query });
+
       const response = await fetch(`${apiUrl}/api/Agent/StreamAgentChat`, {
         method: "POST",
         headers: {
