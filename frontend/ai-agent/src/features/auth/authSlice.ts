@@ -69,6 +69,14 @@ export const microsoftLoginMSAL = createAsyncThunk(
   }
 );
 
+export const setUserProfile = createAsyncThunk(
+  'auth/setUserProfile',
+  async () => {
+    const user = await authService.getUserProfile();
+    return user;
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -148,6 +156,18 @@ const authSlice = createSlice({
       .addCase(microsoftLoginMSAL.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message || 'Microsoft login failed';
+      })
+      .addCase(setUserProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(setUserProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+        state.isAuthenticated = true;
+      })
+      .addCase(setUserProfile.rejected, (state) => {
+        state.isLoading = false;
       });
   },
 });

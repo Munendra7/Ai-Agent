@@ -2,26 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login, clearError, microsoftLoginMSAL } from "../features/auth/authSlice";
 import authService from "../services/authService";
-import { RootState, AppDispatch } from "../app/store";
-import { useSelector, useDispatch } from "react-redux";
 import { Loader2, Mail, Lock, AlertCircle, Sparkles } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { isLoading, error, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth
+  const { isLoading, error } = useAppSelector(
+    (state) => state.auth
   );
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/chat");
-    }
-  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     return () => {

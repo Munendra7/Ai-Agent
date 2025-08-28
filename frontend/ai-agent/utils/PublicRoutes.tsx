@@ -1,8 +1,8 @@
-import { useIsAuthenticated } from "@azure/msal-react";
 import { Navigate, Outlet } from "react-router-dom";
+import { useAppSelector } from "../src/app/hooks";
 
 const PublicRoutes = () => {
-  const isAuthenticated = useIsAuthenticated();
+  const isAuthenticated = useAppSelector(state=> state.auth.isAuthenticated);
   return isAuthenticated ? 
   (
     <Navigate to="/chat" />) 

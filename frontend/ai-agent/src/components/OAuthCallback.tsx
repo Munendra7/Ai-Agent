@@ -1,14 +1,13 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { googleLogin, microsoftLoginMSAL } from '../features/auth/authSlice';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../app/store';
+import { useAppDispatch } from '../app/hooks';
 
 const OAuthCallback: React.FC = () => {
   const { provider } = useParams<{ provider: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);

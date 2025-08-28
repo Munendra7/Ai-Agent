@@ -108,6 +108,11 @@ class AuthService {
       });
     }
   }
+
+  async getUserProfile(): Promise<User> {
+    const response = await api.get<User>('/user/profile');
+    return response.data;
+  }
 }
 
 export default new AuthService();
