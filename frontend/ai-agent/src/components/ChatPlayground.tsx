@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Loader2, Bot } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { useMsal } from "@azure/msal-react";
 import "./ChatPlayground.css";
+import { useAppSelector } from "../app/hooks";
 
 const apiUrl = (import.meta).env.VITE_AIAgent_URL;
 
@@ -17,15 +17,15 @@ const starterPrompts = [
 ];
 
 const ChatPlayground: React.FC = () => {
-  const { instance } = useMsal();
-  const activeAccount = instance.getActiveAccount();
   const sessionId = useRef<string>(crypto.randomUUID());
+  const {user, accessToken} = useAppSelector(state => state.auth);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<
     { text: string; type: "user" | "bot"; persona: string; isLoading?: boolean }[]
   >([
     {
-      text: `Hi ${activeAccount?.name || "there"}, how can I assist you?`,
+      text: `Hi ${user?.firstName || "there"}, how can I assist you?`,
       type: "bot",
       persona: "AI Agent",
     },

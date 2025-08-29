@@ -141,7 +141,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             {
                 HttpOnly = true,
                 Expires = DateTime.UtcNow.AddDays(7),
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Secure = true
             };
             Response.Cookies.Append("refreshToken", token, cookieOptions);
