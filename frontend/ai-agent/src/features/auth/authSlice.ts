@@ -39,7 +39,6 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async () => {
     await authService.logout();
-    await authService.msalLogout();
     localStorage.removeItem('accessToken');
   }
 );

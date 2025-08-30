@@ -1,11 +1,9 @@
 // fetchClient.ts
 const API_URL = import.meta.env.VITE_AIAgent_URL + "/api";
 
-let accessToken: string | null = null;
 let dispatchFn: ((action: { type: string; payload?: unknown }) => void) | null = null;
 
-export function setupFetchInterceptors(token: string | null,dispatch: (action: { type: string; payload?: unknown }) => void){
-  accessToken = token;
+export function setupFetchInterceptors(dispatch: (action: { type: string; payload?: unknown }) => void){
   dispatchFn = dispatch;
 }
 
@@ -16,6 +14,8 @@ type FetchOptions = RequestInit & {
 
 export async function fetchWithInterceptors<T>(url: string, options: FetchOptions = {}): Promise<T> {
   const { headers, body, stream, ...rest } = options;
+
+  let accessToken = localStorage.getItem('accessToken');
 
   const finalHeaders: HeadersInit = {
     "Content-Type": "application/json",
@@ -54,6 +54,7 @@ export async function fetchWithInterceptors<T>(url: string, options: FetchOption
       return fetchWithInterceptors<T>(url, options);
     } catch (err) {
       dispatchFn({ type: "auth/logout" });
+      window.location.href = "/login";
       throw err;
     }
   }

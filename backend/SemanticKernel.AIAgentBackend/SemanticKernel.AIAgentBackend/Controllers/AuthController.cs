@@ -131,7 +131,13 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 await _authService.RevokeTokenAsync(refreshToken, ipAddress);
             }
 
-            Response.Cookies.Delete("refreshToken");
+            Response.Cookies.Delete("refreshToken" , new CookieOptions()
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                Path = "/"
+            });
             return Ok(new { message = "Logged out successfully" });
         }
 
@@ -142,7 +148,8 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 HttpOnly = true,
                 Expires = DateTime.UtcNow.AddDays(7),
                 SameSite = SameSiteMode.None,
-                Secure = true
+                Secure = true,
+                Path = "/"
             };
             Response.Cookies.Append("refreshToken", token, cookieOptions);
         }

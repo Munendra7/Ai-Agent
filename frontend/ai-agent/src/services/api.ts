@@ -9,10 +9,10 @@ const api = axios.create({
 
 
 // Interceptor setup function to inject getToken and dispatch
-export function setupApiInterceptors(accesstoken:string | null,dispatch: (action: { type: string; payload?: unknown }) => void) {
+export function setupApiInterceptors(dispatch: (action: { type: string; payload?: unknown }) => void) {
   api.interceptors.request.use(
     (config) => {
-      const token = accesstoken;
+      const token = localStorage.getItem('accessToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -36,7 +36,8 @@ export function setupApiInterceptors(accesstoken:string | null,dispatch: (action
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return api(originalRequest);
         } catch (refreshError) {
-          dispatch({ type: 'auth/logout' });    
+          dispatch({ type: 'auth/logout' });
+          window.location.href = '/login';
           return Promise.reject(refreshError);
         }
       }
