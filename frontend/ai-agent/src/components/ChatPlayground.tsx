@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import "./ChatPlayground.css";
 import { useAppSelector } from "../app/hooks";
 import { fetchWithInterceptors } from "../services/fetchClient";
+import { useNavigate, useParams } from "react-router-dom";
 
 const starterPrompts = [
   "List all documents in your knowledge base",
@@ -15,8 +16,12 @@ const starterPrompts = [
   "Draft and send an email",
 ];
 
+const guidRegex =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 const ChatPlayground: React.FC = () => {
-  const sessionId = useRef<string>(crypto.randomUUID());
+  const sessionId = useParams<{ sessionid: string }>().sessionid;
+  const navigate = useNavigate();
   const {user} = useAppSelector(state => state.auth);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,6 +41,19 @@ const ChatPlayground: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    if (!sessionId || !guidRegex.test(sessionId)) {
+      const storedId = localStorage.getItem("chatSessionId");
+      if (storedId && guidRegex.test(storedId)) {
+        navigate(`/chat/${storedId}`, { replace: true });
+      } else {
+        const newId = crypto.randomUUID();
+        localStorage.setItem("chatSessionId", newId);
+        navigate(`/chat/${newId}`, { replace: true });
+      }
+    }
+  }, [navigate, sessionId]);
+
   const formatChatResponse = (text: string): string => {
     return text.replace(/- \*\*(.*?)\*\*/g, "\n- **`$1`**").replace(/ - /g, "\n- ").trim();
   };
@@ -52,7 +70,7 @@ const ChatPlayground: React.FC = () => {
 
       const stream = await fetchWithInterceptors<ReadableStream<Uint8Array>>(
         "/Agent/StreamAgentChat",
-        { method: "POST", body: JSON.stringify({ sessionId: sessionId.current, query }), stream: true }
+        { method: "POST", body: JSON.stringify({ sessionId: sessionId, query }), stream: true }
       );
       if (!stream) throw new Error("No response from server");
 

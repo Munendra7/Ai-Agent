@@ -34,7 +34,7 @@ const Login: React.FC = () => {
   const handleMicrosoftLogin = async () => {
     try {
       await dispatch(microsoftLoginMSAL()).unwrap();
-      navigate("/chat");
+      navigate("/chat/"+crypto.randomUUID());
     } catch (error) {
       console.error("Microsoft login failed:", error);
     }
@@ -111,7 +111,7 @@ const Login: React.FC = () => {
         }
       `}</style>
 
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900 gradient-animation">
+      <div className="mt-2 min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900 gradient-animation">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Gradient Orbs */}
@@ -195,17 +195,17 @@ const Login: React.FC = () => {
               </div>
 
               {/* Forgot Password Link */}
-              <div className="text-right">
+              {/* <div className="text-right">
                 <Link to="/forgot-password" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
                   Forgot password?
                 </Link>
-              </div>
+              </div> */}
 
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold flex items-center justify-center transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+                className="cursor-pointer w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold flex items-center justify-center transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
               >
                 {isLoading ? (
                   <>
@@ -234,14 +234,14 @@ const Login: React.FC = () => {
               >
                 <GoogleLogo />
                 <span>Google</span>
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-400/0 via-red-400/0 to-yellow-400/0 group-hover:from-blue-400/10 group-hover:via-red-400/10 group-hover:to-yellow-400/10 transition-all" />
+                <div className="cursor-pointer absolute inset-0 rounded-xl bg-gradient-to-r from-blue-400/0 via-red-400/0 to-yellow-400/0 group-hover:from-blue-400/10 group-hover:via-red-400/10 group-hover:to-yellow-400/10 transition-all" />
               </button>
 
               <button
                 type="button"
                 onClick={handleMicrosoftLogin}
                 disabled={isLoading}
-                className="group relative flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed hover-lift"
+                className="cursor-pointer group relative flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed hover-lift"
               >
                 <MicrosoftLogo />
                 <span>Microsoft</span>

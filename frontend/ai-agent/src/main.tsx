@@ -25,7 +25,7 @@ const router  = createBrowserRouter(
         <Route path="/auth/:provider/callback" element={<OAuthCallback />} />
       </Route>
       <Route path="/chat" element={<ProtectedRoute />}>
-        <Route path="/chat" element={<ChatPlayground />} />
+        <Route path="/chat/:sessionid" element={<ChatPlayground />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Route>

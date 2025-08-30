@@ -1,6 +1,7 @@
 import React from "react";
 import Typewriter from "typewriter-effect";
 import Background from "../src/assets/HomeBackground.jpg";
+import SignInButton from "../src/components/SignInButton";
 
 const HomePage: React.FC = () => {
   const capabilities = [
@@ -58,7 +59,7 @@ const HomePage: React.FC = () => {
           </p>
 
           <div className="mt-8 animate-fade-up delay-500">
-            {/* <SignInButton /> */}
+            <SignInButton buttonText="Get started with AI Agent"/>
           </div>
         </div>
 

@@ -18,12 +18,12 @@ const OAuthCallback: React.FC = () => {
       if (provider === 'google') {
         dispatch(googleLogin({ code, redirectUri }))
           .unwrap()
-          .then(() => navigate('/chat'))
+          .then(() => navigate('/chat/'+crypto.randomUUID()))
           .catch(() => navigate('/login'));
       } else if (provider === 'microsoft') {
         dispatch(microsoftLoginMSAL())
           .unwrap()
-          .then(() => navigate('/chat'))
+          .then(() => navigate('/chat/'+crypto.randomUUID()))
           .catch(() => navigate('/login'));
       }
     } else {
