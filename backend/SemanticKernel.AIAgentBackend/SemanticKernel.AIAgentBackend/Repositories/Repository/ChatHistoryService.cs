@@ -32,10 +32,10 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ChatHistory>> GetMessagesAsync(Guid sessionId, int lastChats)
+        public async Task<IEnumerable<ChatHistory>> GetMessagesAsync(Guid sessionId, Guid userId, int lastChats)
         {
             return await dbContext.ChatHistory
-                .Where(x => x.SessionId == sessionId)
+                .Where(x => x.SessionId == sessionId && x.UserId==userId)
                 .OrderByDescending(x => x.Timestamp)
                 .Take(lastChats)
                 .OrderBy(x => x.Timestamp)
@@ -49,36 +49,37 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             if (summary != null && summary.UpdatedAt > DateTime.UtcNow.AddSeconds(-15))
                 return summary.Content;
 
-            if (!chatHistories.Any())
-                return string.Empty;
+            string finalSummary = summary?.Content??"";
+            if (chatHistories.Count() > 0)
+            {
+                string chatContent = string.Join("\n", chatHistories.Select(x => $"{x.Sender}: {x.Message}"));
 
-            string chatContent = string.Join("\n", chatHistories.Select(x => $"{x.Sender}: {x.Message}"));
+                string prompt = $@"
+                You are an intelligent assistant designed to generate factual and context-aware chat summaries for future grounding.
 
-            string prompt = $@"
-            You are an intelligent assistant designed to generate factual and context-aware chat summaries for future grounding.
+                Your task is to create a brief and accurate summary of the following chat history between a user and assistant.
 
-            Your task is to create a brief and accurate summary of the following chat history between a user and assistant.
+                ### Instructions:
+                - Focus only on source of inforamtion, factual exchanges and meaningful questions or answers.
+                - Do NOT add information that is not explicitly present in the chat.
+                - Do NOT speculate, assume, or generalize beyond what was said.
+                - Keep the summary clear, coherent, and within 100 words.
+                - Preserve key topics, information source file, user intents, and assistant responses.
+                - If the user is asking for info from specific file name, sheet name keep it always in your summary.
 
-            ### Instructions:
-            - Focus only on source of inforamtion, factual exchanges and meaningful questions or answers.
-            - Do NOT add information that is not explicitly present in the chat.
-            - Do NOT speculate, assume, or generalize beyond what was said.
-            - Keep the summary clear, coherent, and within 100 words.
-            - Preserve key topics, information source file, user intents, and assistant responses.
-            - If the user is asking for info from specific file name, sheet name keep it always in your summary.
+                ### Previous Chat Context:
+                {summary?.Content}
 
-            ### Previous Chat Context:
-            {summary?.Content}
+                ### Chat History:
+                {chatContent}
 
-            ### Chat History:
-            {chatContent}
+                ### Summary (Max 100 words):
+                ";
 
-            ### Summary (Max 100 words):
-            ";
+                var result = await _kernel.InvokePromptAsync(prompt);
 
-            var result = await _kernel.InvokePromptAsync(prompt);
-
-            string finalSummary = result?.GetValue<string>() ?? "No summary generated.";
+                finalSummary = result?.GetValue<string>() ?? "No summary generated.";
+            }
 
             if (summary == null)
             {

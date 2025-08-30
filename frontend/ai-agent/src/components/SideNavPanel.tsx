@@ -1,11 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Settings, Brain, FileText } from 'lucide-react';
 import { toast } from 'react-toastify';
-import axios from 'axios';
-import { useMsal } from '@azure/msal-react';
-import { backendAPILoginRequest } from '../authConfig';
-
-const apiUrl = (import.meta as any).env.VITE_AIAgent_URL;
+import api from '../services/api';
 
 enum UploadTypeEnum {
     Knowledge = "Knowledge",
@@ -17,9 +13,6 @@ const SideNavPanel: React.FC = () => {
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [description, setDescription] = useState('');
-    const { instance } = useMsal();
-    const activeAccount = instance.getActiveAccount();
-    const [accessToken, setAccessToken] = useState<string | null>(null);
     const [UploadType, setUploadType] = useState<UploadTypeEnum>();
     const [isUploading, setIsUploading] = useState(false);
 
@@ -34,10 +27,6 @@ const SideNavPanel: React.FC = () => {
     };
 
     const handleUpload = async () => {
-        if (!accessToken) {
-            toast.error("Access token not available");
-            return;
-        }
 
         if (!file || (UploadType === UploadTypeEnum.Knowledge && !description.trim())) {
             toast.error("File and description are mandatory!");
@@ -54,12 +43,11 @@ const SideNavPanel: React.FC = () => {
         setIsUploading(true);
         try {
             const endpoint = UploadType === UploadTypeEnum.Knowledge
-                ? `${apiUrl}/api/Knowledge/Upload`
-                : `${apiUrl}/api/Knowledge/Upload/AddTemplate`;
+                ? `/Knowledge/Upload`
+                : `/Knowledge/Upload/AddTemplate`;
 
-            await axios.post(endpoint, formData, {
+            await api.post(endpoint, formData,{
                 headers: {
-                    Authorization: `Bearer ${accessToken}`,
                     'Content-Type': 'multipart/form-data',
                 },
             });
@@ -75,24 +63,6 @@ const SideNavPanel: React.FC = () => {
             setIsUploading(false);
         }
     };
-
-    useEffect(() => {
-        const fetchToken = async () => {
-            try {
-                const response = await instance.acquireTokenSilent({
-                    ...backendAPILoginRequest,
-                    account: activeAccount!,
-                });
-                setAccessToken(response.accessToken);
-            } catch (error) {
-                console.error("Token acquisition failed", error);
-            }
-        };
-
-        if (activeAccount) {
-            fetchToken();
-        }
-    }, [instance, activeAccount]);
 
     return (
         <div className="fixed top-16 left-0 h-full flex flex-col bg-gray-800 text-white w-16 p-2 border-r border-gray-700 z-40">

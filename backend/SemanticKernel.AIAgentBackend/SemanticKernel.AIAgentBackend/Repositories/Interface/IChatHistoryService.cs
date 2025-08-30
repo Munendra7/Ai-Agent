@@ -8,7 +8,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Interface
 
         public Task AddMessagesAsync(List<ChatHistory> chatHistories);
 
-        public Task<IEnumerable<ChatHistory>> GetMessagesAsync(Guid sessionId, int lastChats);
+        public Task<IEnumerable<ChatHistory>> GetMessagesAsync(Guid sessionId, Guid userId, int lastChats);
 
         public Task<string> GetOrUpdateGroundingSummaryAsync(Guid sessionId, List<ChatHistory> chatHistories);
     }

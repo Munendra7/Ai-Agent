@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 import Login from './components/Login.tsx';
 import OAuthCallback from './components/OAuthCallback.tsx';
 import ChatPlayground from './components/ChatPlayground.tsx';
+import Register from './components/Register.tsx';
 
 const router  = createBrowserRouter(
   createRoutesFromElements(
@@ -20,6 +21,7 @@ const router  = createBrowserRouter(
       <Route path="/" element={<PublicRoutes />} >
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/auth/:provider/callback" element={<OAuthCallback />} />
       </Route>
       <Route path="/chat" element={<ProtectedRoute />}>

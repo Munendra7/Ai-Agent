@@ -39,7 +39,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async () => {
     await authService.logout();
-    await authService.msalLogout(); // Also logout from MSAL if logged in
+    await authService.msalLogout();
     localStorage.removeItem('accessToken');
   }
 );
@@ -87,12 +87,6 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       localStorage.setItem('accessToken', action.payload.accessToken);
     },
-    logout: (state) => {
-      state.user = null;
-      state.accessToken = null;
-      state.isAuthenticated = false;
-      localStorage.removeItem('accessToken');
-    },
     clearError: (state) => {
       state.error = null;
     },
@@ -130,10 +124,19 @@ const authSlice = createSlice({
         state.error = action.error.message || 'Login failed';
       })
       // Logout
+      .addCase(logoutUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.accessToken = null;
         state.isAuthenticated = false;
+        state.isLoading = false;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Logout failed';
       })
       // Google Login
       .addCase(googleLogin.fulfilled, (state, action) => {

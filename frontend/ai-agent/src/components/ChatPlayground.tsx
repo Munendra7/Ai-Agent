@@ -3,8 +3,7 @@ import { Send, Loader2, Bot } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import "./ChatPlayground.css";
 import { useAppSelector } from "../app/hooks";
-
-const apiUrl = (import.meta).env.VITE_AIAgent_URL;
+import { fetchWithInterceptors } from "../services/fetchClient";
 
 const starterPrompts = [
   "List all documents in your knowledge base",
@@ -18,7 +17,7 @@ const starterPrompts = [
 
 const ChatPlayground: React.FC = () => {
   const sessionId = useRef<string>(crypto.randomUUID());
-  const {user, accessToken} = useAppSelector(state => state.auth);
+  const {user} = useAppSelector(state => state.auth);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<
@@ -51,18 +50,13 @@ const ChatPlayground: React.FC = () => {
 
       //const response = await api.post('/Agent/Chat', { sessionId: sessionId.current, query });
 
-      const response = await fetch(`${apiUrl}/api/Agent/StreamAgentChat`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sessionId: sessionId.current, query }),
-      });
+      const stream = await fetchWithInterceptors<ReadableStream<Uint8Array>>(
+        "/Agent/StreamAgentChat",
+        { method: "POST", body: JSON.stringify({ sessionId: sessionId.current, query }), stream: true }
+      );
+      if (!stream) throw new Error("No response from server");
 
-      if (!response.body) throw new Error("No response body");
-
-      const reader = response.body.getReader();
+      const reader = stream.getReader();
       const decoder = new TextDecoder();
       let fullText = "";
       let isFirstChunk = true;

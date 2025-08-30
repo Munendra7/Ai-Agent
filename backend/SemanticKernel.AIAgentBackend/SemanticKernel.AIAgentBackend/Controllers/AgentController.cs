@@ -8,6 +8,7 @@ using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
@@ -42,10 +43,10 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             _logger = logger;
         }
 
-        private async Task<(ChatCompletionAgent Agent, AgentThread AgentThread, KernelArguments Arguments)> BuildAgentThreadAsync(UserQueryDTO dto)
+        private async Task<(ChatCompletionAgent Agent, AgentThread AgentThread, KernelArguments Arguments)> BuildAgentThreadAsync(UserQueryDTO dto, Guid userId)
         {
             var history = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
-            var userHistory = await _chatService.GetMessagesAsync(dto.SessionId, 15);
+            var userHistory = await _chatService.GetMessagesAsync(dto.SessionId, userId, 15);
             var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userHistory.ToList());
 
             if (!string.IsNullOrWhiteSpace(grounding))
@@ -79,7 +80,13 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
             try
             {
-                var (agent, thread, args) = await BuildAgentThreadAsync(dto);
+                var userId = GetUserId();
+                if (userId == null)
+                {
+                    return Unauthorized();
+                }
+
+                var (agent, thread, args) = await BuildAgentThreadAsync(dto, new Guid(userId));
 
                 string assistantMessage = "";
 
@@ -140,7 +147,15 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
             try
             {
-                var (agent, thread, args) = await BuildAgentThreadAsync(dto);
+                var userId = GetUserId();
+                if (userId == null)
+                {
+                    Response.StatusCode = 401;
+                    await Response.Body.FlushAsync();
+                    return;
+                }
+
+                var (agent, thread, args) = await BuildAgentThreadAsync(dto, new Guid(userId));
 
                 Response.ContentType = "text/event-stream";
                 Response.Headers["Cache-Control"] = "no-cache";
@@ -162,8 +177,8 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
                 await _chatService.AddMessagesAsync(new List<ChatHistory>
                 {
-                    new() { SessionId = dto.SessionId, Message = dto.Query, Sender = "User", Timestamp = DateTime.Now },
-                    new() { SessionId = dto.SessionId, Message = fullResponse, Sender = "Assistant", Timestamp = DateTime.Now }
+                    new() { SessionId = dto.SessionId, UserId = new Guid(userId), Message = dto.Query, Sender = "User", Timestamp = DateTime.Now },
+                    new() { SessionId = dto.SessionId, UserId = new Guid(userId), Message = fullResponse, Sender = "Assistant", Timestamp = DateTime.Now }
                 });
             }
             catch (Exception ex)
@@ -172,6 +187,12 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 Response.StatusCode = 500;
                 await Response.WriteAsync("An error occurred during streaming.");
             }
+        }
+
+        private string? GetUserId()
+        {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier)
+                   ?? User.FindFirstValue("userId");
         }
     }
 }

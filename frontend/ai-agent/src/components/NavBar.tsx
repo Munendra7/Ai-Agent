@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import Copilot from "../assets/AIAgent.svg";
 import { Menu, X } from "lucide-react";
-import { useIsAuthenticated, useMsal } from "@azure/msal-react";
+import SignOutButton from "./SignOutButton";
+import SignInButton from "./SignInButton";
+import { useAppSelector } from "../app/hooks";
 
 const NavBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const isAuthenticated = useIsAuthenticated();
-  const { instance } = useMsal();
-  const activeAccount = instance.getActiveAccount();
+  const {user, isAuthenticated} = useAppSelector(state => state.auth);
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-black/80 backdrop-blur-lg text-white z-50 border-b border-gray-700 shadow-md">
@@ -33,13 +33,12 @@ const NavBar: React.FC = () => {
           {isAuthenticated ? (
             <>
               <span className="text-sm text-gray-300">
-                Welcome, {activeAccount?.name}
+                Welcome, {user?.firstName}
               </span>
-              {/* <SignOutButton /> */}
+              <SignOutButton/>
             </>
           ) : (
-            // <SignInButton />
-            <></>
+            <SignInButton />
           )}
         </div>
       </div>
@@ -50,13 +49,12 @@ const NavBar: React.FC = () => {
           {isAuthenticated ? (
             <>
               <span className="text-sm mb-2 text-gray-300">
-                Welcome, {activeAccount?.name}
+                Welcome, {user?.firstName}
               </span>
-              {/* <SignOutButton /> */}
+              <SignOutButton/>
             </>
           ) : (
-            // <SignInButton />
-            <></>
+             <SignInButton />
           )}
         </div>
       )}

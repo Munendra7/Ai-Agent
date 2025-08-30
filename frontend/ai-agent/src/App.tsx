@@ -5,6 +5,7 @@ import { initializeMsal } from "./services/msalService";
 import { setUserProfile } from "./features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { setupApiInterceptors } from "./services/api";
+import { setupFetchInterceptors } from "./services/fetchClient";
 
 export const App: React.FC = () => {
   const [msalInitialized, setMsalInitialized] = useState(false);
@@ -21,6 +22,7 @@ export const App: React.FC = () => {
 
   useEffect(() => { 
     setupApiInterceptors(accessToken, dispatch);
+    setupFetchInterceptors(accessToken, dispatch);
     dispatch(setUserProfile()).unwrap();
   }, [accessToken, dispatch]);
 
