@@ -3,8 +3,9 @@ import { Send, Loader2, Bot } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import "./ChatPlayground.css";
 import { useAppSelector } from "../app/hooks";
-import { fetchWithInterceptors } from "../services/fetchClient";
+import api from '../services/api';
 import { useNavigate, useParams } from "react-router-dom";
+import { fetchWithInterceptors } from "../services/fetchClient";
 
 const starterPrompts = [
   "List all documents in your knowledge base",
@@ -19,28 +20,83 @@ const starterPrompts = [
 const guidRegex =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+interface ChatMessage {
+  text: string;
+  type: "user" | "bot";
+  persona: string;
+  isLoading?: boolean;
+  timestamp?: string;
+}
+
+interface ChatHistoryResponse {
+  data: Array<{
+    message: string;
+    sender: string;
+  }>; 
+}
+
 const ChatPlayground: React.FC = () => {
   const sessionId = useParams<{ sessionid: string }>().sessionid;
   const navigate = useNavigate();
   const {user} = useAppSelector(state => state.auth);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState<
-    { text: string; type: "user" | "bot"; persona: string; isLoading?: boolean }[]
-  >([
-    {
-      text: `Hi ${user?.firstName || "there"}, how can I assist you?`,
-      type: "bot",
-      persona: "AI Agent",
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
+  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Load chat history when sessionId is available
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      if (!sessionId || !guidRegex.test(sessionId)) {
+        return;
+      }
+
+      setIsLoadingHistory(true);
+      
+      try {
+        const response = await api.get(`/chatsession/${sessionId}`) as ChatHistoryResponse;
+        if (response && response.data && response.data.length > 0) {
+          const historicalMessages: ChatMessage[] = response.data.map(msg => ({
+            text: msg.message,
+            type: msg.sender==="Assistant" ? "bot":"user",
+            persona: msg.sender=="Assistant" ? "AI Agent":"You"
+          }));
+          setMessages(historicalMessages);
+        } else {
+          setMessages([
+            {
+              text: `Hi ${user?.firstName || "there"}, how can I assist you?`,
+              type: "bot",
+              persona: "AI Agent",
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error loading chat history:", error);
+        // On error, show welcome message
+        setMessages([
+          {
+            text: `Hi ${user?.firstName || "there"}, how can I assist you?`,
+            type: "bot",
+            persona: "AI Agent",
+          },
+        ]);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+
+    loadChatHistory();
+  }, [sessionId, user]);
+
+  // Handle session ID validation and navigation
   useEffect(() => {
     if (!sessionId || !guidRegex.test(sessionId)) {
       const storedId = localStorage.getItem("chatSessionId");
@@ -51,6 +107,9 @@ const ChatPlayground: React.FC = () => {
         localStorage.setItem("chatSessionId", newId);
         navigate(`/chat/${newId}`, { replace: true });
       }
+    } else {
+      // Valid sessionId, update localStorage
+      localStorage.setItem("chatSessionId", sessionId);
     }
   }, [navigate, sessionId]);
 
@@ -65,9 +124,6 @@ const ChatPlayground: React.FC = () => {
     ]);
 
     try {
-
-      //const response = await api.post('/Agent/Chat', { sessionId: sessionId.current, query });
-
       const stream = await fetchWithInterceptors<ReadableStream<Uint8Array>>(
         "/Agent/StreamAgentChat",
         { method: "POST", body: JSON.stringify({ sessionId: sessionId, query }), stream: true }
@@ -139,7 +195,19 @@ const ChatPlayground: React.FC = () => {
     }
   };
 
-  const hasUserMessage = messages.some((m) => m.type === "user");
+  // Show loading state while fetching history
+  if (isLoadingHistory) {
+    return (
+      <div className="chat-container flex flex-col h-screen pt-16 ml-16 p-4">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex items-center space-x-3">
+            <Loader2 className="animate-spin text-white" size={24} />
+            <span className="text-white text-lg">Loading chat history...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="chat-container flex flex-col h-screen pt-16 ml-16 p-4">
@@ -177,12 +245,17 @@ const ChatPlayground: React.FC = () => {
                   {msg.text.replace(/\n/g, "  \n")}
                 </ReactMarkdown>
               )}
+              {msg.timestamp && (
+                <span className="text-xs text-white/60 mt-1 block">
+                  {new Date(msg.timestamp).toLocaleString()}
+                </span>
+              )}
             </div>
           </div>
         ))}
 
-        {/* Starter Prompts UI */}
-        {!hasUserMessage && (
+        {/* Starter Prompts UI - Only show when no user messages and history is loaded */}
+        {!messages.some((m) => m.type === "user") && (
           <div className="mt-6">
             <h3 className="text-lg font-semibold mb-3 text-white">
               Try asking me:
@@ -214,13 +287,13 @@ const ChatPlayground: React.FC = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={isWaitingForResponse}
+          disabled={isWaitingForResponse || isLoadingHistory}
         />
         <button
           className={`p-3 rounded-full flex items-center justify-center w-12 h-12 transition-all duration-200 
-            ${isWaitingForResponse ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+            ${(isWaitingForResponse || isLoadingHistory) ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
           onClick={() => handleSendMessage()}
-          disabled={isWaitingForResponse}
+          disabled={isWaitingForResponse || isLoadingHistory}
         >
           <Send size={20} />
         </button>

@@ -50,7 +50,8 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         {
             var history = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
             var userHistory = await _chatService.GetMessagesAsync(dto.SessionId, userId, 15);
-            var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userId, userHistory.ToList());
+            
+            var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userId, userHistory.ToList(), dto.Query);
 
             if (!string.IsNullOrWhiteSpace(grounding))
                 history.AddSystemMessage($"Previous Summary: {grounding}");

@@ -51,21 +51,18 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 .ToListAsync();
         }
 
-        public async Task<string> GetOrUpdateGroundingSummaryAsync(Guid sessionId, Guid userId, List<ChatHistory> chatHistories)
+        public async Task<string> GetOrUpdateGroundingSummaryAsync(Guid sessionId, Guid userId, List<ChatHistory> chatHistories, string userQuery)
         {
             var summary = await dbContext.SessionSummaries.FirstOrDefaultAsync(s => s.SessionId == sessionId);
 
             if (summary != null && summary.UpdatedAt > DateTime.UtcNow.AddSeconds(-15))
                 return summary.Content;
 
-            string finalSummary = summary?.Content?? "";
-            string summaryTitle = summary?.Title ?? "";
+            string chatContent = string.Join("\n", chatHistories.Select(x => $"{x.Sender}: {x.Message}"));
 
-            if (chatHistories.Count() > 0)
-            {
-                string chatContent = string.Join("\n", chatHistories.Select(x => $"{x.Sender}: {x.Message}"));
+            chatContent += $"\nUser: {userQuery}";
 
-                string summarygroundingprompt = $@"
+            string summarygroundingprompt = $@"
                 You are an intelligent assistant designed to generate factual and context-aware chat summaries for future grounding.
 
                 Your task is to create a brief and accurate summary of the following chat history between a user and assistant.
@@ -87,20 +84,19 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 ### Summary (Max 100 words):
                 ";
 
-                var result = await _kernel.InvokePromptAsync(summarygroundingprompt);
+            var result = await _kernel.InvokePromptAsync(summarygroundingprompt);
 
-                finalSummary = result?.GetValue<string>() ?? "No summary generated.";
+            string finalSummary = result?.GetValue<string>() ?? "No summary generated.";
 
-                string summaryTitlePrompt = $@"
+            string summaryTitlePrompt = $@"
                 Give me a Title for this chat summary in less than 30 characters.
                 ### Chat Summary:
                 {finalSummary}
                 ### Title (Max 30 characters):
                 ";
 
-                var titleResult = await _kernel.InvokePromptAsync(summaryTitlePrompt);
-                summaryTitle = titleResult?.GetValue<string>() ?? chatHistories.First().Message ?? string.Empty;
-            }
+            var titleResult = await _kernel.InvokePromptAsync(summaryTitlePrompt);
+            string summaryTitle = titleResult?.GetValue<string>() ?? chatHistories.First().Message ?? string.Empty;
 
             if (summary == null)
             {

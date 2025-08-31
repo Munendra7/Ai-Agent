@@ -12,6 +12,6 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Interface
 
         public Task<IEnumerable<SessionSummary>> GetSessionSummariesAsync(Guid userId, int lastSessions);
 
-        public Task<string> GetOrUpdateGroundingSummaryAsync(Guid sessionId, Guid userId, List<ChatHistory> chatHistories);
+        public Task<string> GetOrUpdateGroundingSummaryAsync(Guid sessionId, Guid userId, List<ChatHistory> chatHistories, string userQuery);
     }
 }
