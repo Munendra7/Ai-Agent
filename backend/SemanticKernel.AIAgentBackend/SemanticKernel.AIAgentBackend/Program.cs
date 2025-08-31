@@ -139,6 +139,8 @@ builder.Services.AddScoped(sp =>
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddHttpContextAccessor();
+
 // 1 GB = 1073741824 bytes -- Only for Testing (Not recommeneded)
 const long Gigabyte = 1073741824L*3;
 

@@ -21,7 +21,7 @@ namespace SemanticKernel.AIAgentBackend.Data
         {
             modelBuilder.Entity<ChatHistory>(entity =>
             {
-                entity.HasIndex(x => x.SessionId);
+                entity.HasIndex(x => new { x.SessionId, x.UserId });
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id)
                     .HasDefaultValueSql("NEWID()");
@@ -32,14 +32,15 @@ namespace SemanticKernel.AIAgentBackend.Data
 
                 entity.HasOne(e => e.SessionSummary)
                     .WithMany(s => s.ChatHistories)
-                    .HasForeignKey(e => e.SessionId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .HasForeignKey(e => e.SessionId);
             });
 
             modelBuilder.Entity<SessionSummary>(entity =>
             {
                 entity.HasKey(e => e.SessionId);
-                entity.HasKey(x => x.SessionId);
+                entity.HasOne(s => s.User)
+                    .WithMany(user => user.SessionSummaries)
+                    .HasForeignKey(s => s.UserId).OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<User>(entity =>

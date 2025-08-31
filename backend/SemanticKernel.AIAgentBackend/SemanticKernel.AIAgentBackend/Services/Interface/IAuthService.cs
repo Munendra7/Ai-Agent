@@ -11,5 +11,6 @@ namespace SemanticKernel.AIAgentBackend.Services.Interface
         Task<AuthResponseDTO?> RefreshTokenAsync(string token, string ipAddress);
         Task<AuthResponseDTO?> ExternalLoginAsync(string provider, OAuthUserInfo userInfo, string ipAddress);
         Task RevokeTokenAsync(string token, string ipAddress);
+        string? GetUserId();
     }
 }

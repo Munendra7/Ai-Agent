@@ -9,6 +9,7 @@ using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using SemanticKernel.AIAgentBackend.Services.Interface;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
@@ -22,6 +23,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         private readonly IChatHistoryService _chatService;
         private readonly ILogger _logger;
         private readonly IAgentFactory _agentFactory;
+        private readonly IAuthService _authService;
 
         private const string ChatSystemPrompt = @"
             You are an AI assistant that answers queries strictly using retrieved knowledge.
@@ -34,20 +36,21 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             - Keep responses factual, concise, and context-aware.
         ";
 
-        public AgentController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatHistoryService chatService, IAgentFactory agentFactory, ILogger<ChatController> logger)
+        public AgentController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatHistoryService chatService, IAgentFactory agentFactory, IAuthService authService, ILogger<ChatController> logger)
         {
             _kernel = kernel;
             _configuration = configuration;
             _chatService = chatService;
             _agentFactory = agentFactory;
             _logger = logger;
+            _authService = authService;
         }
 
         private async Task<(ChatCompletionAgent Agent, AgentThread AgentThread, KernelArguments Arguments)> BuildAgentThreadAsync(UserQueryDTO dto, Guid userId)
         {
             var history = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
             var userHistory = await _chatService.GetMessagesAsync(dto.SessionId, userId, 15);
-            var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userHistory.ToList());
+            var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userId, userHistory.ToList());
 
             if (!string.IsNullOrWhiteSpace(grounding))
                 history.AddSystemMessage($"Previous Summary: {grounding}");
@@ -80,7 +83,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
             try
             {
-                var userId = GetUserId();
+                var userId =  _authService.GetUserId();
                 if (userId == null)
                 {
                     return Unauthorized();
@@ -147,7 +150,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
             try
             {
-                var userId = GetUserId();
+                var userId = _authService.GetUserId();
                 if (userId == null)
                 {
                     Response.StatusCode = 401;
@@ -187,12 +190,6 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 Response.StatusCode = 500;
                 await Response.WriteAsync("An error occurred during streaming.");
             }
-        }
-
-        private string? GetUserId()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier)
-                   ?? User.FindFirstValue("userId");
         }
     }
 }

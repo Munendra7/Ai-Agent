@@ -5,6 +5,7 @@ using SemanticKernel.AIAgentBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using SemanticKernel.AIAgentBackend.Services.Interface;
 using SemanticKernel.AIAgentBackend.Services.Model;
+using System.Security.Claims;
 
 namespace SemanticKernel.AIAgentBackend.Services.Service
 {
@@ -13,12 +14,14 @@ namespace SemanticKernel.AIAgentBackend.Services.Service
         private readonly AppDbContext _context;
         private readonly ITokenService _tokenService;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthService(AppDbContext context, ITokenService tokenService, IPasswordHasher<User> passwordHasher)
+        public AuthService(AppDbContext context, ITokenService tokenService, IPasswordHasher<User> passwordHasher, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _tokenService = tokenService;
             _passwordHasher = passwordHasher;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<AuthResponseDTO?> RegisterAsync(RegisterRequestDTO request, string ipAddress)
@@ -234,6 +237,13 @@ namespace SemanticKernel.AIAgentBackend.Services.Service
                 LastName = user.LastName,
                 Roles = roles.ToList()
             };
+        }
+
+        public string? GetUserId()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            return user?.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? user?.FindFirstValue("userId");
         }
     }
 }
