@@ -98,7 +98,9 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             string pdfFileName = $"Generated_{Guid.NewGuid()}.pdf";
             string pdfUrl = await blobService.UploadFileAsync(pdfStream, pdfFileName, BlobStorageConstants.GeneratedDocsContainerName);
 
-            return pdfUrl.Replace(BlobStorageConstants.StorageImageName, "localhost");
+            return blobService.GenerateSasUri(pdfFileName, BlobStorageConstants.GeneratedDocsContainerName, 1440).Replace(BlobStorageConstants.StorageImageName, "localhost");
+
+            //return pdfUrl.Replace(BlobStorageConstants.StorageImageName, "localhost");
         }
     }
 }

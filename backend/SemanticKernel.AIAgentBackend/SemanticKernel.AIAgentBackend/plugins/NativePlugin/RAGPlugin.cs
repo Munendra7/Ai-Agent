@@ -83,6 +83,14 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             return knowledgeDocuments;
         }
 
+        [KernelFunction("download_document"), Description("Download a document from AI Agent Knowledge and get the SAS URL of the file.")]
+        public string DownloadDocumentAsync([Description("Name of the document to download")] string documentName)
+        {
+            var sasuri = blobService.GenerateSasUri(documentName, BlobStorageConstants.KnowledgeContainerName);
+
+            return sasuri.Replace(BlobStorageConstants.StorageImageName, "localhost");
+        }
+
         //[KernelFunction("summarize_document"), Description("Use this function ONLY when the user explicitly asks to summarize a document and provides a document name. Do NOT use this for general document queries.")]
         //public async Task<string> SummarizeDocumentAsync([Description("Name of the document to summarize")] string documentName)
         //{

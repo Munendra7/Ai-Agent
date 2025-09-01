@@ -28,7 +28,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             var userId = _authService.GetUserId() ?? "anonymous";
 
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-            await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+            await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
 
             // Sanitize the filename to ensure it only contains ASCII characters
             var sanitizedFileName = SanitizeFileName(fileName);
@@ -61,6 +61,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             };
 
             await blobClient.UploadAsync(fileStream, options);
+
             return blobClient.Uri.ToString();
         }
 
@@ -69,7 +70,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             var userId = _authService.GetUserId() ?? "anonymous";
 
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-            await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+            await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
 
             // Sanitize the filename for lookup
             var sanitizedFileName = SanitizeFileName(fileName);
@@ -104,7 +105,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             var userId = _authService.GetUserId() ?? "anonymous";
 
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-            await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+            await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
 
             List<string> fileNames = new List<string>();
 
