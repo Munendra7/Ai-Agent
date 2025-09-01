@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.AI;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel.Embeddings;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
+using SemanticKernel.AIAgentBackend.Services.Interface;
 
 namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 {
@@ -16,15 +18,17 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
         #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         private readonly ITextEmbeddingGenerationService _embeddingGenerator;
         #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        private readonly IAuthService _authService;
 
         #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-        public EmbeddingService(ITextEmbeddingGenerationService embeddingGenerator, QdrantClient qdrantClient, IConfiguration configuration, IDocumentsProcessFactory documentsProcessFactory)
+        public EmbeddingService(ITextEmbeddingGenerationService embeddingGenerator, QdrantClient qdrantClient, IConfiguration configuration, IDocumentsProcessFactory documentsProcessFactory, IAuthService authService)
         #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         {
             _qdrantClient = qdrantClient;
             _configuration = configuration;
             _documentsProcessFactory = documentsProcessFactory;
             _embeddingGenerator = embeddingGenerator;
+            _authService = authService;
         }
 
         public async Task<string> ProcessFileAsync(FileUploadDTO fileDTO, string filePath, List<string>? textChunks = null)
@@ -74,6 +78,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                     {
                         ["FileName"] = fileName,
                         ["FilePath"] = filePath,
+                        ["UserId"] = _authService.GetUserId() ?? "anonymous",
                         ["FileDescription"] = fileDescription ?? string.Empty,
                         ["ChunkIndex"] = i.ToString(),
                         ["Chunk"] = chunkTexts[i]
@@ -100,10 +105,31 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             var promptEmbedding = await _embeddingGenerator.GenerateEmbeddingAsync(prompt);
             var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
 
+            var userId = _authService.GetUserId() ?? "";
+
+            var filter = new Filter
+            {
+                Must =
+                {
+                    new Condition
+                    {
+                        Field = new FieldCondition
+                        {
+                            Key = "UserId",
+                            Match = new Match
+                            {
+                                Text = userId // Filter chunks by user id
+                            }
+                        }
+                    }
+                }
+            };
+
             var returnedLocations = await _qdrantClient.QueryAsync(
                 collectionName: collectionName,
                 query: promptEmbedding.ToArray(),
-                limit: 20
+                limit: 20,
+                filter: filter
             );
 
             return returnedLocations;
@@ -113,6 +139,8 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
         {
             var promptEmbedding = await _embeddingGenerator.GenerateEmbeddingAsync(prompt);
             var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
+
+            var userId = _authService.GetUserId() ?? "";
 
             var filter = new Filter
             {
@@ -128,7 +156,18 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                                 Text = fileName // Filter chunks by document name
                             }
                         }
-                    } 
+                    },
+                    new Condition
+                    {
+                        Field = new FieldCondition
+                        {
+                            Key = "UserId",
+                            Match = new Match
+                            {
+                                Text = userId // Filter chunks by user id
+                            }
+                        }
+                    }
                 }
             };
 
@@ -149,11 +188,31 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             int limit = 100;
             PointId? nextOffset = null;
 
+            var userId = _authService.GetUserId() ?? "";
+
+            var filter = new Filter
+            {
+                Must =
+                {
+                    new Condition
+                    {
+                        Field = new FieldCondition
+                        {
+                            Key = "UserId",
+                            Match = new Match
+                            {
+                                Text = userId // Filter chunks by user id
+                            }
+                        }
+                    }
+                }
+            };
+
             do
             {
                 var scrollResponse = await _qdrantClient.ScrollAsync(
                     collectionName,
-                    filter: null,
+                    filter: filter,
                     limit: (uint)limit,
                     offset: nextOffset,
                     payloadSelector: new WithPayloadSelector { Enable = true }
@@ -181,19 +240,34 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             int limit = 100; // Fetch up to 100 chunks per request
             PointId? nextOffset = null;
 
+            var userId = _authService.GetUserId() ?? "";
+
             var filter = new Filter
             {
-                Must = { new Condition
-                {
-                    Field = new FieldCondition
+                Must = { 
+                    new Condition
                     {
-                        Key = "FileName",
-                        Match = new Match
+                        Field = new FieldCondition
                         {
-                            Text = documentName // Filter chunks by document name
+                            Key = "FileName",
+                            Match = new Match
+                            {
+                                Text = documentName // Filter chunks by document name
+                            }
+                        }
+                    },
+                    new Condition
+                    {
+                        Field = new FieldCondition
+                        {
+                            Key = "UserId",
+                            Match = new Match
+                            {
+                                Text = userId // Filter chunks by user id
+                            }
                         }
                     }
-                }}
+                }
             };
 
             do
