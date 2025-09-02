@@ -52,7 +52,7 @@
               "RelativeDocumentMoniker": "docker-compose.yml",
               "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\docker-compose.yml",
               "RelativeToolTip": "docker-compose.yml",
-              "ViewState": "AgIAACQAAAAAAAAAAAAAADcAAABdAAAAAAAAAA==",
+              "ViewState": "AgIAADkAAAAAAAAAAAAAADcAAABdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
               "WhenOpened": "2025-09-01T17:14:22.4Z",
               "EditorCaption": ""
@@ -67,8 +67,7 @@
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\RAGPlugin.cs",
               "ViewState": "AgIAABEAAAAAAAAAAAAgwFgAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-01T17:04:22.465Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-01T17:04:22.465Z"
             },
             {
               "$type": "Document",
@@ -80,8 +79,7 @@
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Controllers\\KnowledgeController.cs",
               "ViewState": "AgIAAEgAAAAAAAAAAAAAACMAAABAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-01T16:42:32.242Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-01T16:42:32.242Z"
             },
             {
               "$type": "Document",
@@ -93,8 +91,7 @@
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Dockerfile",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-09-01T16:37:59.846Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-01T16:37:59.846Z"
             },
             {
               "$type": "Document",
@@ -106,8 +103,7 @@
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\DocumentGenerationPlugin.cs",
               "ViewState": "AgIAAFQAAAAAAAAAAAAAAGMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-01T16:32:50.654Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-01T16:32:50.654Z"
             },
             {
               "$type": "Document",
@@ -119,8 +115,7 @@
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Repositories\\Interface\\IBlobService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-01T15:24:50.353Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-01T15:24:50.353Z"
             },
             {
               "$type": "Document",
@@ -132,8 +127,7 @@
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Repositories\\Repository\\BlobService.cs",
               "ViewState": "AgIAAKQAAAAAAAAAAAAUwLIAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-01T15:16:38.428Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-01T15:16:38.428Z"
             },
             {
               "$type": "Document",
@@ -145,8 +139,7 @@
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Repositories\\Repository\\EmbeddingService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-01T15:05:33.043Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-01T15:05:33.043Z"
             }
           ]
         }

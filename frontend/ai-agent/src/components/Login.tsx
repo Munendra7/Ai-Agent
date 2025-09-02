@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login, clearError, microsoftLoginMSAL } from "../features/auth/authSlice";
 import authService from "../services/authService";
-import { Loader2, Mail, Lock, AlertCircle, Sparkles } from "lucide-react";
+import { Loader2, Mail, Lock, AlertCircle } from "lucide-react";
+import Copilot from "../assets/AIAgent.svg";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 
 const Login: React.FC = () => {
@@ -128,13 +129,8 @@ const Login: React.FC = () => {
         <div className="relative z-10 w-full max-w-md p-6">
           <div className="glass-morphism p-8 rounded-3xl border border-white/10 shadow-2xl hover-lift">
             {/* Logo/Icon */}
-            <div className="flex justify-center mb-8">
-              <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-6 transition-transform">
-                  <Sparkles className="w-10 h-10 text-white" />
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-20 h-20 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-2xl blur-xl" />
-              </div>
+            <div className="flex justify-center mb-2">
+              <img src={Copilot} alt="AI Agent Logo" className="h-20 w-20" />
             </div>
 
             {/* Title */}
