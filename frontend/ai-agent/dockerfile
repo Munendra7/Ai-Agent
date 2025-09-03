@@ -1,22 +1,28 @@
-FROM node:18-alpine
+# -------- Base Build Stage --------
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Install dependencies first (better caching)
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the app source code
+# Copy source and build
 COPY . .
-
-# Build the app for production (creates a 'dist' folder)
 RUN npm run build
 
-# Install a simple static server to serve the production build
+
+# -------- Production Stage --------
+FROM node:18-alpine AS runner
+
+WORKDIR /app
+
+# Install lightweight static file server
 RUN npm install -g serve
 
-# Expose the port that the production server will listen on
+# Copy only the built output (not node_modules, not source code)
+COPY --from=builder /app/dist ./dist
+
 EXPOSE 5173
 
-# Serve the 'dist' folder on port 5173
 CMD ["serve", "-s", "dist", "-l", "5173"]

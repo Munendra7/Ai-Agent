@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Brain, FileText, MessageSquare, Plus, Trash2 } from 'lucide-react';
+import { Settings, Brain, FileText, MessageSquare, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
@@ -46,8 +46,11 @@ const SideNavPanel: React.FC = () => {
         try {
             const response = await api.get('/chatsession');
             setChatSessions(response.data);
-        } catch (error: any) {
-            toast.error(`Failed to load chat sessions: ${error.message || error}`);
+        } catch (error: unknown) {
+            const errorMessage = typeof error === 'object' && error !== null && 'message' in error
+                ? (error as { message?: string }).message
+                : String(error);
+            toast.error(`Failed to load chat sessions: ${errorMessage}`);
             setChatSessions([]);
         } finally {
             setIsLoadingSessions(false);
@@ -100,8 +103,11 @@ const SideNavPanel: React.FC = () => {
             setFile(null);
             setDescription('');
             setIsSettingsOpen(false);
-        } catch (error: any) {
-            toast.error(`Upload failed: ${error.message || error}`);
+        } catch (error: unknown) {
+            const errorMessage = typeof error === 'object' && error !== null && 'message' in error
+                ? (error as { message?: string }).message
+                : String(error);
+            toast.error(`Upload failed: ${errorMessage}`);
         } finally {
             setIsUploading(false);
         }

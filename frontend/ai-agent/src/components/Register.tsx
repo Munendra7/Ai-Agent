@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { register, clearError } from "../features/auth/authSlice";
-import { Loader2, Mail, Lock, AlertCircle, Sparkles, User } from "lucide-react";
+import { Loader2, Mail, Lock, AlertCircle, User } from "lucide-react";
+import Copilot from "../assets/AIAgent.svg";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 
 const Register: React.FC = () => {
@@ -63,7 +64,7 @@ const Register: React.FC = () => {
         .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
       `}</style>
 
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900 gradient-animation">
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900 gradient-animation mt-4">
         {/* Background */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -left-40 w-80 h-80 bg-blue-500/30 rounded-full blur-3xl glow-effect" />
@@ -77,13 +78,8 @@ const Register: React.FC = () => {
         <div className="relative z-10 w-full max-w-md p-6">
           <div className="glass-morphism p-8 rounded-3xl border border-white/10 shadow-2xl hover-lift">
             {/* Logo */}
-            <div className="flex justify-center mb-8">
-              <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-6 transition-transform">
-                  <Sparkles className="w-10 h-10 text-white" />
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-20 h-20 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-2xl blur-xl" />
-              </div>
+            <div className="flex justify-center mb-2">
+              <img src={Copilot} alt="AI Agent Logo" className="h-20 w-20" />
             </div>
 
             {/* Title */}
