@@ -55,7 +55,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 #pragma warning disable SKEXP0110
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
-                var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService);
+                var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService, _configuration);
                 var emailWriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
                 var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _templateBasedDocGenerator, _configuration);
 

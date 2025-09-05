@@ -11,12 +11,14 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         private readonly Kernel _kernel;
         private readonly IEmbeddingService embeddingService;
         private readonly IBlobService blobService;
+        private readonly IConfiguration _configuration;
 
-        public RAGPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IEmbeddingService embeddingService, IBlobService blobService)
+        public RAGPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IEmbeddingService embeddingService, IBlobService blobService, IConfiguration configuration)
         {
             _kernel = kernel;
             this.embeddingService = embeddingService;
             this.blobService = blobService;
+            _configuration = configuration;
         }
 
         [KernelFunction("answerfromKnowledge"), Description("Acts as the AI knowledge base by retrieving relevant information from user-provided information and documents using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query.")]
@@ -24,10 +26,23 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         {
             try
             {
-                //var searchResults = await embeddingService.SimilaritySearch(query).ConfigureAwait(false);
+                // Enhance query if configured
+                var enhanceQuery = _configuration.GetValue<bool>("RAG:EnableQueryEnhancement", true);
+                var searchQuery = enhanceQuery ? await EnhanceQuery(query) : query;
+
+                // Get configuration values
+                var topK = _configuration.GetValue<int>("RAG:MaxSearchResults", 5);
+                var minScore = _configuration.GetValue<float>("RAG:MinRelevanceScore", 0.7f);
+
                 var searchResults = string.IsNullOrEmpty(documentname)
-                ? await embeddingService.SimilaritySearch(query).ConfigureAwait(false)
-                : await embeddingService.SimilaritySearchInFile(query, documentname).ConfigureAwait(false);
+                ? await embeddingService.SimilaritySearch(query, topK, minScore).ConfigureAwait(false)
+                : await embeddingService.SimilaritySearchInFile(query, documentname, topK, minScore).ConfigureAwait(false);
+
+                // Filter by relevance score
+                var relevantResults = searchResults
+                    .Where(r => r.Score > minScore)
+                    .Take(topK)
+                    .ToList();
 
                 if (searchResults == null || !searchResults.Any())
                 {
@@ -40,19 +55,35 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                     if (result.Payload.TryGetValue("FileName", out var fileName) &&
                         result.Payload.TryGetValue("Chunk", out var chunk))
                     {
-                        builder.AppendLine($"{fileName.StringValue}: {chunk.StringValue}");
+                        builder.AppendLine($"[SourceName]:  {fileName.StringValue} | [Context]: {chunk.StringValue}");
                     }
                 }
                 string searchResultsText = builder.ToString();
+
+                // Dynamic prompt template with source references
                 string promptTemplate = @"
-                    You are an AI assistant that answers questions based only on the given context.
-    
-                    Context: {{$searchResults}}
-                    Question: {{$query}}
-    
-                    Provide a clear and concise response (maximum 300 words) strictly based on the provided Context.  
-                    Mention the file name where it is located.'
-                ";
+                You are a highly accurate AI assistant. Answer the user's question **strictly using the provided context**.
+
+                --- CONTEXT DOCUMENTS ---
+                {{$searchResults}}
+
+                Each context chunk is labeled with its source like [SourceName]: <text>. Always reference the source name when using information.
+
+                --- USER QUESTION ---
+                {{$query}}
+
+                --- INSTRUCTIONS ---
+                1. Answer **only** using the information provided in the context above.
+                2. If the context does not contain sufficient information, explicitly state what is missing.
+                3. For every fact or statement, include the source document name in square brackets, e.g., [Doc1].
+                4. Be concise but complete (maximum 300 words).
+                5. Structure your answer clearly using paragraphs or bullet points.
+                6. Do **not** fabricate information or sources.
+
+                --- RESPONSE ---
+                Your answer (with sources referenced): <Answer>
+                Reference Sources: <SourceName(s)>";
+
 
                 var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
 
@@ -91,52 +122,6 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             return sasuri.Replace(BlobStorageConstants.StorageImageName, "localhost");
         }
 
-        //[KernelFunction("summarize_document"), Description("Use this function ONLY when the user explicitly asks to summarize a document and provides a document name. Do NOT use this for general document queries.")]
-        //public async Task<string> SummarizeDocumentAsync([Description("Name of the document to summarize")] string documentName)
-        //{
-        //    try
-        //    {
-        //        var documentChunks = await embeddingService.RetrieveDocumentChunksAsync(documentName);
-
-        //        // Step 2: Summarize each chunk
-        //        var chunkSummaries = new List<string>();
-        //        foreach (var chunk in documentChunks)
-        //        {
-        //            string summary = await SummarizeChunkAsync(chunk);
-        //            chunkSummaries.Add(summary);
-        //        }
-
-        //        // Step 3: Generate final summary from chunk summaries
-        //        string combinedSummary = string.Join("\n", chunkSummaries);
-        //        string finalSummary = await SummarizeChunkAsync(combinedSummary);
-
-        //        return finalSummary;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return "Error retrieving and summarizing document.";
-        //    }
-        //}
-
-        //private async Task<string> SummarizeChunkAsync(string chunk)
-        //{
-        //    var promptTemplate = """
-        //        Summarize the following text while keeping key details:
-        //        {{$chunk}}
-
-        //        Provide a concise summary within 300 words.
-        //    """;
-
-        //    var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
-
-        //    var summaryResponse = await _kernel.InvokeAsync(
-        //        semanticFunction,
-        //        new KernelArguments { ["chunk"] = chunk }
-        //    ).ConfigureAwait(false);
-
-        //    return summaryResponse.ToString();
-        //}
-
         [KernelFunction("summarize_document"), Description("Use this function ONLY when the user explicitly asks to summarize a document and provides a document name. Do NOT use this for general document queries.")]
         public async Task<string> SummarizeDocumentAsync([Description("Name of the document to summarize")] string documentName)
         {
@@ -160,12 +145,33 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 // Step 2: Recursively summarize if too large
                 string finalSummary = await SummarizeRecursivelyAsync(intermediateSummaries, MaxTokensPerBatch);
 
-                return finalSummary;
+                return $"## Summary of {documentName}\n\n{finalSummary}";
             }
             catch (Exception ex)
             {
                 return $"Error summarizing document: {ex.Message}";
             }
+        }
+
+        private async Task<string> EnhanceQuery(string originalQuery)
+        {
+            var enhancementPrompt = @"
+            Rewrite the following query to be more comprehensive for semantic search.
+            Include relevant synonyms and related terms while maintaining the original intent.
+            Keep the enhanced query concise (max 2-3 sentences).
+
+            Original query: {{$query}}
+
+            Enhanced query:";
+
+            var semanticFunction = _kernel.CreateFunctionFromPrompt(enhancementPrompt);
+
+            var enhancedQuery = await _kernel.InvokeAsync(
+                semanticFunction,
+                new KernelArguments { ["query"] = originalQuery }
+            ).ConfigureAwait(false);
+
+            return enhancedQuery.ToString();
         }
 
         private async Task<string> SummarizeRecursivelyAsync(List<string> summaries, int maxTokens)
@@ -210,10 +216,19 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         private async Task<string> SummarizeChunkAsync(string chunk)
         {
             var promptTemplate = """
-                Summarize the following text while preserving key details:
-                {{$chunk}}
+            Create a structured summary of the following text:
 
-                Keep the summary concise, under 500 words.
+            TEXT:
+            {{$chunk}}
+
+            SUMMARY REQUIREMENTS:
+            - Capture ALL key facts and figures
+            - Maintain chronological order if applicable
+            - Preserve technical terms and proper nouns
+            - Use bullet points for lists
+            - Maximum 500 words
+
+            SUMMARY:
             """;
 
             var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);

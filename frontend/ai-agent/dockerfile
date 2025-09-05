@@ -1,7 +1,8 @@
-# -------- Base Build Stage --------
 FROM node:18-alpine AS builder
-
 WORKDIR /app
+
+# Set npm config to handle certificate issues
+RUN npm config set strict-ssl false
 
 # Install dependencies first (better caching)
 COPY package*.json ./
@@ -11,18 +12,16 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-
-# -------- Production Stage --------
+# Production Stage
 FROM node:18-alpine AS runner
-
 WORKDIR /app
 
-# Install lightweight static file server
+# Install serve with certificate fix
+RUN npm config set strict-ssl false
 RUN npm install -g serve
 
-# Copy only the built output (not node_modules, not source code)
+# Copy only the built output
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 5173
-
 CMD ["serve", "-s", "dist", "-l", "5173"]
