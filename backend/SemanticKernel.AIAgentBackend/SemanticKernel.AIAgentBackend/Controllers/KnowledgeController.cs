@@ -5,12 +5,14 @@ using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using SemanticKernel.AIAgentBackend.Constants;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [EnableRateLimiting("authenticated")]
     public class KnowledgeController : ControllerBase
     {
         private readonly IEmbeddingService embeddingService;

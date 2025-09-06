@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Services.Interface;
 
@@ -19,6 +20,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         }
 
         [HttpPost("register")]
+        [DisableRateLimiting]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDTO request)
         {
             var ipAddress = GetIpAddress();
@@ -32,6 +34,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         }
 
         [HttpPost("login")]
+        [DisableRateLimiting]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
         {
             var ipAddress = GetIpAddress();
@@ -45,6 +48,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         }
 
         [HttpPost("refresh-token")]
+        [EnableRateLimiting("authenticated")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDTO? request)
         {
             var refreshToken = request?.RefreshToken ?? Request.Cookies["refreshToken"];
@@ -64,6 +68,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
         [HttpPost("revoke-token")]
         [Authorize]
+        [EnableRateLimiting("authenticated")]
         public async Task<IActionResult> RevokeToken([FromBody] RefreshTokenRequestDTO? request)
         {
             var token = request?.RefreshToken ?? Request.Cookies["refreshToken"];
@@ -78,6 +83,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         }
 
         [HttpPost("google")]
+        [DisableRateLimiting]
         public async Task<IActionResult> GoogleLogin([FromBody] ExternalAuthRequestDTO request)
         {
             var userInfo = await _oauthService.GetGoogleUserInfoAsync(request.Code, request.RedirectUri);
@@ -96,6 +102,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         }
 
         [HttpPost("microsoft/token")]
+        [DisableRateLimiting]
         public async Task<IActionResult> MicrosoftTokenExchange([FromBody] MicrosoftTokenRequestDTO request)
         {
             try
@@ -122,6 +129,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
         [HttpPost("logout")]
         [Authorize]
+        [DisableRateLimiting]
         public async Task<IActionResult> Logout()
         {
             var refreshToken = Request.Cookies["refreshToken"];

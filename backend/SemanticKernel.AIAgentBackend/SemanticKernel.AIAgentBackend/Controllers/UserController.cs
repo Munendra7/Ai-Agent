@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SemanticKernel.AIAgentBackend.Data;
 using System.Security.Claims;
@@ -10,6 +11,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [DisableRateLimiting]
     public class UserController : ControllerBase
     {
         private readonly AppDbContext _context;

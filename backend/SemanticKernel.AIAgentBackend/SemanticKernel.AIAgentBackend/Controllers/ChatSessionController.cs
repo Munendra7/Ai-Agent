@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using SemanticKernel.AIAgentBackend.Services.Interface;
 
@@ -9,6 +10,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [DisableRateLimiting]
     public class ChatSessionController : ControllerBase
     {
         private readonly IChatHistoryService _chatService;

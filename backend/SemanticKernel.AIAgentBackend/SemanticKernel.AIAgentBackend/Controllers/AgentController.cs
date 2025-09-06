@@ -10,12 +10,14 @@ using Microsoft.SemanticKernel.Agents;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using SemanticKernel.AIAgentBackend.Services.Interface;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [EnableRateLimiting("api-intensive")]
     public class AgentController : ControllerBase
     {
         private readonly Kernel _kernel;

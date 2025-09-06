@@ -17,7 +17,9 @@ using SemanticKernel.AIAgentBackend.Models.Domain;
 using SemanticKernel.AIAgentBackend.Services.Interface;
 using SemanticKernel.AIAgentBackend.Services.Service;
 using Serilog;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -156,6 +158,97 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     serverOptions.Limits.MaxRequestBodySize = Gigabyte;
 });
 
+// ========== RATE LIMITING CONFIGURATION ==========
+builder.Services.AddRateLimiter(options =>
+{
+    // Global rejection configuration
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    {
+        // Get user from JWT token or use anonymous identifier
+        var userId = httpContext.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous";
+        var endpoint = httpContext.Request.Path.Value ?? "unknown";
+
+        // Partition by both user + endpoint
+        var key = $"{userId}:{endpoint}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 50, // Default limit for all users
+                Window = TimeSpan.FromMinutes(1)
+            });
+    });
+
+    // Custom rejection response
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            context.HttpContext.Response.Headers.RetryAfter = retryAfter.TotalSeconds.ToString();
+        }
+
+        await context.HttpContext.Response.WriteAsync(
+            "Too many requests. Please try again later.", cancellationToken);
+    };
+
+    // Policy for authenticated users - higher limits
+    options.AddPolicy("authenticated", httpContext =>
+    {
+        var userId = httpContext.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous";
+        var endpoint = httpContext.Request.Path.Value ?? "unknown";
+
+        // Partition by both user + endpoint
+        var key = $"{userId}:{endpoint}";
+
+        if (string.IsNullOrEmpty(userId) || userId == "anonymous")
+        {
+            // Lower limits for anonymous users
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: "anonymous",
+                factory: partition => new FixedWindowRateLimiterOptions
+                {
+                    AutoReplenishment = true,
+                    PermitLimit = 5,
+                    Window = TimeSpan.FromMinutes(1)
+                });
+        }
+
+        // Higher limits for authenticated users
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1)
+            });
+    });
+
+    // Sliding window policy for API-intensive operations
+    options.AddPolicy("api-intensive", httpContext =>
+    {
+        var userId = httpContext.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous";
+        var endpoint = httpContext.Request.Path.Value ?? "unknown";
+
+        // Partition by both user + endpoint
+        var key = $"{userId}:{endpoint}";
+
+        return RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: key,
+            factory: partition => new SlidingWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 6
+            });
+    });
+});
+
 var app = builder.Build();
 
 app.UseCors("AllowReactApp");
@@ -177,6 +270,8 @@ app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 
