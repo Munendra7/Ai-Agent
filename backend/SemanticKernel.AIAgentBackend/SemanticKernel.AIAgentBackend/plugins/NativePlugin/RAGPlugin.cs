@@ -21,7 +21,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             _configuration = configuration;
         }
 
-        [KernelFunction("answerfromKnowledge"), Description("Acts as the AI knowledge base by retrieving relevant information from user-provided information and documents using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query.")]
+        [KernelFunction("answerfromKnowledge"), Description("Acts as the AI knowledge base by retrieving relevant information from knowledge base using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query. It is Not mandatory to give document name to use this function.")]
         public async Task<string> AnswerAsync([Description("User query")] string query, [Description("Optional: restrict search to specific document name")] string? documentname = null)
         {
             try

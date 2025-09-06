@@ -6,6 +6,7 @@ import { useAppSelector } from "../app/hooks";
 import api from '../services/api';
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchWithInterceptors } from "../services/fetchClient";
+import remarkGfm from "remark-gfm";
 
 const starterPrompts = [
   "List all documents in your knowledge base",
@@ -113,10 +114,6 @@ const ChatPlayground: React.FC = () => {
     }
   }, [navigate, sessionId]);
 
-  const formatChatResponse = (text: string): string => {
-    return text.replace(/- \*\*(.*?)\*\*/g, "\n- **`$1`**").replace(/ - /g, "\n- ").trim();
-  };
-
   const fetchAgentStreamResponse = async (query: string) => {
     setMessages((prev) => [
       ...prev,
@@ -155,7 +152,7 @@ const ChatPlayground: React.FC = () => {
 
             updated[lastIndex] = {
               ...updated[lastIndex],
-              text: formatChatResponse(fullText),
+              text: fullText,
             };
 
             return updated;
@@ -231,6 +228,7 @@ const ChatPlayground: React.FC = () => {
                 </div>
               ) : (
                 <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
                   components={{
                     a: (props) => (
                       <a
@@ -240,9 +238,24 @@ const ChatPlayground: React.FC = () => {
                         className="underline text-blue-400 hover:text-blue-300"
                       />
                     ),
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto my-2">
+                      <table className="table-auto border-collapse border border-gray-400 text-sm">
+                        {children}
+                      </table>
+                    </div>
+                  ),
+                  th: ({ children }) => (
+                    <th className="border border-gray-400 px-2 py-1 bg-gray-700 text-white">
+                      {children}
+                    </th>
+                  ),
+                  td: ({ children }) => (
+                    <td className="border border-gray-400 px-2 py-1">{children}</td>
+                  ),
                   }}
                 >
-                  {msg.text.replace(/\n/g, "  \n")}
+                  {msg.text}
                 </ReactMarkdown>
               )}
               {msg.timestamp && (

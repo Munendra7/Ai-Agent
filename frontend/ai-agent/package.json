@@ -23,6 +23,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.2.0",
     "react-toastify": "^11.0.5",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.0.9",
     "typewriter-effect": "^2.22.0"
   },
