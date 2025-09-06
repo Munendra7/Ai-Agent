@@ -21,7 +21,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             _configuration = configuration;
         }
 
-        [KernelFunction("answerfromKnowledge"), Description("Acts as the AI knowledge base by retrieving relevant information from knowledge base using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query. It is Not mandatory to give document name to use this function.")]
+        [KernelFunction("answerfromKnowledge"), Description("Acts as the AI knowledge base by retrieving relevant information from stored documents using a Retrieval-Augmented Generation (RAG) approach. It generates precise and context-aware answers based on the user's query. It is Not mandatory to give document name to use this function.")]
         public async Task<string> AnswerAsync([Description("User query")] string query, [Description("Optional: restrict search to specific document name")] string? documentname = null)
         {
             try
@@ -74,11 +74,13 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 
                 --- INSTRUCTIONS ---
                 1. Answer **only** using the information provided in the context above.
-                2. If the context does not contain sufficient information, explicitly state what is missing.
-                3. For every fact or statement, include the source document name in square brackets, e.g., [Doc1].
-                4. Be concise but complete (maximum 300 words).
-                5. Structure your answer clearly using paragraphs or bullet points.
-                6. Do **not** fabricate information or sources.
+                2. Always Return the response in table format if the user question is about comparisons, data or lists, and if you fill info can be shown better in table.
+                3. If the context does not contain sufficient information, explicitly state what is missing.
+                4. For every fact or statement, include the source document name in square brackets, e.g., [Doc1].
+                5. Be concise but complete (maximum 500 words).
+                6. Structure your answer clearly using tables, paragraphs or bullet points.
+                7. Do **not** fabricate information or sources.
+                8. Always mention the source name as mentioned in context.
 
                 --- RESPONSE ---
                 Your answer (with sources referenced): <Answer>
@@ -156,9 +158,9 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         private async Task<string> EnhanceQuery(string originalQuery)
         {
             var enhancementPrompt = @"
-            Rewrite the following query to be more comprehensive for semantic search.
-            Include relevant synonyms and related terms while maintaining the original intent.
-            Keep the enhanced query concise (max 2-3 sentences).
+            Rewrite the query for semantic search over a vector database. Correct the spelling and grammar.
+            Expand with synonyms, related terms, abbreviations, and alternate phrasings.
+            Keep it concise (Max 1–2 sentences) and relevant to the original intent.
 
             Original query: {{$query}}
 

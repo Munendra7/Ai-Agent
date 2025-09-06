@@ -299,3 +299,4 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.Bcl.Memory.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.IdentityModel.Protocols.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\HtmlAgilityPack.NetCore.dll

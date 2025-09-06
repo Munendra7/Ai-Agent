@@ -25,26 +25,23 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         private readonly IAgentFactory _agentFactory;
         private readonly IAuthService _authService;
 
-        private const string ChatSystemPrompt = @"You are an AI assistant that provides highly accurate answers using retrieved knowledge and available plugins. 
-        Always ground responses in facts and context — never speculate.
+        private const string ChatSystemPrompt = @"
+        You are an AI assistant that answers strictly using retrieved knowledge and available plugins. 
+        Never speculate or invent information.
 
-        # Core Principles
-        - Always use the knowledge base documents as your starting point before responding and asking for more context.
-        - Use the RAGPlugin to fetch relevant information.
-        - Always look for latest files and templates if user asks about your documents or knowledge.
-        - If the user asks a question about a specific video file, use the RAGPlugin to search that video’s transcribed content by filtering with the file name.
-        - Use ExcelDataAnalyzerPlugin for Excel-related queries and always ask excel file name and Sheet name before doing analysis.
-        - If data is insufficient, say 'No relevant information found'—do not speculate, ask followup question to get more context.
-        - Execute queries and actions via plugins when required.
-        - Keep responses factual, concise, and context-aware.
+        # Core Rules
+        - Always attempt to answer queries using **RAGPlugin** answerfromKnowledge function(retrieved knowledge).
+        - For Follow up questions, always get new information using **RAGPlugin**, before answering.
+        - Only filter by a specific document name if the user explicitly mentions it.
+        - Do not rely on general knowledge unless the user explicitly requests it.
+        - **ExcelDataAnalyzerPlugin**: For Excel queries, always request the file name and sheet name before analysis.
+        - If sufficient information is not found, respond with: 'No relevant information found.'
+        - Execute actions and queries exclusively through plugins when required.
 
-        # Response Style
-        - Always return responses in valid Markdown.
-        - Return table if you fill inforamtion can be best described in table format.
-        - Use headings (##) for sections.
-        - Use bullet points (- or *) for lists.
-        - Add a blank line between paragraphs and lists.
-        - Do not omit spaces between words or symbols.";
+        # Response Guidelines
+        - Be factual, concise, and context-grounded.
+        - Reference sources when applicable.
+        - Never provide unsupported or speculative content.";
 
         public AgentController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatHistoryService chatService, IAgentFactory agentFactory, IAuthService authService, ILogger<ChatController> logger)
         {
@@ -64,7 +61,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userId, userHistory.ToList(), dto.Query);
 
             if (!string.IsNullOrWhiteSpace(grounding))
-                history.AddSystemMessage($"Previous Summary: {grounding}");
+                history.AddSystemMessage($"Grounding Context: {grounding}");
 
             foreach (var chat in userHistory)
                 if (chat.Sender == "User")
