@@ -147,7 +147,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         [Route("StreamAgentChat")]
         [HttpPost]
         [ValidateModel]
-        public async Task StreamAgentChat([FromBody] UserQueryDTO dto)
+        public async Task StreamAgentChat([FromBody] UserQueryDTO dto, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(dto.Query))
             {
@@ -175,7 +175,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
                 string fullResponse = "";
 
-                await foreach (var chunk in agent.InvokeStreamingAsync(thread, new() { KernelArguments = args }))
+                await foreach (var chunk in agent.InvokeStreamingAsync(thread, new() { KernelArguments = args }, cancellationToken))
                 {
                     var content = chunk.Message?.ToString();
                     if (!string.IsNullOrEmpty(content))
@@ -191,6 +191,13 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     new() { SessionId = dto.SessionId, UserId = new Guid(userId), Message = dto.Query, Sender = "User", Timestamp = DateTime.Now },
                     new() { SessionId = dto.SessionId, UserId = new Guid(userId), Message = fullResponse, Sender = "Assistant", Timestamp = DateTime.Now }
                 });
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("SingleAgentChat request was cancelled by client.");
+                Response.StatusCode = 499;
+                await Response.WriteAsync("SingleAgentChat request was cancelled by client.");
+                return;
             }
             catch (Exception ex)
             {

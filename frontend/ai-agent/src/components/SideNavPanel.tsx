@@ -180,7 +180,7 @@ const SideNavPanel: React.FC = () => {
                         </div>
                     </div>
                     
-                    <div className="flex-1 overflow-y-auto p-4">
+                    <div className="flex-1 overflow-y-auto p-4 mb-20">
                         {isLoadingSessions ? (
                             <div className="flex items-center justify-center py-8">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>

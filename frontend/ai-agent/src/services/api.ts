@@ -7,7 +7,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-
 // Interceptor setup function to inject getToken and dispatch
 export function setupApiInterceptors(dispatch: (action: { type: string; payload?: unknown }) => void) {
   api.interceptors.request.use(
@@ -25,17 +24,31 @@ export function setupApiInterceptors(dispatch: (action: { type: string; payload?
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
-
+      // Check if this is a 401 error and not already a retry
       if (error.response?.status === 401 && !originalRequest._retry) {
+        // IMPORTANT: Check if this IS the refresh token request itself
+        if (originalRequest.url === '/auth/refresh-token') {
+          // Don't try to refresh if the refresh itself failed
+          localStorage.removeItem('accessToken');
+          dispatch({ type: 'auth/logout' });
+          window.location.href = '/login';
+          return Promise.reject(error);
+        }
+
         originalRequest._retry = true;
 
         try {
           const response = await api.post('/auth/refresh-token');
           const { accessToken, user } = response.data;
+          
+          // Update the token in localStorage
+          localStorage.setItem('accessToken', accessToken);
+          
           dispatch({ type: 'auth/setCredentials', payload: { accessToken, user } });
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return api(originalRequest);
         } catch (refreshError) {
+          localStorage.removeItem('accessToken');
           dispatch({ type: 'auth/logout' });
           window.location.href = '/login';
           return Promise.reject(refreshError);

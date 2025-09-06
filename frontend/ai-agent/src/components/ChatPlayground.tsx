@@ -58,9 +58,7 @@ const ChatPlayground: React.FC = () => {
       if (!sessionId || !guidRegex.test(sessionId)) {
         return;
       }
-
       setIsLoadingHistory(true);
-      
       try {
         const response = await api.get(`/chatsession/${sessionId}`) as ChatHistoryResponse;
         if (response && response.data && response.data.length > 0) {
@@ -69,7 +67,11 @@ const ChatPlayground: React.FC = () => {
             type: msg.sender==="Assistant" ? "bot":"user",
             persona: msg.sender=="Assistant" ? "AI Agent":"You"
           }));
-          setMessages(historicalMessages);
+          setMessages([{
+              text: `Hi ${user?.firstName || "there"}, how can I assist you?`,
+              type: "bot",
+              persona: "AI Agent",
+            }, ...historicalMessages]);
         } else {
           setMessages([
             {

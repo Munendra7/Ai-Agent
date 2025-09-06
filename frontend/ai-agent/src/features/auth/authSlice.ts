@@ -82,8 +82,6 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (state, action: PayloadAction<{ accessToken: string; user: User }>) => {
       state.accessToken = action.payload.accessToken;
-      state.user = action.payload.user;
-      state.isAuthenticated = true;
       localStorage.setItem('accessToken', action.payload.accessToken);
     },
     clearError: (state) => {
