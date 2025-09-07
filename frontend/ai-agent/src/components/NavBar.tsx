@@ -1,21 +1,25 @@
 import React, { useState } from "react";
-import { SignOutButton } from "./MSAuthentication/SignOutButton";
 import Copilot from "../assets/AIAgent.svg";
 import { Menu, X } from "lucide-react";
-import { useIsAuthenticated, useMsal } from "@azure/msal-react";
-import { SignInButton } from "./MSAuthentication/SignInButton";
+import SignOutButton from "./SignOutButton";
+import SignInButton from "./SignInButton";
+import { useAppSelector } from "../app/hooks";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const NavBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const isAuthenticated = useIsAuthenticated();
-  const { instance } = useMsal();
-  const activeAccount = instance.getActiveAccount();
+  const {user, isAuthenticated} = useAppSelector(state => state.auth);
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const hideSignIn = location.pathname === "/login" || location.pathname === "/register";
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-black/80 backdrop-blur-lg text-white z-50 border-b border-gray-700 shadow-md">
       <div className="flex items-center justify-between px-6 py-3">
         {/* Logo */}
-        <div className="flex items-center">
+        <div className="flex items-center cursor-pointer" onClick={()=>{navigate("/")}}>
           <img src={Copilot} alt="AI Agent Logo" className="h-10 w-10 mr-2" />
           <h1 className="text-xl font-bold text-white tracking-wide">
             AI Agent
@@ -35,12 +39,12 @@ const NavBar: React.FC = () => {
           {isAuthenticated ? (
             <>
               <span className="text-sm text-gray-300">
-                Welcome, {activeAccount?.name}
+                Welcome, {user?.firstName}
               </span>
-              <SignOutButton />
+              <SignOutButton/>
             </>
           ) : (
-            <SignInButton />
+            !hideSignIn && <SignInButton />
           )}
         </div>
       </div>
@@ -51,12 +55,12 @@ const NavBar: React.FC = () => {
           {isAuthenticated ? (
             <>
               <span className="text-sm mb-2 text-gray-300">
-                Welcome, {activeAccount?.name}
+                Welcome, {user?.firstName}
               </span>
-              <SignOutButton />
+              <SignOutButton/>
             </>
           ) : (
-            <SignInButton />
+            !hideSignIn && <SignInButton />
           )}
         </div>
       )}

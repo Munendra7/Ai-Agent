@@ -40,7 +40,7 @@ namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin
 
                 ChatHistory chatHistory = new ChatHistory();
 
-                var userChatHistory = await _chatService.GetMessagesAsync(sessionId, 10);
+                var userChatHistory = await _chatService.GetMessagesAsync(sessionId, new Guid(), 10);
 
                 foreach (var chat in userChatHistory)
                 {

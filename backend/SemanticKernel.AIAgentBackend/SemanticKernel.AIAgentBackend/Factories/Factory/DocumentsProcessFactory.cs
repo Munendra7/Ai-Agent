@@ -26,7 +26,6 @@ using System.Text.Json;
 using ParagraphProperties = DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties;
 using TableCellProperties = DocumentFormat.OpenXml.Wordprocessing.TableCellProperties;
 using RunProperties = DocumentFormat.OpenXml.Wordprocessing.RunProperties;
-using Newtonsoft.Json.Linq;
 
 namespace SemanticKernel.AIAgentBackend.Factories.Factory
 {
@@ -34,20 +33,20 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
     {
         public DocumentsProcessFactory() { }
 
-        public IEnumerable<string> ExtractTextChunksFromFile(IFormFile file, int chunkSize = 512)
+        public IEnumerable<string> ExtractTextChunksFromFile(IFormFile file, int chunkSize = 512, int chunkOverlap=100)
         {
             using var stream = file.OpenReadStream();
             if (file.FileName.EndsWith(".txt"))
             {
-                return ExtractTextChunksFromTxt(stream, chunkSize);
+                return ExtractTextChunksFromTxt(stream, chunkSize, chunkOverlap);
             }
             else if (file.FileName.EndsWith(".pdf"))
             {
-                return ExtractTextChunksFromPdf(stream, chunkSize);
+                return ExtractTextChunksFromPdf(stream, chunkSize, chunkOverlap);
             }
             else if (file.FileName.EndsWith(".docx"))
             {
-                return ExtractTextChunksFromDocx(stream, chunkSize);
+                return ExtractTextChunksFromDocx(stream, chunkSize, chunkOverlap);
             }
             else if (file.FileName.EndsWith(".xlsx") || file.FileName.EndsWith(".xls"))
             {
@@ -106,13 +105,13 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             return structuredData;
         }
 
-        private IEnumerable<string> ExtractTextChunksFromTxt(Stream stream, int chunkSize)
+        private IEnumerable<string> ExtractTextChunksFromTxt(Stream stream, int chunkSize, int chunkOverlap)
         {
             using var reader = new StreamReader(stream);
-            return ChunkText(reader.ReadToEnd(), chunkSize);
+            return CreateOverlappingChunks(reader.ReadToEnd(), chunkSize, chunkOverlap);
         }
 
-        private IEnumerable<string> ExtractTextChunksFromPdf(Stream stream, int chunkSize)
+        private IEnumerable<string> ExtractTextChunksFromPdf(Stream stream, int chunkSize, int chunkOverlap)
         {
             using var pdfDocument = PdfDocument.Open(stream);
             var text = new StringBuilder();
@@ -120,10 +119,10 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             {
                 text.Append(ContentOrderTextExtractor.GetText(page));
             }
-            return ChunkText(text.ToString(), chunkSize);
+            return CreateOverlappingChunks(text.ToString(), chunkSize, chunkOverlap);
         }
 
-        private IEnumerable<string> ExtractTextChunksFromDocx(Stream stream, int chunkSize)
+        private IEnumerable<string> ExtractTextChunksFromDocx(Stream stream, int chunkSize, int chunkOverlap)
         {
             StringBuilder text = new StringBuilder();
             using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(stream, false))
@@ -137,7 +136,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
                     }
                 }
             }
-            return ChunkText(text.ToString(), chunkSize);
+            return CreateOverlappingChunks(text.ToString(), chunkSize, chunkOverlap);
         }
 
         public IEnumerable<string> ChunkText(string text, int chunkSize)
@@ -158,6 +157,45 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
                 chunks.Add(currentChunk.ToString());
             }
             return chunks;
+        }
+
+        /// <summary>
+        /// Splits text into overlapping chunks of fixed size (character-based).
+        /// Ensures deterministic overlap between consecutive chunks.
+        /// </summary>
+        /// <param name="text">Input text</param>
+        /// <param name="chunkSize">Target chunk size in characters (default 512)</param>
+        /// <param name="chunkOverlap">Number of characters to overlap between chunks (default 100)</param>
+        /// <returns>Enumerable of clean text chunks</returns>
+        public static IEnumerable<string> CreateOverlappingChunks(string text, int chunkSize = 512, int chunkOverlap = 100)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                yield break;
+
+            if (chunkOverlap >= chunkSize)
+                throw new ArgumentException("chunkOverlap must be smaller than chunkSize");
+
+            // Normalize whitespace for cleaner embeddings
+            text = Regex.Replace(text, @"\s+", " ").Trim();
+
+            int start = 0;
+            while (start < text.Length)
+            {
+                int end = Math.Min(start + chunkSize, text.Length);
+
+                // Extract substring
+                string chunk = text.Substring(start, end - start).Trim();
+                if (!string.IsNullOrEmpty(chunk))
+                {
+                    yield return chunk;
+                }
+
+                // Move forward by (chunkSize - overlap)
+                start += (chunkSize - chunkOverlap);
+
+                if (start >= text.Length)
+                    break;
+            }
         }
 
         public HashSet<string> ExtractPlaceholders(Stream templateStream)

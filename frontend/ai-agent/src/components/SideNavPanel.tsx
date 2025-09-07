@@ -1,30 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import { Settings, Brain, FileText } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Settings, Brain, FileText, MessageSquare, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
-import axios from 'axios';
-import { useMsal } from '@azure/msal-react';
-import { backendAPILoginRequest } from '../authConfig';
-
-const apiUrl = (import.meta as any).env.VITE_AIAgent_URL;
+import { useNavigate, useParams } from 'react-router-dom';
+import api from '../services/api';
 
 enum UploadTypeEnum {
     Knowledge = "Knowledge",
     Template = "Template"
 };
 
+interface SessionSummary {
+    sessionId: string;
+    title: string;
+    content: string;
+    updatedAt: string;
+    userId: string;
+}
+
 const SideNavPanel: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate();
+    const { sessionid: currentSessionId } = useParams<{ sessionid: string }>();
+    
+    // Existing state
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [description, setDescription] = useState('');
-    const { instance } = useMsal();
-    const activeAccount = instance.getActiveAccount();
-    const [accessToken, setAccessToken] = useState<string | null>(null);
     const [UploadType, setUploadType] = useState<UploadTypeEnum>();
     const [isUploading, setIsUploading] = useState(false);
+    
+    // New state for chat management
+    const [isChatPanelOpen, setIsChatPanelOpen] = useState(false);
+    const [chatSessions, setChatSessions] = useState<SessionSummary[]>([]);
+    const [isLoadingSessions, setIsLoadingSessions] = useState(false);
 
-    const togglePanel = () => {
-        setIsOpen(!isOpen);
+    // Load chat sessions when chat panel opens
+    useEffect(() => {
+        if (isChatPanelOpen) {
+            loadChatSessions();
+        }
+    }, [isChatPanelOpen]);
+
+    const loadChatSessions = async () => {
+        setIsLoadingSessions(true);
+        try {
+            const response = await api.get('/chatsession');
+            setChatSessions(response.data);
+        } catch (error: unknown) {
+            const errorMessage = typeof error === 'object' && error !== null && 'message' in error
+                ? (error as { message?: string }).message
+                : String(error);
+            toast.error(`Failed to load chat sessions: ${errorMessage}`);
+            setChatSessions([]);
+        } finally {
+            setIsLoadingSessions(false);
+        }
+    };
+
+    const toggleSettingsPanel = () => {
+        setIsSettingsOpen(!isSettingsOpen);
+        if (isChatPanelOpen) setIsChatPanelOpen(false); // Close chat panel if open
+    };
+
+    const toggleChatPanel = () => {
+        setIsChatPanelOpen(!isChatPanelOpen);
+        if (isSettingsOpen) setIsSettingsOpen(false); // Close settings panel if open
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,11 +74,6 @@ const SideNavPanel: React.FC = () => {
     };
 
     const handleUpload = async () => {
-        if (!accessToken) {
-            toast.error("Access token not available");
-            return;
-        }
-
         if (!file || (UploadType === UploadTypeEnum.Knowledge && !description.trim())) {
             toast.error("File and description are mandatory!");
             return;
@@ -54,12 +89,11 @@ const SideNavPanel: React.FC = () => {
         setIsUploading(true);
         try {
             const endpoint = UploadType === UploadTypeEnum.Knowledge
-                ? `${apiUrl}/api/Knowledge/Upload`
-                : `${apiUrl}/api/Knowledge/Upload/AddTemplate`;
+                ? `/Knowledge/Upload`
+                : `/Knowledge/Upload/AddTemplate`;
 
-            await axios.post(endpoint, formData, {
+            await api.post(endpoint, formData,{
                 headers: {
-                    Authorization: `Bearer ${accessToken}`,
                     'Content-Type': 'multipart/form-data',
                 },
             });
@@ -68,39 +102,138 @@ const SideNavPanel: React.FC = () => {
             setIsUploadModalOpen(false);
             setFile(null);
             setDescription('');
-            setIsOpen(false);
-        } catch (error: any) {
-            toast.error(`Upload failed: ${error.message || error}`);
+            setIsSettingsOpen(false);
+        } catch (error: unknown) {
+            const errorMessage = typeof error === 'object' && error !== null && 'message' in error
+                ? (error as { message?: string }).message
+                : String(error);
+            toast.error(`Upload failed: ${errorMessage}`);
         } finally {
             setIsUploading(false);
         }
     };
 
-    useEffect(() => {
-        const fetchToken = async () => {
-            try {
-                const response = await instance.acquireTokenSilent({
-                    ...backendAPILoginRequest,
-                    account: activeAccount!,
-                });
-                setAccessToken(response.accessToken);
-            } catch (error) {
-                console.error("Token acquisition failed", error);
-            }
-        };
+    const handleNewChat = () => {
+        const newSessionId = crypto.randomUUID();
+        localStorage.setItem("chatSessionId", newSessionId);
+        navigate(`/chat/${newSessionId}`);
+        setIsChatPanelOpen(false);
+        toast.success("New chat session started!");
+    };
 
-        if (activeAccount) {
-            fetchToken();
-        }
-    }, [instance, activeAccount]);
+    const handleChatSelect = (sessionId: string) => {
+        localStorage.setItem("chatSessionId", sessionId);
+        navigate(`/chat/${sessionId}`);
+        setIsChatPanelOpen(false);
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now.getTime() - date.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) return 'Today';
+        if (diffDays === 2) return 'Yesterday';
+        if (diffDays <= 7) return `${diffDays - 1} days ago`;
+        return date.toLocaleDateString();
+    };
+
+    const truncateTitle = (title: string, maxLength: number = 30) => {
+        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
+    };
 
     return (
         <div className="fixed top-16 left-0 h-full flex flex-col bg-gray-800 text-white w-16 p-2 border-r border-gray-700 z-40">
-            <button onClick={togglePanel} className="p-3 rounded-lg hover:bg-gray-700 transition-all">
+            {/* Chat Button */}
+            <button 
+                onClick={toggleChatPanel} 
+                className={`p-3 rounded-lg hover:bg-gray-700 transition-all mb-2 ${isChatPanelOpen ? 'bg-gray-700' : ''}`}
+                title="Chat History"
+            >
+                <MessageSquare size={24} />
+            </button>
+
+            {/* Settings Button */}
+            <button 
+                onClick={toggleSettingsPanel} 
+                className={`p-3 rounded-lg hover:bg-gray-700 transition-all ${isSettingsOpen ? 'bg-gray-700' : ''}`}
+                title="Settings"
+            >
                 <Settings size={24} />
             </button>
 
-            {isOpen && (
+            {/* Chat Panel */}
+            {isChatPanelOpen && (
+                <div className="absolute left-16 top-0 w-80 h-full bg-gray-900 shadow-lg border-l border-gray-700 z-50 flex flex-col">
+                    <div className="p-4 border-b border-gray-700">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-bold">Chat History</h2>
+                            <button
+                                onClick={handleNewChat}
+                                className="flex items-center gap-2 px-3 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-all text-sm"
+                                title="New Chat"
+                            >
+                                <Plus size={16} />
+                                New Chat
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto p-4 mb-20">
+                        {isLoadingSessions ? (
+                            <div className="flex items-center justify-center py-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+                                <span className="ml-3 text-gray-400">Loading chats...</span>
+                            </div>
+                        ) : chatSessions.length === 0 ? (
+                            <div className="text-center py-8 text-gray-400">
+                                <MessageSquare size={48} className="mx-auto mb-4 opacity-50" />
+                                <p>No chat sessions yet</p>
+                                <p className="text-sm mt-2">Start a new conversation!</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                {chatSessions.map((session) => (
+                                    <div
+                                        key={session.sessionId}
+                                        onClick={() => handleChatSelect(session.sessionId)}
+                                        className={`p-3 rounded-lg cursor-pointer transition-all hover:bg-gray-700 border border-transparent ${
+                                            currentSessionId === session.sessionId 
+                                                ? 'bg-blue-600/20 border-blue-600' 
+                                                : 'hover:border-gray-600'
+                                        }`}
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-medium text-sm mb-1 truncate" title={session.title}>
+                                                    {session.title || 'New Chat'}
+                                                </h3>
+                                                {session.content && (
+                                                    <p className="text-xs text-gray-400 line-clamp-2 mb-2">
+                                                        {truncateTitle(session.content, 60)}
+                                                    </p>
+                                                )}
+                                                <p className="text-xs text-gray-500">
+                                                    {formatDate(session.updatedAt)}
+                                                </p>
+                                            </div>
+                                            {currentSessionId === session.sessionId && (
+                                                <div className="flex-shrink-0 ml-2">
+                                                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Settings Panel */}
+            {isSettingsOpen && (
                 <div className="absolute left-16 top-0 w-64 h-full bg-gray-900 shadow-lg p-4 border-l border-gray-700 z-50">
                     <h2 className="text-lg font-bold mb-4">Settings</h2>
                     <button
@@ -108,11 +241,10 @@ const SideNavPanel: React.FC = () => {
                             setIsUploadModalOpen(true);
                             setUploadType(UploadTypeEnum.Knowledge);
                         }}
-                        className="flex items-center gap-2 p-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-all w-full"
+                        className="flex items-center gap-2 p-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-all w-full mb-3"
                     >
                         <Brain size={20} /> Upload Knowledge
                     </button>
-                    <br />
                     <button
                         onClick={() => {
                             setIsUploadModalOpen(true);
@@ -125,6 +257,7 @@ const SideNavPanel: React.FC = () => {
                 </div>
             )}
 
+            {/* Upload Modal */}
             {isUploadModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center animate-fadeIn z-50">
                     <div className="relative w-96">
@@ -180,7 +313,7 @@ const SideNavPanel: React.FC = () => {
                                 <button
                                     onClick={() => {
                                         setIsUploadModalOpen(false);
-                                        setIsOpen(false);
+                                        setIsSettingsOpen(false);
                                         setFile(null);
                                         setDescription('');
                                     }}

@@ -4,7 +4,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Interface
 {
     public interface IDocumentsProcessFactory
     {
-        IEnumerable<string> ExtractTextChunksFromFile(IFormFile file, int chunkSize = 512);
+        IEnumerable<string> ExtractTextChunksFromFile(IFormFile file, int chunkSize, int chunkOverlap);
 
         IEnumerable<string> ChunkText(string text, int chunkSize);
 

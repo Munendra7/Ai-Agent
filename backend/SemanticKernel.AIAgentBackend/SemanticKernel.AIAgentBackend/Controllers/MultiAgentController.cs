@@ -1,4 +1,5 @@
 ﻿using DocxProcessorLibrary.TemplateBasedDocGenerator;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
@@ -14,6 +15,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MultiAgentController : ControllerBase
     {
         private readonly Kernel _kernel;
@@ -53,13 +55,13 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 #pragma warning disable SKEXP0110
                 var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
                 var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
-                var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService);
+                var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService, _configuration);
                 var emailWriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
                 var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _templateBasedDocGenerator, _configuration);
 
                 Microsoft.SemanticKernel.ChatCompletion.ChatHistory chatHistory = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
 
-                var userChatHistory = await _chatService.GetMessagesAsync(userQueryDTO.SessionId, 10);
+                var userChatHistory = await _chatService.GetMessagesAsync(userQueryDTO.SessionId, new Guid(), 10);
 
                 foreach (var chat in userChatHistory)
                 {

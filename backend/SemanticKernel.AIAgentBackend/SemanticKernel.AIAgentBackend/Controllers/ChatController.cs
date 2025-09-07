@@ -88,7 +88,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
                 Microsoft.SemanticKernel.ChatCompletion.ChatHistory chatHistory = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
 
-                var userChatHistory = await _chatService.GetMessagesAsync(userQueryDTO.SessionId, 10);
+                var userChatHistory = await _chatService.GetMessagesAsync(userQueryDTO.SessionId, new Guid(), 10);
 
                 foreach (var chat in userChatHistory)
                 {

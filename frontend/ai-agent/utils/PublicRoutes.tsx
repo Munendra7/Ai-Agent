@@ -1,11 +1,12 @@
-import { useIsAuthenticated } from "@azure/msal-react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useParams } from "react-router-dom";
+import { useAppSelector } from "../src/app/hooks";
 
 const PublicRoutes = () => {
-  const isAuthenticated = useIsAuthenticated();
+  const isAuthenticated = useAppSelector(state=> state.auth.isAuthenticated);
+  const sessionId = useParams<{ sessionid: string }>().sessionid;
   return isAuthenticated ? 
   (
-    <Navigate to="/chat" />) 
+    <Navigate to={"/chat/"+ sessionId} />) 
     : 
     <Outlet />;
 };

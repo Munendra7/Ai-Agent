@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Loader2, Bot } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { useMsal } from "@azure/msal-react";
-import { backendAPILoginRequest } from "../authConfig";
 import "./ChatPlayground.css";
-
-const apiUrl = (import.meta).env.VITE_AIAgent_URL;
+import { useAppSelector } from "../app/hooks";
+import api from '../services/api';
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchWithInterceptors } from "../services/fetchClient";
+import remarkGfm from "remark-gfm";
 
 const starterPrompts = [
   "List all documents in your knowledge base",
@@ -17,74 +18,118 @@ const starterPrompts = [
   "Draft and send an email",
 ];
 
+const guidRegex =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+interface ChatMessage {
+  text: string;
+  type: "user" | "bot";
+  persona: string;
+  isLoading?: boolean;
+  timestamp?: string;
+}
+
+interface ChatHistoryResponse {
+  data: Array<{
+    message: string;
+    sender: string;
+  }>; 
+}
+
 const ChatPlayground: React.FC = () => {
-  const { instance } = useMsal();
-  const activeAccount = instance.getActiveAccount();
-  const sessionId = useRef<string>(crypto.randomUUID());
+  const sessionId = useParams<{ sessionid: string }>().sessionid;
+  const navigate = useNavigate();
+  const {user} = useAppSelector(state => state.auth);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [messages, setMessages] = useState<
-    { text: string; type: "user" | "bot"; persona: string; isLoading?: boolean }[]
-  >([
-    {
-      text: `Hi ${activeAccount?.name || "there"}, how can I assist you?`,
-      type: "bot",
-      persona: "AI Agent",
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
+  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Load chat history when sessionId is available
   useEffect(() => {
-    const fetchToken = async () => {
+    const loadChatHistory = async () => {
+      if (!sessionId || !guidRegex.test(sessionId)) {
+        return;
+      }
+      setIsLoadingHistory(true);
       try {
-        const response = await instance.acquireTokenSilent({
-          ...backendAPILoginRequest,
-          account: activeAccount!,
-        });
-        setAccessToken(response.accessToken);
+        const response = await api.get(`/chatsession/${sessionId}`) as ChatHistoryResponse;
+        if (response && response.data && response.data.length > 0) {
+          const historicalMessages: ChatMessage[] = response.data.map(msg => ({
+            text: msg.message,
+            type: msg.sender==="Assistant" ? "bot":"user",
+            persona: msg.sender=="Assistant" ? "AI Agent":"You"
+          }));
+          setMessages([{
+              text: `Hi ${user?.firstName || "there"}, how can I assist you?`,
+              type: "bot",
+              persona: "AI Agent",
+            }, ...historicalMessages]);
+        } else {
+          setMessages([
+            {
+              text: `Hi ${user?.firstName || "there"}, how can I assist you?`,
+              type: "bot",
+              persona: "AI Agent",
+            },
+          ]);
+        }
       } catch (error) {
-        console.error("Token acquisition failed", error);
+        console.error("Error loading chat history:", error);
+        // On error, show welcome message
+        setMessages([
+          {
+            text: `Hi ${user?.firstName || "there"}, how can I assist you?`,
+            type: "bot",
+            persona: "AI Agent",
+          },
+        ]);
+      } finally {
+        setIsLoadingHistory(false);
       }
     };
 
-    if (activeAccount) {
-      fetchToken();
-    }
-  }, [activeAccount, instance]);
+    loadChatHistory();
+  }, [sessionId, user]);
 
-  const formatChatResponse = (text: string): string => {
-    return text.replace(/- \*\*(.*?)\*\*/g, "\n- **`$1`**").replace(/ - /g, "\n- ").trim();
-  };
+  // Handle session ID validation and navigation
+  useEffect(() => {
+    if (!sessionId || !guidRegex.test(sessionId)) {
+      const storedId = localStorage.getItem("chatSessionId");
+      if (storedId && guidRegex.test(storedId)) {
+        navigate(`/chat/${storedId}`, { replace: true });
+      } else {
+        const newId = crypto.randomUUID();
+        localStorage.setItem("chatSessionId", newId);
+        navigate(`/chat/${newId}`, { replace: true });
+      }
+    } else {
+      // Valid sessionId, update localStorage
+      localStorage.setItem("chatSessionId", sessionId);
+    }
+  }, [navigate, sessionId]);
 
   const fetchAgentStreamResponse = async (query: string) => {
-    if (!accessToken) {
-      console.error("Access token not available");
-      return;
-    }
-
     setMessages((prev) => [
       ...prev,
       { text: "", type: "bot", persona: "AI Agent", isLoading: true },
     ]);
 
     try {
-      const response = await fetch(`${apiUrl}/api/Agent/StreamAgentChat`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sessionId: sessionId.current, query }),
-      });
+      const stream = await fetchWithInterceptors<ReadableStream<Uint8Array>>(
+        "/Agent/StreamAgentChat",
+        { method: "POST", body: JSON.stringify({ sessionId: sessionId, query }), stream: true }
+      );
+      if (!stream) throw new Error("No response from server");
 
-      if (!response.body) throw new Error("No response body");
-
-      const reader = response.body.getReader();
+      const reader = stream.getReader();
       const decoder = new TextDecoder();
       let fullText = "";
       let isFirstChunk = true;
@@ -109,7 +154,7 @@ const ChatPlayground: React.FC = () => {
 
             updated[lastIndex] = {
               ...updated[lastIndex],
-              text: formatChatResponse(fullText),
+              text: fullText,
             };
 
             return updated;
@@ -149,7 +194,19 @@ const ChatPlayground: React.FC = () => {
     }
   };
 
-  const hasUserMessage = messages.some((m) => m.type === "user");
+  // Show loading state while fetching history
+  if (isLoadingHistory) {
+    return (
+      <div className="chat-container flex flex-col h-screen pt-16 ml-16 p-4">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex items-center space-x-3">
+            <Loader2 className="animate-spin text-white" size={24} />
+            <span className="text-white text-lg">Loading chat history...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="chat-container flex flex-col h-screen pt-16 ml-16 p-4">
@@ -173,6 +230,7 @@ const ChatPlayground: React.FC = () => {
                 </div>
               ) : (
                 <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
                   components={{
                     a: (props) => (
                       <a
@@ -182,17 +240,37 @@ const ChatPlayground: React.FC = () => {
                         className="underline text-blue-400 hover:text-blue-300"
                       />
                     ),
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto my-2">
+                      <table className="table-auto border-collapse border border-gray-400 text-sm">
+                        {children}
+                      </table>
+                    </div>
+                  ),
+                  th: ({ children }) => (
+                    <th className="border border-gray-400 px-2 py-1 bg-gray-700 text-white">
+                      {children}
+                    </th>
+                  ),
+                  td: ({ children }) => (
+                    <td className="border border-gray-400 px-2 py-1">{children}</td>
+                  ),
                   }}
                 >
-                  {msg.text.replace(/\n/g, "  \n")}
+                  {msg.text}
                 </ReactMarkdown>
+              )}
+              {msg.timestamp && (
+                <span className="text-xs text-white/60 mt-1 block">
+                  {new Date(msg.timestamp).toLocaleString()}
+                </span>
               )}
             </div>
           </div>
         ))}
 
-        {/* Starter Prompts UI */}
-        {!hasUserMessage && (
+        {/* Starter Prompts UI - Only show when no user messages and history is loaded */}
+        {!messages.some((m) => m.type === "user") && (
           <div className="mt-6">
             <h3 className="text-lg font-semibold mb-3 text-white">
               Try asking me:
@@ -224,13 +302,13 @@ const ChatPlayground: React.FC = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={isWaitingForResponse}
+          disabled={isWaitingForResponse || isLoadingHistory}
         />
         <button
           className={`p-3 rounded-full flex items-center justify-center w-12 h-12 transition-all duration-200 
-            ${isWaitingForResponse ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+            ${(isWaitingForResponse || isLoadingHistory) ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
           onClick={() => handleSendMessage()}
-          disabled={isWaitingForResponse}
+          disabled={isWaitingForResponse || isLoadingHistory}
         >
           <Send size={20} />
         </button>

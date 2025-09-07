@@ -7,11 +7,17 @@ using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 using Microsoft.SemanticKernel.Agents;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using SemanticKernel.AIAgentBackend.Services.Interface;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace SemanticKernel.AIAgentBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+    [EnableRateLimiting("api-intensive")]
     public class AgentController : ControllerBase
     {
         private readonly Kernel _kernel;
@@ -19,35 +25,45 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         private readonly IChatHistoryService _chatService;
         private readonly ILogger _logger;
         private readonly IAgentFactory _agentFactory;
+        private readonly IAuthService _authService;
 
         private const string ChatSystemPrompt = @"
-            You are an AI assistant that answers queries strictly using retrieved knowledge.
-            - Use the RAGPlugin to fetch relevant information before responding.
-            - Always look for latest files and templates if user asks about your documents or knowledge.
-            - If the user asks a question about a specific video file, use the RAGPlugin to search that video’s transcribed content by filtering with the file name.
-            - Use ExcelDataAnalyzerPlugin for Excel-related queries and always ask excel file name and Sheet name before doing analysis.
-            - If data is insufficient, say 'No relevant information found'—do not speculate.
-            - Execute queries and actions via plugins when required.
-            - Keep responses factual, concise, and context-aware.
-        ";
+        You are an AI assistant that answers strictly using retrieved knowledge and available plugins. 
+        Never speculate or invent information.
 
-        public AgentController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatHistoryService chatService, IAgentFactory agentFactory, ILogger<ChatController> logger)
+        # Core Rules
+        - Always attempt to answer queries using **RAGPlugin** answerfromKnowledge function(retrieved knowledge).
+        - For Follow up questions, always get new information using **RAGPlugin**, before answering.
+        - Only filter by a specific document name if the user explicitly mentions it.
+        - Do not rely on general knowledge unless the user explicitly requests it.
+        - **ExcelDataAnalyzerPlugin**: For Excel queries, always request the file name and sheet name before analysis.
+        - If sufficient information is not found, respond with: 'No relevant information found.'
+        - Execute actions and queries exclusively through plugins when required.
+
+        # Response Guidelines
+        - Be factual, concise, and context-grounded.
+        - Reference sources when applicable.
+        - Never provide unsupported or speculative content.";
+
+        public AgentController([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration, IChatHistoryService chatService, IAgentFactory agentFactory, IAuthService authService, ILogger<ChatController> logger)
         {
             _kernel = kernel;
             _configuration = configuration;
             _chatService = chatService;
             _agentFactory = agentFactory;
             _logger = logger;
+            _authService = authService;
         }
 
-        private async Task<(ChatCompletionAgent Agent, AgentThread AgentThread, KernelArguments Arguments)> BuildAgentThreadAsync(UserQueryDTO dto)
+        private async Task<(ChatCompletionAgent Agent, AgentThread AgentThread, KernelArguments Arguments)> BuildAgentThreadAsync(UserQueryDTO dto, Guid userId)
         {
             var history = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
-            var userHistory = await _chatService.GetMessagesAsync(dto.SessionId, 15);
-            var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userHistory.ToList());
+            var userHistory = await _chatService.GetMessagesAsync(dto.SessionId, userId, 15);
+            
+            var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userId, userHistory.ToList(), dto.Query);
 
             if (!string.IsNullOrWhiteSpace(grounding))
-                history.AddSystemMessage($"Previous Summary: {grounding}");
+                history.AddSystemMessage($"Grounding Context: {grounding}");
 
             foreach (var chat in userHistory)
                 if (chat.Sender == "User")
@@ -77,7 +93,13 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
             try
             {
-                var (agent, thread, args) = await BuildAgentThreadAsync(dto);
+                var userId =  _authService.GetUserId();
+                if (userId == null)
+                {
+                    return Unauthorized();
+                }
+
+                var (agent, thread, args) = await BuildAgentThreadAsync(dto, new Guid(userId));
 
                 string assistantMessage = "";
 
@@ -127,7 +149,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         [Route("StreamAgentChat")]
         [HttpPost]
         [ValidateModel]
-        public async Task StreamAgentChat([FromBody] UserQueryDTO dto)
+        public async Task StreamAgentChat([FromBody] UserQueryDTO dto, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(dto.Query))
             {
@@ -138,7 +160,15 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
             try
             {
-                var (agent, thread, args) = await BuildAgentThreadAsync(dto);
+                var userId = _authService.GetUserId();
+                if (userId == null)
+                {
+                    Response.StatusCode = 401;
+                    await Response.Body.FlushAsync();
+                    return;
+                }
+
+                var (agent, thread, args) = await BuildAgentThreadAsync(dto, new Guid(userId));
 
                 Response.ContentType = "text/event-stream";
                 Response.Headers["Cache-Control"] = "no-cache";
@@ -147,10 +177,10 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
                 string fullResponse = "";
 
-                await foreach (var chunk in agent.InvokeStreamingAsync(thread, new() { KernelArguments = args }))
+                await foreach (var chunk in agent.InvokeStreamingAsync(thread, new() { KernelArguments = args }, cancellationToken))
                 {
                     var content = chunk.Message?.ToString();
-                    if (!string.IsNullOrWhiteSpace(content))
+                    if (!string.IsNullOrEmpty(content))
                     {
                         fullResponse += content;
                         await Response.WriteAsync(content);
@@ -160,9 +190,16 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
                 await _chatService.AddMessagesAsync(new List<ChatHistory>
                 {
-                    new() { SessionId = dto.SessionId, Message = dto.Query, Sender = "User", Timestamp = DateTime.Now },
-                    new() { SessionId = dto.SessionId, Message = fullResponse, Sender = "Assistant", Timestamp = DateTime.Now }
+                    new() { SessionId = dto.SessionId, UserId = new Guid(userId), Message = dto.Query, Sender = "User", Timestamp = DateTime.Now },
+                    new() { SessionId = dto.SessionId, UserId = new Guid(userId), Message = fullResponse, Sender = "Assistant", Timestamp = DateTime.Now }
                 });
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("SingleAgentChat request was cancelled by client.");
+                Response.StatusCode = 499;
+                await Response.WriteAsync("SingleAgentChat request was cancelled by client.");
+                return;
             }
             catch (Exception ex)
             {

@@ -61,7 +61,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
 
             var weatherPlugin = new WeatherPlugin(_kernel, _configuration);
             var googleSearchPlugin = new GoogleSearchPlugin(_kernel, _configuration);
-            var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService);
+            var ragPlugin = new RAGPlugin(_kernel, _embeddingService, _blobService, _configuration);
             var emailwriterPlugin = new EmailWriterPlugin(_httpClient, _configuration);
             var documentGenerationPlugin = new DocumentGenerationPlugin(_blobService, _templateBasedDocGenerator, _configuration);
             var excelDataAnalyzerPlugin = new ExcelDataAnalyzerPlugin(_kernel, _blobService);

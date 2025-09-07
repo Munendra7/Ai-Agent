@@ -50,10 +50,10 @@ services:
     ports:
       - "10000:10000"   # Blob Storage
     volumes:
-      - blobstorage_data:/data
+      - blobstorage_data:/workspace
     networks:
       - app_network
-    command: "azurite --blobHost 0.0.0.0 --loose --skipApiVersionCheck"
+    command: "azurite --blobHost 0.0.0.0 --loose --skipApiVersionCheck --location /workspace"
 
   ffmpeg-node:
     build:

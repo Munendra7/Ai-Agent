@@ -1,22 +1,27 @@
-FROM node:18-alpine
-
+FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Set npm config to handle certificate issues
+RUN npm config set strict-ssl false
+
+# Install dependencies first (better caching)
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the app source code
+# Copy source and build
 COPY . .
-
-# Build the app for production (creates a 'dist' folder)
 RUN npm run build
 
-# Install a simple static server to serve the production build
+# Production Stage
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+# Install serve with certificate fix
+RUN npm config set strict-ssl false
 RUN npm install -g serve
 
-# Expose the port that the production server will listen on
-EXPOSE 5173
+# Copy only the built output
+COPY --from=builder /app/dist ./dist
 
-# Serve the 'dist' folder on port 5173
+EXPOSE 5173
 CMD ["serve", "-s", "dist", "-l", "5173"]
