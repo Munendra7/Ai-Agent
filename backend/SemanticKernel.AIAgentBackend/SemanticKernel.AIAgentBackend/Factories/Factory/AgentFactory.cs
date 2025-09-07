@@ -33,7 +33,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
                     new OpenAIPromptExecutionSettings
                     {
                         FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
-                        MaxTokens = 1000,
+                        MaxTokens = 2000,
                         Temperature = 0.2,
                         TopP = 0.5,
                         ChatSystemPrompt = instructions

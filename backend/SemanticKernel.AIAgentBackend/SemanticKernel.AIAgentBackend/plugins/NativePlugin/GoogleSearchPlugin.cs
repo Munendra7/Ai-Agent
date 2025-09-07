@@ -14,7 +14,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
         private readonly IConfiguration _configuration;
 
         // Configuration constants
-        private const int MAX_CONTENT_LENGTH = 2000;
+        private const int MAX_CONTENT_LENGTH = 5000;
         private const int TIMEOUT_SECONDS = 10;
 
         public GoogleSearchPlugin([FromKeyedServices("LLMKernel")] Kernel kernel, IConfiguration configuration)
@@ -188,11 +188,18 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             {
                 try
                 {
-                    result.PageContent = await ExtractPageContentAsync(result.Link);
+                    if (!string.IsNullOrWhiteSpace(result.Link)) // Ensure Link is not null or empty  
+                    {
+                        result.PageContent = await ExtractPageContentAsync(result.Link);
+                    }
+                    else
+                    {
+                        result.PageContent = result.Snippet; // Fallback to snippet  
+                    }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    result.PageContent = result.Snippet; // Fallback to snippet
+                    result.PageContent = result.Snippet; // Fallback to snippet  
                 }
             });
 
@@ -317,7 +324,7 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
                 - Any important caveats or conflicting information
                 - Relevant sources for further reading
                 
-                Keep the total response under 300 words unless the complexity demands more detail.";
+                Keep the total response under 2000 words unless the complexity demands more detail.";
 
             var semanticFunction = _kernel.CreateFunctionFromPrompt(promptTemplate);
 

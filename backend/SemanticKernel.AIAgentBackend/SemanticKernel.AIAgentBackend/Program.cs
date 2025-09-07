@@ -47,7 +47,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<OAuthSettings>(builder.Configuration.GetSection("OAuth"));
 
-// Services
+// Auth Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
