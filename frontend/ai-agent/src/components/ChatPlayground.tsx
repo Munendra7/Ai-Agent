@@ -47,6 +47,8 @@ const ChatPlayground: React.FC = () => {
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -117,6 +119,9 @@ const ChatPlayground: React.FC = () => {
   }, [navigate, sessionId]);
 
   const fetchAgentStreamResponse = async (query: string) => {
+
+    abortControllerRef.current = new AbortController();
+
     setMessages((prev) => [
       ...prev,
       { text: "", type: "bot", persona: "AI Agent", isLoading: true },
@@ -125,7 +130,7 @@ const ChatPlayground: React.FC = () => {
     try {
       const stream = await fetchWithInterceptors<ReadableStream<Uint8Array>>(
         "/Agent/StreamAgentChat",
-        { method: "POST", body: JSON.stringify({ sessionId: sessionId, query }), stream: true }
+        { method: "POST", body: JSON.stringify({ sessionId: sessionId, query }), stream: true, signal: abortControllerRef.current.signal }
       );
       if (!stream) throw new Error("No response from server");
 
@@ -162,11 +167,24 @@ const ChatPlayground: React.FC = () => {
         }
       }
     } catch (error: any) {
-      console.error("Error streaming agent response", error);
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { text: error.message, type: "bot", persona: "AI Agent" },
-      ]);
+
+      if (error.name === 'AbortError') {
+        console.log("Fetch aborted");
+          setMessages((prev) => [
+          ...prev.slice(0, -1),
+          { text: "❌ Request cancelled.", type: "bot", persona: "AI Agent" },
+        ]);
+        return;
+      }
+      else
+      {
+        console.error("Error streaming agent response", error);
+        setMessages((prev) => [
+          ...prev.slice(0, -1),
+          { text: error.message, type: "bot", persona: "AI Agent" },
+        ]);
+      }
+      
     } finally {
       setIsWaitingForResponse(false);
     }
@@ -185,6 +203,13 @@ const ChatPlayground: React.FC = () => {
     ]);
 
     fetchAgentStreamResponse(currentInput);
+  };
+
+  const handleCancelRequest = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -304,14 +329,25 @@ const ChatPlayground: React.FC = () => {
           onKeyDown={handleKeyDown}
           disabled={isWaitingForResponse || isLoadingHistory}
         />
-        <button
-          className={`p-3 rounded-full flex items-center justify-center w-12 h-12 transition-all duration-200 
-            ${(isWaitingForResponse || isLoadingHistory) ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
-          onClick={() => handleSendMessage()}
-          disabled={isWaitingForResponse || isLoadingHistory}
-        >
-          <Send size={20} />
-        </button>
+        {!isWaitingForResponse ? (
+          <button
+            className={`p-3 rounded-full flex items-center justify-center w-12 h-12 transition-all duration-200 
+              ${(isWaitingForResponse || isLoadingHistory) ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+            onClick={() => handleSendMessage()}
+            disabled={isWaitingForResponse || isLoadingHistory}
+          >
+            <Send size={20} />
+          </button>
+        ) : (
+          <button
+            className={`p-3 rounded-full flex items-center justify-center w-12 h-12 transition-all duration-200 
+              ${!isWaitingForResponse ? "bg-gray-600 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
+            onClick={handleCancelRequest}
+            disabled={!isWaitingForResponse}
+          >
+            ✖
+          </button>
+        )}
       </div>
     </div>
   );
