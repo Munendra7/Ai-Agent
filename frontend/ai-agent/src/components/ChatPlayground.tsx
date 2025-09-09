@@ -30,10 +30,12 @@ interface ChatMessage {
 }
 
 interface ChatHistoryResponse {
-  data: Array<{
-    message: string;
-    sender: string;
-  }>; 
+  data: {
+    items: Array<{
+      message: string;
+      sender: string;
+    }>; 
+  } 
 }
 
 const ChatPlayground: React.FC = () => {
@@ -63,8 +65,8 @@ const ChatPlayground: React.FC = () => {
       setIsLoadingHistory(true);
       try {
         const response = await api.get(`/chatsession/${sessionId}`) as ChatHistoryResponse;
-        if (response && response.data && response.data.length > 0) {
-          const historicalMessages: ChatMessage[] = response.data.map(msg => ({
+        if (response && response.data && response.data.items.length > 0) {
+          const historicalMessages: ChatMessage[] = response.data.items.map(msg => ({
             text: msg.message,
             type: msg.sender==="Assistant" ? "bot":"user",
             persona: msg.sender=="Assistant" ? "AI Agent":"You"

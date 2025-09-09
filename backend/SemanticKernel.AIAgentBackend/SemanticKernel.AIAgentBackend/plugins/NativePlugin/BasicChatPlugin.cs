@@ -24,7 +24,7 @@ namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin
         }
 
         [KernelFunction("chat"), Description("Retrieves historical conversation data and serves as a fallback when other plugins lack the required context. This function is executed by the planner if the user's query relates to past interactions or ambiguous information.")]
-        public async Task<string> ChatAsync([Description("User query")] string query)
+        public async Task<string> ChatAsync([Description("User query")] string query, CancellationToken cancellationToken)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace SemanticKernel.AIAgentBackend.Plugins.NativePlugin
 
                 ChatHistory chatHistory = new ChatHistory();
 
-                var userChatHistory = await _chatService.GetMessagesAsync(sessionId, new Guid(), 10);
+                var userChatHistory = await _chatService.GetMessagesAsync(sessionId, new Guid(), 10, cancellationToken);
 
                 foreach (var chat in userChatHistory)
                 {

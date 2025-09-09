@@ -39,7 +39,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
         [HttpPost]
         [ValidateModel]
-        public async Task<IActionResult> ChatAsync([FromBody] UserQueryDTO userQueryDTO)
+        public async Task<IActionResult> ChatAsync([FromBody] UserQueryDTO userQueryDTO, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(userQueryDTO.Query))
             {
@@ -88,7 +88,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
 
                 Microsoft.SemanticKernel.ChatCompletion.ChatHistory chatHistory = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
 
-                var userChatHistory = await _chatService.GetMessagesAsync(userQueryDTO.SessionId, new Guid(), 10);
+                var userChatHistory = await _chatService.GetMessagesAsync(userQueryDTO.SessionId, new Guid(), 10, cancellationToken);
 
                 foreach (var chat in userChatHistory)
                 {
@@ -125,7 +125,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                             Sender = "Assistant",
                             Timestamp = DateTime.Now
                         }
-                    }
+                    }, cancellationToken
                 );
 
                 return Ok(response);
@@ -164,7 +164,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                                 Sender = "Assistant",
                                 Timestamp = DateTime.Now
                             }
-                        }
+                        }, cancellationToken
                     );
 
                     return Ok(response);

@@ -4,6 +4,7 @@ using Microsoft.SemanticKernel;
 using SemanticKernel.AIAgentBackend.Data;
 using SemanticKernel.AIAgentBackend.Factories.Interface;
 using SemanticKernel.AIAgentBackend.Models.Domain;
+using SemanticKernel.AIAgentBackend.Models.DTO;
 using SemanticKernel.AIAgentBackend.Repositories.Interface;
 using ChatHistory = SemanticKernel.AIAgentBackend.Models.Domain.ChatHistory;
 
@@ -20,38 +21,38 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             _kernel = kernel;
         }
 
-        public async Task AddMessageAsync(ChatHistory chatHistory)
+        public async Task AddMessageAsync(ChatHistory chatHistory, CancellationToken cancellationToken)
         {
             dbContext.ChatHistory.Add(chatHistory);
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task AddMessagesAsync(List<ChatHistory> chatHistories)
+        public async Task AddMessagesAsync(List<ChatHistory> chatHistories, CancellationToken cancellationToken)
         {
             dbContext.ChatHistory.AddRange(chatHistories);
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<ChatHistory>> GetMessagesAsync(Guid sessionId, Guid userId, int lastChats)
+        public async Task<IEnumerable<ChatHistory>> GetMessagesAsync(Guid sessionId, Guid userId, int lastChats, CancellationToken cancellationToken)
         {
             return await dbContext.ChatHistory
                 .Where(x => x.SessionId == sessionId && x.UserId==userId)
                 .OrderByDescending(x => x.Timestamp)
                 .Take(lastChats)
                 .OrderBy(x => x.Timestamp)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<SessionSummary>> GetSessionSummariesAsync(Guid userId, int lastSessions)
+        public async Task<IEnumerable<SessionSummary>> GetSessionSummariesAsync(Guid userId, int lastSessions, CancellationToken cancellationToken)
         {
             return await dbContext.SessionSummaries
                 .Where(s => s.UserId == userId)
                 .OrderByDescending(s => s.UpdatedAt)
                 .Take(lastSessions)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<string> GetOrUpdateGroundingSummaryAsync(Guid sessionId, Guid userId, List<ChatHistory> chatHistories, string userQuery)
+        public async Task<string> GetOrUpdateGroundingSummaryAsync(Guid sessionId, Guid userId, List<ChatHistory> chatHistories, string userQuery, CancellationToken cancellationToken)
         {
             var summary = await dbContext.SessionSummaries.FirstOrDefaultAsync(s => s.SessionId == sessionId);
 
@@ -84,7 +85,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 ### Summary (Max 100 words):
                 ";
 
-            var result = await _kernel.InvokePromptAsync(summarygroundingprompt);
+            var result = await _kernel.InvokePromptAsync(summarygroundingprompt, null, null, null, cancellationToken);
 
             string finalSummary = result?.GetValue<string>() ?? "No summary generated.";
 
@@ -95,7 +96,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 ### Title (Max 30 characters):
                 ";
 
-            var titleResult = await _kernel.InvokePromptAsync(summaryTitlePrompt);
+            var titleResult = await _kernel.InvokePromptAsync(summaryTitlePrompt, null, null, null, cancellationToken);
             string summaryTitle = titleResult?.GetValue<string>() ?? chatHistories.First().Message ?? string.Empty;
 
             if (summary == null)
@@ -117,8 +118,47 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 summary.UpdatedAt = DateTime.UtcNow;
             }
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
             return summary.Content;
+        }
+
+        public async Task<PaginationResponseDTO<ChatHistory>> GetPagedMessagesAsync(Guid sessionId, Guid userId, PaginationRequestDTO paginationRequestDTO, CancellationToken cancellationToken)
+        {
+            var totalCount = await dbContext.ChatHistory.CountAsync(x => x.SessionId == sessionId && x.UserId == userId, cancellationToken);
+
+            var items = await dbContext.ChatHistory
+                .Where(x => x.SessionId == sessionId && x.UserId == userId)
+                .OrderBy(x => x.Timestamp).
+                Skip((paginationRequestDTO.PageNumber - 1) * paginationRequestDTO.PageSize)
+                .Take(paginationRequestDTO.PageSize)
+                .ToListAsync(cancellationToken);
+
+            return new PaginationResponseDTO<ChatHistory> {
+                Items = items,
+                PageNumber = paginationRequestDTO.PageNumber,
+                PageSize = paginationRequestDTO.PageSize,
+                TotalCount = totalCount
+            };
+        }
+
+        public async Task<PaginationResponseDTO<SessionSummary>> GetPagedSessionsAsync(Guid userId, PaginationRequestDTO paginationRequestDTO, CancellationToken cancellationToken)
+        {
+            var totalCount = await dbContext.SessionSummaries.CountAsync(s => s.UserId == userId, cancellationToken);
+
+            var items = await dbContext.SessionSummaries
+                .Where(s => s.UserId == userId)
+                .OrderByDescending(s => s.UpdatedAt)
+                .Skip((paginationRequestDTO.PageNumber - 1) * paginationRequestDTO.PageSize)
+                .Take(paginationRequestDTO.PageSize)
+                .ToListAsync(cancellationToken);
+
+            return new PaginationResponseDTO<SessionSummary>
+            {
+                Items = items,
+                PageNumber = paginationRequestDTO.PageNumber,
+                PageSize = paginationRequestDTO.PageSize,
+                TotalCount = totalCount
+            };
         }
     }
 }

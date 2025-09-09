@@ -59,16 +59,16 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
             }
             catch (Exception ex)
             {
-                return $"An error occurred while searching. Please try again.";
+                return $"An error occurred while searching. Please try again." + ex.Message;
             }
         }
 
         [KernelFunction("search_with_filter"), Description("Search with specific filters like date range, site, or file type")]
         public async Task<string> SearchWithFilterAsync(
             [Description("Search query")] string query,
-            [Description("Site to search within (e.g., 'reddit.com')")] string site = null,
-            [Description("File type filter (e.g., 'pdf', 'doc')")] string fileType = null,
-            [Description("Date range: 'd' (day), 'w' (week), 'm' (month), 'y' (year)")] string dateRange = null)
+            [Description("Site to search within (e.g., 'reddit.com')")] string site = "",
+            [Description("File type filter (e.g., 'pdf', 'doc')")] string fileType = "",
+            [Description("Date range: 'd' (day), 'w' (week), 'm' (month), 'y' (year)")] string dateRange = "")
         {
             var filteredQuery = BuildFilteredQuery(query, site, fileType, dateRange);
             return await SearchAsync(filteredQuery, 3, true);
@@ -265,7 +265,6 @@ namespace SemanticKernel.AIAgentBackend.plugins.NativePlugin
 
                 var content = contentBuilder.ToString();
 
-                // Truncate if necessary
                 if (content.Length > MAX_CONTENT_LENGTH)
                 {
                     content = content.Substring(0, MAX_CONTENT_LENGTH) + "...";

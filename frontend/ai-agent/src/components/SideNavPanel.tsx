@@ -44,8 +44,8 @@ const SideNavPanel: React.FC = () => {
     const loadChatSessions = async () => {
         setIsLoadingSessions(true);
         try {
-            const response = await api.get('/chatsession');
-            setChatSessions(response.data);
+            const response = await api.get(`/chatsession?PageNumber=1&PageSize=50`) as { data: { items: SessionSummary[] } };
+            setChatSessions(response.data.items);
         } catch (error: unknown) {
             const errorMessage = typeof error === 'object' && error !== null && 'message' in error
                 ? (error as { message?: string }).message

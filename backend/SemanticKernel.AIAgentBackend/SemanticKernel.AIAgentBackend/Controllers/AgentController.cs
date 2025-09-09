@@ -55,12 +55,12 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             _authService = authService;
         }
 
-        private async Task<(ChatCompletionAgent Agent, AgentThread AgentThread, KernelArguments Arguments)> BuildAgentThreadAsync(UserQueryDTO dto, Guid userId)
+        private async Task<(ChatCompletionAgent Agent, AgentThread AgentThread, KernelArguments Arguments)> BuildAgentThreadAsync(UserQueryDTO dto, Guid userId, CancellationToken cancellationToken)
         {
             var history = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
-            var userHistory = await _chatService.GetMessagesAsync(dto.SessionId, userId, 15);
+            var userHistory = await _chatService.GetMessagesAsync(dto.SessionId, userId, 15, cancellationToken);
             
-            var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userId, userHistory.ToList(), dto.Query);
+            var grounding = await _chatService.GetOrUpdateGroundingSummaryAsync(dto.SessionId, userId, userHistory.ToList(), dto.Query, cancellationToken);
 
             if (!string.IsNullOrWhiteSpace(grounding))
                 history.AddSystemMessage($"Grounding Context: {grounding}");
@@ -86,7 +86,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
         [Route("SingleAgentChat")]
         [HttpPost]
         [ValidateModel]
-        public async Task<IActionResult> SingleAgentChat([FromBody] UserQueryDTO dto)
+        public async Task<IActionResult> SingleAgentChat([FromBody] UserQueryDTO dto, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(dto.Query))
                 return BadRequest("Query cannot be empty.");
@@ -99,20 +99,26 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     return Unauthorized();
                 }
 
-                var (agent, thread, args) = await BuildAgentThreadAsync(dto, new Guid(userId));
+                var (agent, thread, args) = await BuildAgentThreadAsync(dto, new Guid(userId), cancellationToken);
 
                 string assistantMessage = "";
 
-                await foreach (var chunk in agent.InvokeStreamingAsync(thread, new() { KernelArguments = args }))
+                await foreach (var chunk in agent.InvokeStreamingAsync(thread, new() { KernelArguments = args }, cancellationToken))
                     assistantMessage += chunk.Message?.ToString();
 
                 await _chatService.AddMessagesAsync(new List<ChatHistory>
                 {
                     new() { SessionId = dto.SessionId, Message = dto.Query, Sender = "User", Timestamp = DateTime.Now },
                     new() { SessionId = dto.SessionId, Message = assistantMessage, Sender = "Assistant", Timestamp = DateTime.Now }
-                });
+                }, cancellationToken);
 
                 return Ok(new ChatResponseDTO { Response = assistantMessage });
+            }
+
+            catch(OperationCanceledException)
+            {
+                _logger.LogWarning("SingleAgentChat request was cancelled by client.");
+                return StatusCode(499, "SingleAgentChat request was cancelled by client.");
             }
             catch (Exception ex)
             {
@@ -134,7 +140,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     {
                         new() { SessionId = dto.SessionId, Message = dto.Query, Sender = "User", Timestamp = DateTime.Now },
                         new() { SessionId = dto.SessionId, Message = response, Sender = "Assistant", Timestamp = DateTime.Now }
-                    });
+                    }, cancellationToken);
 
                     return Ok(new ChatResponseDTO { Response = response });
                 }
@@ -168,7 +174,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                     return;
                 }
 
-                var (agent, thread, args) = await BuildAgentThreadAsync(dto, new Guid(userId));
+                var (agent, thread, args) = await BuildAgentThreadAsync(dto, new Guid(userId), cancellationToken);
 
                 Response.ContentType = "text/event-stream";
                 Response.Headers["Cache-Control"] = "no-cache";
@@ -192,7 +198,7 @@ namespace SemanticKernel.AIAgentBackend.Controllers
                 {
                     new() { SessionId = dto.SessionId, UserId = new Guid(userId), Message = dto.Query, Sender = "User", Timestamp = DateTime.Now },
                     new() { SessionId = dto.SessionId, UserId = new Guid(userId), Message = fullResponse, Sender = "Assistant", Timestamp = DateTime.Now }
-                });
+                }, cancellationToken);
             }
             catch (OperationCanceledException)
             {

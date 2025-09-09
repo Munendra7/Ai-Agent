@@ -3,48 +3,28 @@
   "WorkspaceRootPath": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\plugins\\nativeplugin\\googlesearchplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\plugins\\nativeplugin\\googlesearchplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\controllers\\agentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\controllers\\agentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\factories\\factory\\agentfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\factories\\factory\\agentfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\appsettings.production.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\appsettings.production.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\repositories\\repository\\embeddingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\repositories\\repository\\embeddingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\repositories\\repository\\chathistoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\repositories\\repository\\chathistoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\controllers\\chatsessioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\controllers\\chatsessioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\repositories\\interface\\ichathistoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\repositories\\interface\\ichathistoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\models\\dto\\paginationrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\models\\dto\\paginationrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\models\\dto\\paginationresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\models\\dto\\paginationresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|d:\\code files\\learning\\semantic kernel\\ai-agent\\backend\\semantickernel.aiagentbackend\\semantickernel.aiagentbackend\\repositories\\repository\\embeddingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5E8F4ED0-9CA4-4FF5-864E-6BABC21DD802}|SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend.csproj|solutionrelative:semantickernel.aiagentbackend\\repositories\\repository\\embeddingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -54,144 +34,85 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AgentFactory.cs",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Factories\\Factory\\AgentFactory.cs",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Factories\\Factory\\AgentFactory.cs",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Factories\\Factory\\AgentFactory.cs",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Factories\\Factory\\AgentFactory.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAkAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "IChatHistoryService.cs",
+              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Repositories\\Interface\\IChatHistoryService.cs",
+              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Repositories\\Interface\\IChatHistoryService.cs",
+              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Repositories\\Interface\\IChatHistoryService.cs",
+              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Repositories\\Interface\\IChatHistoryService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAiwBEAAABNAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-07T09:58:37.689Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "appsettings.Production.json",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\appsettings.Production.json",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\appsettings.Production.json",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\appsettings.Production.json",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\appsettings.Production.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-06T18:04:30.015Z",
+              "WhenOpened": "2025-09-09T18:26:12.208Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "appsettings.Development.json",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\appsettings.Development.json",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\appsettings.Development.json",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\appsettings.Development.json",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\appsettings.Development.json",
-              "ViewState": "AgIAABsAAAAAAAAAAAAiwCkAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-06T18:04:22.179Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\appsettings.json",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\appsettings.json",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\appsettings.json",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\appsettings.json",
-              "ViewState": "AgIAABsAAAAAAAAAAAAiwCkAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-06T18:04:13.14Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
               "Title": "EmbeddingService.cs",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Repositories\\Repository\\EmbeddingService.cs",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Repositories\\Repository\\EmbeddingService.cs",
               "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Repositories\\Repository\\EmbeddingService.cs",
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Repositories\\Repository\\EmbeddingService.cs",
-              "ViewState": "AgIAAE8BAAAAAAAAAAASwGABAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-06T17:48:36.114Z"
+              "WhenOpened": "2025-09-09T18:26:07.407Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "GoogleSearchPlugin.cs",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\plugins\\NativePlugin\\GoogleSearchPlugin.cs",
-              "ViewState": "AgIAAP4AAAAAAAAAAAAtwAsBAAAoAAAAAAAAAA==",
+              "Title": "ChatHistoryService.cs",
+              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Repositories\\Repository\\ChatHistoryService.cs",
+              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Repositories\\Repository\\ChatHistoryService.cs",
+              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Repositories\\Repository\\ChatHistoryService.cs",
+              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Repositories\\Repository\\ChatHistoryService.cs",
+              "ViewState": "AgIAAHMAAAAAAAAAAAAAAIIAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-06T17:48:36.165Z",
+              "WhenOpened": "2025-09-09T18:26:05.802Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PaginationResponseDTO.cs",
+              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Models\\DTO\\PaginationResponseDTO.cs",
+              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Models\\DTO\\PaginationResponseDTO.cs",
+              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Models\\DTO\\PaginationResponseDTO.cs",
+              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Models\\DTO\\PaginationResponseDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-09T18:23:31.507Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PaginationRequestDTO.cs",
+              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Models\\DTO\\PaginationRequestDTO.cs",
+              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Models\\DTO\\PaginationRequestDTO.cs",
+              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Models\\DTO\\PaginationRequestDTO.cs",
+              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Models\\DTO\\PaginationRequestDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-09T18:17:30.711Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Program.cs",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Program.cs",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Program.cs",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Program.cs",
-              "ViewState": "AgIAAAABAAAAAAAAAAAiwCYAAABYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-06T17:46:24.275Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "UserController.cs",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\UserController.cs",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Controllers\\UserController.cs",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\UserController.cs",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Controllers\\UserController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-06T17:45:55.94Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
               "Title": "ChatSessionController.cs",
               "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\ChatSessionController.cs",
               "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Controllers\\ChatSessionController.cs",
               "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\ChatSessionController.cs",
               "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Controllers\\ChatSessionController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAYAAAAAAAAAA==",
+              "ViewState": "AgIAABkAAAAAAAAAAAAAACkAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-06T17:45:21.45Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "AgentController.cs",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\AgentController.cs",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Controllers\\AgentController.cs",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\AgentController.cs",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Controllers\\AgentController.cs",
-              "ViewState": "AgIAABMAAAAAAAAAAAAiwC8AAAA8AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-06T17:41:15.352Z",
+              "WhenOpened": "2025-09-09T18:14:48.163Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\AuthController.cs",
-              "RelativeDocumentMoniker": "SemanticKernel.AIAgentBackend\\Controllers\\AuthController.cs",
-              "ToolTip": "D:\\Code Files\\Learning\\Semantic kernel\\AI-Agent\\backend\\SemanticKernel.AIAgentBackend\\SemanticKernel.AIAgentBackend\\Controllers\\AuthController.cs",
-              "RelativeToolTip": "SemanticKernel.AIAgentBackend\\Controllers\\AuthController.cs",
-              "ViewState": "AgIAAFUAAAAAAAAAAAAAAIMAAAAdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-06T17:41:35.992Z"
             }
           ]
         }
