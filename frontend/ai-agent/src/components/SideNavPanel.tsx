@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Settings, Brain, FileText, MessageSquare, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -33,19 +33,21 @@ const SideNavPanel: React.FC = () => {
     const [isChatPanelOpen, setIsChatPanelOpen] = useState(false);
     const [chatSessions, setChatSessions] = useState<SessionSummary[]>([]);
     const [isLoadingSessions, setIsLoadingSessions] = useState(false);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [hasMoreSessions, setHasMoreSessions] = useState(true);
 
-    // Load chat sessions when chat panel opens
-    useEffect(() => {
-        if (isChatPanelOpen) {
-            loadChatSessions();
-        }
-    }, [isChatPanelOpen]);
+    const infinitescrollLoaderRef = React.useRef<HTMLDivElement | null>(null);
 
-    const loadChatSessions = async () => {
+    const loadChatSessions = useCallback(async () => {
+
+        if(isLoadingSessions || !hasMoreSessions) return;
+
         setIsLoadingSessions(true);
         try {
-            const response = await api.get(`/chatsession?PageNumber=1&PageSize=50`) as { data: { items: SessionSummary[] } };
-            setChatSessions(response.data.items);
+            const response = await api.get(`/chatsession?PageNumber=${pageNumber}&PageSize=5`) as { data: { items: SessionSummary[], hasNext:boolean } };
+            setChatSessions(prev=> [...prev, ...response.data.items]);
+            setPageNumber(prev => prev + 1);
+            setHasMoreSessions(response.data.hasNext);
         } catch (error: unknown) {
             const errorMessage = typeof error === 'object' && error !== null && 'message' in error
                 ? (error as { message?: string }).message
@@ -55,7 +57,26 @@ const SideNavPanel: React.FC = () => {
         } finally {
             setIsLoadingSessions(false);
         }
-    };
+    }, [pageNumber, isLoadingSessions, hasMoreSessions]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries)=>{
+            if(isChatPanelOpen && entries[0].isIntersecting && hasMoreSessions && !isLoadingSessions)
+            {
+                loadChatSessions();
+            }                
+        },{ threshold: 1.0 });
+
+        const currentRef = infinitescrollLoaderRef.current;
+        if(currentRef)
+            observer.observe(currentRef);
+
+        return () => {
+            if(currentRef)
+                observer.unobserve(currentRef);
+        };
+
+    }, [isChatPanelOpen, loadChatSessions, hasMoreSessions, isLoadingSessions]);
 
     const toggleSettingsPanel = () => {
         setIsSettingsOpen(!isSettingsOpen);
@@ -64,6 +85,9 @@ const SideNavPanel: React.FC = () => {
 
     const toggleChatPanel = () => {
         setIsChatPanelOpen(!isChatPanelOpen);
+        setPageNumber(1);
+        setChatSessions([]);
+        setHasMoreSessions(true);
         if (isSettingsOpen) setIsSettingsOpen(false); // Close settings panel if open
     };
 
@@ -181,19 +205,15 @@ const SideNavPanel: React.FC = () => {
                     </div>
                     
                     <div className="flex-1 overflow-y-auto p-4 mb-20">
-                        {isLoadingSessions ? (
-                            <div className="flex items-center justify-center py-8">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
-                                <span className="ml-3 text-gray-400">Loading chats...</span>
-                            </div>
-                        ) : chatSessions.length === 0 ? (
+                        <div className="space-y-2">
+                        {chatSessions.length === 0 && !isLoadingSessions ? (
                             <div className="text-center py-8 text-gray-400">
                                 <MessageSquare size={48} className="mx-auto mb-4 opacity-50" />
                                 <p>No chat sessions yet</p>
                                 <p className="text-sm mt-2">Start a new conversation!</p>
                             </div>
                         ) : (
-                            <div className="space-y-2">
+                            <>
                                 {chatSessions.map((session) => (
                                     <div
                                         key={session.sessionId}
@@ -226,8 +246,20 @@ const SideNavPanel: React.FC = () => {
                                         </div>
                                     </div>
                                 ))}
-                            </div>
+                            </>
                         )}
+                        <div ref={infinitescrollLoaderRef} className="h-1"></div>
+                                {isLoadingSessions && hasMoreSessions && (   
+                                    <div className="flex items-center justify-center py-8">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+                                        <span className="ml-3 text-gray-400">Loading chats...</span>
+                                    </div>
+                                )}
+                                {!hasMoreSessions && chatSessions.length>0 && (
+                                    <div className="text-center text-xs text-gray-500 mt-4">
+                                        No more chat sessions
+                                    </div>)}
+                        </div>
                     </div>
                 </div>
             )}
