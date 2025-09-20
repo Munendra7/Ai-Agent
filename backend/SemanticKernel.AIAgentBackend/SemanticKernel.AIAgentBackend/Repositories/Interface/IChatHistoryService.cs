@@ -18,5 +18,9 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Interface
         public Task<PaginationResponseDTO<ChatHistory>> GetPagedMessagesAsync(Guid sessionId, Guid userId, PaginationRequestDTO paginationRequestDTO, CancellationToken cancellationToken);
 
         public Task<PaginationResponseDTO<SessionSummary>> GetPagedSessionsAsync(Guid userId, PaginationRequestDTO paginationRequestDTO, CancellationToken cancellationToken);
+    
+        public Task<CursorPaginationResponseDTO<ChatHistory>> GetCursorMessagesAsync(Guid sessionId, Guid userId, CursorPaginationRequestDTO paginationRequestDTO, CancellationToken cancellationToken);
+
+        public Task<CursorPaginationResponseDTO<SessionSummary>> GetCursorSessionsAsync(Guid userId, CursorPaginationRequestDTO paginationRequestDTO, CancellationToken cancellationToken);
     }
 }

@@ -701,7 +701,7 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.SemanticKernel.AIAgentBackend.props
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.SemanticKernel.AIAgentBackend.props
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\staticwebassets.pack.json
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\Semantic.5C0049ED.Up2Date
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\SemanticKernel.AIAgentBackend.genruntimeconfig.cache
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\ref\SemanticKernel.AIAgentBackend.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

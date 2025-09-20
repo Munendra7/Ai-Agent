@@ -128,8 +128,8 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 
             var items = await dbContext.ChatHistory
                 .Where(x => x.SessionId == sessionId && x.UserId == userId)
-                .OrderBy(x => x.Timestamp).
-                Skip((paginationRequestDTO.PageNumber - 1) * paginationRequestDTO.PageSize)
+                .OrderBy(x => x.Timestamp)
+                .Skip((paginationRequestDTO.PageNumber - 1) * paginationRequestDTO.PageSize)
                 .Take(paginationRequestDTO.PageSize)
                 .ToListAsync(cancellationToken);
 
@@ -158,6 +158,93 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 PageNumber = paginationRequestDTO.PageNumber,
                 PageSize = paginationRequestDTO.PageSize,
                 TotalCount = totalCount
+            };
+        }
+
+        //Cursor based pagination implementation
+
+        public async Task<CursorPaginationResponseDTO<ChatHistory>> GetCursorMessagesAsync(Guid sessionId, Guid userId, CursorPaginationRequestDTO request, CancellationToken cancellationToken)
+        {
+            // Use Timestamp as cursor
+            DateTime? cursorTime = null;
+            if (!string.IsNullOrEmpty(request.Cursor) && DateTime.TryParse(request.Cursor, out var parsed))
+                cursorTime = parsed;
+
+            var query = dbContext.ChatHistory
+                .Where(x => x.SessionId == sessionId && x.UserId == userId);
+
+            if (cursorTime.HasValue)
+            {
+                if (request.IsNext)
+                    query = query.Where(x => x.Timestamp > cursorTime.Value);
+                else
+                    query = query.Where(x => x.Timestamp < cursorTime.Value);
+            }
+
+            query = request.IsNext
+                ? query.OrderBy(x => x.Timestamp)
+                : query.OrderByDescending(x => x.Timestamp);
+
+            var items = await query
+                .Take(request.PageSize + 1) // fetch one extra to detect HasMore
+                .ToListAsync(cancellationToken);
+
+            var hasMore = items.Count > request.PageSize;
+            if (hasMore) items = items.Take(request.PageSize).ToList();
+
+            // Get new cursors
+            string? nextCursor = items.Any() ? items.Last().Timestamp.ToString("O") : null;
+            string? prevCursor = items.Any() ? items.First().Timestamp.ToString("O") : null;
+
+            // Always return items in ascending order for UI consistency
+            items = items.OrderBy(x => x.Timestamp).ToList();
+
+            return new CursorPaginationResponseDTO<ChatHistory>
+            {
+                Items = items,
+                NextCursor = nextCursor,
+                PreviousCursor = prevCursor,
+                HasMore = hasMore
+            };
+        }
+
+        public async Task<CursorPaginationResponseDTO<SessionSummary>> GetCursorSessionsAsync(Guid userId, CursorPaginationRequestDTO request, CancellationToken cancellationToken)
+        {
+            DateTime? cursorTime = null;
+            if (!string.IsNullOrEmpty(request.Cursor) && DateTime.TryParse(request.Cursor, out var parsed))
+                cursorTime = parsed;
+
+            var query = dbContext.SessionSummaries
+                .Where(s => s.UserId == userId);
+
+            if (cursorTime.HasValue)
+            {
+                if (request.IsNext)
+                    query = query.Where(s => s.UpdatedAt < cursorTime.Value); // sessions are newest first
+                else
+                    query = query.Where(s => s.UpdatedAt > cursorTime.Value);
+            }
+
+            query = request.IsNext
+                ? query.OrderByDescending(s => s.UpdatedAt)
+                : query.OrderBy(s => s.UpdatedAt);
+
+            var items = await query
+                .Take(request.PageSize + 1)
+                .ToListAsync(cancellationToken);
+
+            var hasMore = items.Count > request.PageSize;
+            if (hasMore) items = items.Take(request.PageSize).ToList();
+
+            string? nextCursor = items.Any() ? items.Last().UpdatedAt.ToString("O") : null;
+            string? prevCursor = items.Any() ? items.First().UpdatedAt.ToString("O") : null;
+
+            return new CursorPaginationResponseDTO<SessionSummary>
+            {
+                Items = items,
+                NextCursor = nextCursor,
+                PreviousCursor = prevCursor,
+                HasMore = hasMore
             };
         }
     }

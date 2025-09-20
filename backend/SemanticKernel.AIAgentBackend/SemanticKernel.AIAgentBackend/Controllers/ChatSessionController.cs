@@ -47,5 +47,30 @@ namespace SemanticKernel.AIAgentBackend.Controllers
             var sessions = await _chatService.GetPagedSessionsAsync(new Guid(userId), paginationRequestDTO, cancellationToken);
             return Ok(sessions);
         }
+
+        [HttpGet("cursorpaged/GetChatHistory/{sessionId}")]
+        public async Task<ActionResult<CursorPaginationResponseDTO<ChatHistory>>> GetChatHistoryCursorPagedAsync([FromRoute] Guid sessionId, [FromQuery] CursorPaginationRequestDTO paginationRequestDTO, CancellationToken cancellationToken)
+        {
+            var userId = _authService.GetUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var history = await _chatService.GetCursorMessagesAsync(sessionId, new Guid(userId), paginationRequestDTO, cancellationToken);
+            return Ok(history);
+        }
+
+        [HttpGet]
+        [Route("cusrsorpaged/GetChatSessions")]
+        public async Task<ActionResult<CursorPaginationResponseDTO<SessionSummary>>> GetChatSessionsCursorPagedAsync([FromQuery] CursorPaginationRequestDTO paginationRequestDTO, CancellationToken cancellationToken)
+        {
+            var userId = _authService.GetUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var history = await _chatService.GetCursorSessionsAsync(new Guid(userId), paginationRequestDTO, cancellationToken);
+            return Ok(history);
+        }
     }
 }
