@@ -9,7 +9,7 @@ Designed with **Semantic Kernel’s** orchestration, memory, and planning capabi
 ### 📽️ Demo  
 
 
-[![Adobe Express - gif demo video (3)](https://github.com/user-attachments/assets/969a05a5-52cc-408c-ab8c-9074030e2a31)](https://www.youtube.com/watch?v=-5dCIRRaq_A)
+[![AdobeExpress-gifdemovideo3-ezgif com-crop](https://github.com/user-attachments/assets/e86cca04-92ed-4853-870e-74d27d3588a8)](https://www.youtube.com/watch?v=-5dCIRRaq_A)
 
 **Click the GIF above to watch the demo**
 
