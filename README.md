@@ -8,7 +8,10 @@ Designed with **Semantic Kernel’s** orchestration, memory, and planning capabi
 
 ### 📽️ Demo  
 
-![AIAgentDEMOGIF](https://github.com/user-attachments/assets/9dd90e2f-a6e8-4baf-b1d3-5b1d9fedbf7e)
+
+[![AIAgent Demo GIF](https://github.com/user-attachments/assets/9dd90e2f-a6e8-4baf-b1d3-5b1d9fedbf7e)](https://www.youtube.com/watch?v=-5dCIRRaq_A)
+
+**Click the GIF above to watch the demo**
 
 ---
 
