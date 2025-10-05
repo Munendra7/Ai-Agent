@@ -15,8 +15,6 @@ Designed with **Semantic Kernel’s** orchestration, memory, and planning capabi
 
 ---
 
----
-
 ## 🏗️ Architecture Diagram  
 
 Below is the high-level architecture of the **AI-Agent** project:  
