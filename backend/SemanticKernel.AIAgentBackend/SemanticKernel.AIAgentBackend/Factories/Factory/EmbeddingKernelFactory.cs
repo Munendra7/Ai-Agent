@@ -20,7 +20,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
             {
                 case "AzureOpenAI":
                     #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-                    kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(
+                    kernelBuilder.AddAzureOpenAIEmbeddingGenerator(
                         deploymentName: _configuration["AzureOpenAI:EmbeddingDeployment"]!,
                         endpoint: _configuration["AzureOpenAI:Endpoint"]!,
                         apiKey: _configuration["AzureOpenAI:ApiKey"]!
@@ -30,7 +30,7 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
 
                 case "Ollama":
                     #pragma warning disable SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-                    kernelBuilder.AddOllamaTextEmbeddingGeneration(
+                    kernelBuilder.AddOllamaEmbeddingGenerator(
                         modelId: _configuration["Ollama:EmbeddingModelId"]!,
                         endpoint: new Uri(_configuration["Ollama:Endpoint"]!)
                     );
@@ -39,12 +39,21 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
 
                 case "OpenAI":
                     #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-                    kernelBuilder.AddOpenAITextEmbeddingGeneration(
+                    kernelBuilder.AddOpenAIEmbeddingGenerator(
                         modelId: _configuration["OpenAI:EmbeddingModelId"]!,
                         apiKey: _configuration["OpenAI:ApiKey"]!,
                         orgId: _configuration["OpenAI:OrgId"]
                     );
                     #pragma warning restore SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+                    break;
+
+                case "Gemini":
+                    #pragma warning disable SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+                    kernelBuilder.AddGoogleAIEmbeddingGenerator(
+                        modelId: _configuration["Gemini:EmbeddingModelId"]!,
+                        apiKey: _configuration["Gemini:ApiKey"]!
+                    );
+                    #pragma warning restore SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                     break;
 
                 default:

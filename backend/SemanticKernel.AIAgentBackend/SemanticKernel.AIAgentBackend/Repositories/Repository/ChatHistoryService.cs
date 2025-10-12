@@ -85,7 +85,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 ### Summary (Max 100 words):
                 ";
 
-            var result = await _kernel.InvokePromptAsync(summarygroundingprompt, null, null, null, cancellationToken);
+            var result = await _kernel.InvokePromptAsync(summarygroundingprompt);
 
             string finalSummary = result?.GetValue<string>() ?? "No summary generated.";
 
@@ -96,7 +96,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
                 ### Title (Max 30 characters):
                 ";
 
-            var titleResult = await _kernel.InvokePromptAsync(summaryTitlePrompt, null, null, null, cancellationToken);
+            var titleResult = await _kernel.InvokePromptAsync(summaryTitlePrompt);
             string summaryTitle = titleResult?.GetValue<string>() ?? chatHistories.First().Message ?? string.Empty;
 
             if (summary == null)

@@ -46,13 +46,15 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Identity.Web" Version="3.8.4" />
     <PackageReference Include="Microsoft.KernelMemory.Abstractions" Version="0.97.250211.1" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.47.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureOpenAI" Version="1.40.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.40.0-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.40.1" />
-    <PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.40.0-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.40.0-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" Version="1.40.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.66.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureOpenAI" Version="1.66.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.66.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.66.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.66.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.66.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.47.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.66.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" Version="1.66.0-alpha" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="PdfPig" Version="0.1.9" />
     <PackageReference Include="Qdrant.Client" Version="1.13.0" />

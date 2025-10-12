@@ -15,14 +15,11 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
         private readonly QdrantClient _qdrantClient;
         private readonly IConfiguration _configuration;
         private readonly IDocumentsProcessFactory _documentsProcessFactory;
-        #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-        private readonly ITextEmbeddingGenerationService _embeddingGenerator;
-        #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        private readonly IEmbeddingGenerator<string, Embedding<float>> _embeddingGenerator;
         private readonly IAuthService _authService;
 
-        #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-        public EmbeddingService(ITextEmbeddingGenerationService embeddingGenerator, QdrantClient qdrantClient, IConfiguration configuration, IDocumentsProcessFactory documentsProcessFactory, IAuthService authService)
-        #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        
+        public EmbeddingService(IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator, QdrantClient qdrantClient, IConfiguration configuration, IDocumentsProcessFactory documentsProcessFactory, IAuthService authService)
         {
             _qdrantClient = qdrantClient;
             _configuration = configuration;
@@ -56,8 +53,8 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
             var chunkTexts = new List<string>();
             foreach (var chunk in textChunks)
             {
-                var embedding = await _embeddingGenerator.GenerateEmbeddingAsync(chunk);
-                embeddings.Add(embedding.ToArray());
+                var embedding = await _embeddingGenerator.GenerateAsync(chunk);
+                embeddings.Add(embedding.Vector.ToArray());
                 chunkTexts.Add(chunk);
             }
 
@@ -152,7 +149,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 
         public async Task<IReadOnlyList<ScoredPoint>> SimilaritySearch(string prompt, int topK=5, float scoreThreshold = 0.7f)
         {
-            var promptEmbedding = await _embeddingGenerator.GenerateEmbeddingAsync(prompt);
+            var promptEmbedding = await _embeddingGenerator.GenerateAsync(prompt);
             var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
 
             var userId = _authService.GetUserId() ?? "";
@@ -177,7 +174,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 
             var returnedLocations = await _qdrantClient.QueryAsync(
                 collectionName: collectionName,
-                query: promptEmbedding.ToArray(),
+                query: promptEmbedding.Vector.ToArray(),
                 limit: (ulong)topK,
                 filter: filter,
                 scoreThreshold: scoreThreshold
@@ -188,7 +185,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 
         public async Task<IReadOnlyList<ScoredPoint>> SimilaritySearchInFile(string prompt, string fileName, int topK=5, float scoreThreshold=0.7f)
         {
-            var promptEmbedding = await _embeddingGenerator.GenerateEmbeddingAsync(prompt);
+            var promptEmbedding = await _embeddingGenerator.GenerateAsync(prompt);
             var collectionName = _configuration["Qdrant:CollectionName"] ?? "document_embeddings";
 
             var userId = _authService.GetUserId() ?? "";
@@ -224,7 +221,7 @@ namespace SemanticKernel.AIAgentBackend.Repositories.Repository
 
             var returnedLocations = await _qdrantClient.QueryAsync(
                 collectionName: collectionName,
-                query: promptEmbedding.ToArray(),
+                query: promptEmbedding.Vector.ToArray(),
                 limit: (ulong)topK,
                 filter: filter,
                 scoreThreshold: scoreThreshold

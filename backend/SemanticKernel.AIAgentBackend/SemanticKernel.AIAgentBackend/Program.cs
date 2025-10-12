@@ -1,9 +1,11 @@
 using Azure.Storage.Blobs;
+using DocumentFormat.OpenXml.Wordprocessing;
 using DocxProcessorLibrary.TemplateBasedDocGenerator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.AI;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
@@ -133,10 +135,7 @@ builder.Services.AddScoped(sp =>
 {
     var factory = sp.GetRequiredService<IEmbeddingKernelFactory>();
     var Kernel = factory.CreateKernel();
-    #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-    var _embeddingGenerator = Kernel.Services.GetRequiredService<ITextEmbeddingGenerationService>();
-    #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-    return _embeddingGenerator;
+    return Kernel.Services.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>();
 });
 
 builder.Services.AddHttpClient();

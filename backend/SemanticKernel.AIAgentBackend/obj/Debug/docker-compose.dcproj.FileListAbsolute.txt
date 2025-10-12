@@ -190,7 +190,6 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.Extensions.Configuration.Json.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.Extensions.FileProviders.Abstractions.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\System.Diagnostics.DiagnosticSource.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\System.Threading.Channels.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.Extensions.AI.Abstractions.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.Extensions.VectorData.Abstractions.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\System.Text.Encodings.Web.dll
@@ -207,7 +206,6 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Apache.Arrow.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.CodeAnalysis.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\OpenAI.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\System.Linq.Async.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\System.IO.Packaging.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\EPPlus.Interfaces.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\EPPlus.System.Drawing.dll
@@ -300,3 +298,5 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.IdentityModel.Protocols.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\HtmlAgilityPack.NetCore.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.SemanticKernel.Connectors.Google.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\bin\Debug\Microsoft.Extensions.AI.OpenAI.dll

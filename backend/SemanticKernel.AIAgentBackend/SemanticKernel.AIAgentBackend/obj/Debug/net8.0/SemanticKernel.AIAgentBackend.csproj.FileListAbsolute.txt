@@ -362,7 +362,6 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\Microsoft.Bcl.HashCode.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\Microsoft.Bcl.Memory.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\Microsoft.Bcl.TimeProvider.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\Microsoft.Build.Locator.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
@@ -499,7 +498,6 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\System.Security.Permissions.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\System.Text.Encodings.Web.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\System.Text.Json.dll
-D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\System.Threading.Channels.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\System.Windows.Extensions.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
@@ -705,3 +703,5 @@ D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBa
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\SemanticKernel.AIAgentBackend.genruntimeconfig.cache
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\ref\SemanticKernel.AIAgentBackend.dll
 D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\Microsoft.SemanticKernel.Connectors.Google.dll
+D:\Code Files\Learning\Semantic kernel\AI-Agent\backend\SemanticKernel.AIAgentBackend\SemanticKernel.AIAgentBackend\bin\Debug\net8.0\Microsoft.Extensions.AI.OpenAI.dll

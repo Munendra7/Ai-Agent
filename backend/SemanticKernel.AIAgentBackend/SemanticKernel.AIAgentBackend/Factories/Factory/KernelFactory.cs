@@ -53,6 +53,12 @@ namespace SemanticKernel.AIAgentBackend.Factories.Factory
                         _configuration["OpenAI:OrgId"]!
                     );
                     break;
+                case "Gemini":
+                    kernelBuilder.AddGoogleAIGeminiChatCompletion(
+                        _configuration["Gemini:ModelId"]!,
+                        _configuration["Gemini:ApiKey"]!
+                    );
+                    break;
                 default:
                     throw new ArgumentException("Invalid model type specified.");
             }
