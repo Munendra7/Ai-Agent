@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocxProcessorLibrary.TemplateBasedDocGenerator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,6 +25,8 @@ using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddOpenTelemetry().UseAzureMonitor();
 
 // Add services to the container.
 

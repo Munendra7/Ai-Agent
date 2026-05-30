@@ -1,0 +1,23 @@
+subscription_id    = "00000000-0000-0000-0000-000000000000"
+tenant_id          = "00000000-0000-0000-0000-000000000000"
+location           = "centralindia"
+environment        = "prod"
+project_name       = "aiagent"
+sql_admin_username = "sqladminuser"
+sql_admin_object_id = "00000000-0000-0000-0000-000000000000"
+sql_admin_group_name = "sql-admins"
+k8s_namespace      = "ai-agent"
+enable_private_networking = true
+enable_waf_ingress = true
+jwt_secret_value = "replace-with-long-random-secret"
+azure_openai_api_key = ""
+google_search_api_key = ""
+weather_api_key = ""
+speech_to_text_subscription_key = ""
+
+tags = {
+  owner       = "platform-team"
+  managed-by  = "terraform"
+  cost-center = "ai"
+  environment = "prod"
+}

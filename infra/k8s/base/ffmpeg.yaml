@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ffmpeg-node-service
+  namespace: ai-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ffmpeg-node-service
+  template:
+    metadata:
+      labels:
+        app: ffmpeg-node-service
+    spec:
+      containers:
+        - name: ffmpeg-node-service
+          image: __ACR_LOGIN_SERVER__/ai-agent-ffmpeg:__IMAGE_TAG__
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ffmpeg-node-service
+  namespace: ai-agent
+spec:
+  selector:
+    app: ffmpeg-node-service
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP

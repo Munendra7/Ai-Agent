@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: ai-agent
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      serviceAccountName: ai-agent-sa
+      containers:
+        - name: backend
+          image: __ACR_LOGIN_SERVER__/ai-agent-backend:__IMAGE_TAG__
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: app-secrets
+          env:
+            - name: Jwt__Secret
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: jwt-secret
+            - name: ConnectionStrings__AppDBConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: app-db-connection-string
+            - name: ConnectionStrings__AzureBlobStorage
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: azure-blob-storage
+            - name: ApplicationInsights__ConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: application-insights-connection-string
+            - name: AzureOpenAI__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: azure-openai-api-key
+            - name: GoogleSearch__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: google-search-api-key
+            - name: WeatherAPI__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: weather-api-key
+            - name: SpeechToTextService__SubscriptionKey
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: speech-to-text-subscription-key
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          volumeMounts:
+            - name: kv-secrets
+              mountPath: /mnt/secrets-store
+              readOnly: true
+      volumes:
+        - name: kv-secrets
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: kv-ai-agent-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: ai-agent
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP

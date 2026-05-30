@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: ai-agent
+data:
+  ASPNETCORE_URLS: "http://+:8080"
+  ASPNETCORE_ENVIRONMENT: "Production"
+  Jwt__Issuer: "AIAgentAuthSystem"
+  Jwt__Audience: "AIAgentAuthSystemUsers"
+  AzureAd__Instance: "https://login.microsoftonline.com/"
+  VideoToAudioService__EndPoint: "http://ffmpeg-node-service:5000/extract-audio"
+  DocToPDFService__EndPoint: "http://docx-pdf-service:3000"
