@@ -18,7 +18,7 @@ resource "azurerm_dashboard_grafana" "main" {
   name                              = "grafana-${local.prefix}"
   resource_group_name               = azurerm_resource_group.main.name
   location                          = azurerm_resource_group.main.location
-  grafana_major_version             = 9
+  grafana_major_version             = 11
   api_key_enabled                   = false
   deterministic_outbound_ip_enabled = true
   public_network_access_enabled     = true
