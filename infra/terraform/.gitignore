@@ -1,0 +1,10 @@
+# Local Terraform state and plans
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# Local variable overrides
+terraform.tfvars
+*.auto.tfvars

@@ -1,0 +1,133 @@
+name: deploy-azure-aks
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_WORKING_DIR: infra/terraform
+  K8S_WORKING_DIR: infra/k8s/base
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    outputs:
+      acr_name: ${{ steps.tfout.outputs.acr_name }}
+      aks_name: ${{ steps.tfout.outputs.aks_name }}
+      rg_name: ${{ steps.tfout.outputs.rg_name }}
+      kv_name: ${{ steps.tfout.outputs.kv_name }}
+      wi_client_id: ${{ steps.tfout.outputs.wi_client_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init (remote state)
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.TFSTATE_RESOURCE_GROUP }}" \
+            -backend-config="storage_account_name=${{ secrets.TFSTATE_STORAGE_ACCOUNT }}" \
+            -backend-config="container_name=${{ secrets.TFSTATE_CONTAINER }}" \
+            -backend-config="key=${{ secrets.TFSTATE_KEY }}" \
+            -backend-config="use_azuread_auth=true"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}" -var "sql_admin_object_id=${{ secrets.SQL_ADMIN_OBJECT_ID }}" -var "jwt_secret_value=${{ secrets.JWT_SECRET_VALUE }}" -var "azure_openai_api_key=${{ secrets.AZURE_OPENAI_API_KEY }}" -var "google_search_api_key=${{ secrets.GOOGLE_SEARCH_API_KEY }}" -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}" -var "speech_to_text_subscription_key=${{ secrets.SPEECH_TO_TEXT_SUBSCRIPTION_KEY }}"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform outputs
+        id: tfout
+        run: |
+          echo "acr_name=$(terraform output -raw acr_name)" >> "$GITHUB_OUTPUT"
+          echo "aks_name=$(terraform output -raw aks_cluster_name)" >> "$GITHUB_OUTPUT"
+          echo "rg_name=$(terraform output -raw resource_group_name)" >> "$GITHUB_OUTPUT"
+          echo "kv_name=$(terraform output -raw key_vault_name)" >> "$GITHUB_OUTPUT"
+          echo "wi_client_id=$(terraform output -raw workload_identity_client_id)" >> "$GITHUB_OUTPUT"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: terraform
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure Key Vault runtime secrets
+        run: |
+          KV_NAME="${{ needs.terraform.outputs.kv_name }}"
+          az keyvault secret set --vault-name "$KV_NAME" --name "jwt-secret" --value "${{ secrets.JWT_SECRET_VALUE }}" >/dev/null
+          az keyvault secret set --vault-name "$KV_NAME" --name "azure-openai-api-key" --value "${{ secrets.AZURE_OPENAI_API_KEY }}" >/dev/null
+          az keyvault secret set --vault-name "$KV_NAME" --name "google-search-api-key" --value "${{ secrets.GOOGLE_SEARCH_API_KEY }}" >/dev/null
+          az keyvault secret set --vault-name "$KV_NAME" --name "weather-api-key" --value "${{ secrets.WEATHER_API_KEY }}" >/dev/null
+          az keyvault secret set --vault-name "$KV_NAME" --name "speech-to-text-subscription-key" --value "${{ secrets.SPEECH_TO_TEXT_SUBSCRIPTION_KEY }}" >/dev/null
+
+      - name: ACR login
+        run: az acr login --name "${{ needs.terraform.outputs.acr_name }}"
+
+      - name: Set image tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      - name: Build and push backend
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show -n "${{ needs.terraform.outputs.acr_name }}" --query loginServer -o tsv)
+          docker build -t "$ACR_LOGIN_SERVER/ai-agent-backend:${IMAGE_TAG}" -f backend/SemanticKernel.AIAgentBackend/SemanticKernel.AIAgentBackend/Dockerfile backend/SemanticKernel.AIAgentBackend
+          docker push "$ACR_LOGIN_SERVER/ai-agent-backend:${IMAGE_TAG}"
+
+      - name: Build and push frontend
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show -n "${{ needs.terraform.outputs.acr_name }}" --query loginServer -o tsv)
+          docker build -t "$ACR_LOGIN_SERVER/ai-agent-frontend:${IMAGE_TAG}" -f frontend/ai-agent/dockerfile frontend/ai-agent
+          docker push "$ACR_LOGIN_SERVER/ai-agent-frontend:${IMAGE_TAG}"
+
+      - name: Build and push ffmpeg service
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show -n "${{ needs.terraform.outputs.acr_name }}" --query loginServer -o tsv)
+          docker build -t "$ACR_LOGIN_SERVER/ai-agent-ffmpeg:${IMAGE_TAG}" -f ffmpeg-node-service/Dockerfile ffmpeg-node-service
+          docker push "$ACR_LOGIN_SERVER/ai-agent-ffmpeg:${IMAGE_TAG}"
+
+      - name: Build and push docx service
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show -n "${{ needs.terraform.outputs.acr_name }}" --query loginServer -o tsv)
+          docker build -t "$ACR_LOGIN_SERVER/ai-agent-docx:${IMAGE_TAG}" -f docx-to-pdf-node-service/Dockerfile docx-to-pdf-node-service
+          docker push "$ACR_LOGIN_SERVER/ai-agent-docx:${IMAGE_TAG}"
+
+      - name: Get AKS credentials
+        run: az aks get-credentials --resource-group "${{ needs.terraform.outputs.rg_name }}" --name "${{ needs.terraform.outputs.aks_name }}" --overwrite-existing
+
+      - name: Render manifests and deploy
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show -n "${{ needs.terraform.outputs.acr_name }}" --query loginServer -o tsv)
+          cp -R ${{ env.K8S_WORKING_DIR }} /tmp/k8s
+          find /tmp/k8s -type f -name '*.yaml' -print0 | xargs -0 sed -i "s|__ACR_LOGIN_SERVER__|$ACR_LOGIN_SERVER|g"
+          find /tmp/k8s -type f -name '*.yaml' -print0 | xargs -0 sed -i "s|__IMAGE_TAG__|${IMAGE_TAG}|g"
+          find /tmp/k8s -type f -name '*.yaml' -print0 | xargs -0 sed -i "s|__WORKLOAD_IDENTITY_CLIENT_ID__|${{ needs.terraform.outputs.wi_client_id }}|g"
+          find /tmp/k8s -type f -name '*.yaml' -print0 | xargs -0 sed -i "s|__KEYVAULT_NAME__|${{ needs.terraform.outputs.kv_name }}|g"
+          find /tmp/k8s -type f -name '*.yaml' -print0 | xargs -0 sed -i "s|__TENANT_ID__|${{ secrets.AZURE_TENANT_ID }}|g"
+          kubectl apply -k /tmp/k8s
+
+      - name: Verify rollout
+        run: |
+          kubectl -n ai-agent rollout status deploy/backend --timeout=300s
+          kubectl -n ai-agent rollout status deploy/frontend --timeout=300s
+          kubectl -n ai-agent rollout status deploy/ffmpeg-node-service --timeout=300s
+          kubectl -n ai-agent rollout status deploy/docx-pdf-service --timeout=300s

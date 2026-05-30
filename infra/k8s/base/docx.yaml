@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docx-pdf-service
+  namespace: ai-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docx-pdf-service
+  template:
+    metadata:
+      labels:
+        app: docx-pdf-service
+    spec:
+      containers:
+        - name: docx-pdf-service
+          image: __ACR_LOGIN_SERVER__/ai-agent-docx:__IMAGE_TAG__
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: docx-pdf-service
+  namespace: ai-agent
+spec:
+  selector:
+    app: docx-pdf-service
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: ClusterIP
