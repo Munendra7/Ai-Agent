@@ -19,11 +19,11 @@ resource "azurerm_mssql_database" "main" {
   tags = var.tags
 }
 
-resource "azurerm_mssql_server_azuread_administrator" "main" {
-  server_id      = azurerm_mssql_server.main.id
-  login_username = var.sql_admin_group_name
-  object_id      = var.sql_admin_object_id
-  tenant_id      = var.tenant_id
+resource "azurerm_mssql_server_active_directory_administrator" "main" {
+  server_id = azurerm_mssql_server.main.id
+  login     = var.sql_admin_group_name
+  object_id = var.sql_admin_object_id
+  tenant_id = var.tenant_id
 }
 
 resource "azurerm_mssql_firewall_rule" "azure_services" {
