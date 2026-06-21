@@ -16,6 +16,7 @@ env:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    environment: production
     outputs:
       acr_name: ${{ steps.tfout.outputs.acr_name }}
       aks_name: ${{ steps.tfout.outputs.aks_name }}
