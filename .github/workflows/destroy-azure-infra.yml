@@ -19,6 +19,8 @@ jobs:
   destroy:
     if: ${{ github.event.inputs.confirm_destroy == 'DESTROY' }}
     runs-on: ubuntu-latest
+    environment: production
+
     steps:
       - uses: actions/checkout@v4
 
